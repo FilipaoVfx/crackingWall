@@ -6,12 +6,6 @@ import { mockWallpapers } from '../data/mockData';
 export class WallpaperService {
   // Obtener todos los wallpapers (sin usuario autenticado)
   static async getAllWallpapers(): Promise<Wallpaper[]> {
-    // If no valid Supabase URL, use mocks immediately
-    if (!import.meta.env.PUBLIC_SUPABASE_URL || import.meta.env.PUBLIC_SUPABASE_URL.includes('placeholder')) {
-      console.log('Using mock data (no valid Supabase URL)');
-      return mockWallpapers;
-    }
-
     try {
       const { data, error } = await supabase
         .from('wallpapers')
@@ -20,7 +14,10 @@ export class WallpaperService {
 
       if (error) throw error;
 
-      if (!data || data.length === 0) return mockWallpapers;
+      if (!data || data.length === 0) {
+        console.warn('No wallpapers found in Supabase, using mock data');
+        return mockWallpapers;
+      }
 
       return data.map(wallpaper => ({
         ...wallpaper,
