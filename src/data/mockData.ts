@@ -11,40 +11,49 @@ const getWallpaperUrl = (width: number, height: number, category: string) => {
   return `https://img-wrapper.vercel.app/image?url=https://placehold.co/${width}x${height}/${color}/FFFFFF?text=${category.toUpperCase()}`;
 };
 
-// Generar wallpapers mock
-export const generateMockWallpapers = (count: number): Wallpaper[] => {
-  return Array.from({ length: count }, () => {
-    const category = faker.helpers.arrayElement(categories);
-    const width = faker.helpers.arrayElement([1920, 2560, 3840]);
-    const height = faker.helpers.arrayElement([1080, 1440, 2160]);
-
-    return {
-      id: faker.string.uuid(),
-      title: `${category} ${faker.number.int({ min: 1, max: 999 })}`,
-      description: `Beautiful ${category.toLowerCase()} wallpaper for your desktop`,
-      category,
-      url: getWallpaperUrl(width, height, category),
-      alt_text: `${category} wallpaper`,
-      width,
-      height: height.toString(),
-      file_size: faker.number.int({ min: 1000000, max: 5000000 }), // 1-5 MB
-      format: 'webp' as const,
-      created_at: faker.date.past().toISOString(),
-      updated_at: faker.date.recent().toISOString(),
-      resolution: `${width}x${height}`,
-      downloads: faker.number.int({ min: 50, max: 50000 }),
-      likes: faker.number.int({ min: 5, max: 5000 }),
-      isLiked: faker.datatype.boolean(),
-      is_featured: faker.datatype.boolean({ probability: 0.2 }),
-      tags: [category.toLowerCase(), 'wallpaper', 'hd']
-    };
-  });
-};
+// Seed faker for consistent results
+faker.seed(123);
 
 export const mockCategories: Category[] = categories.map(cat => ({
   id: cat.toLowerCase(),
   name: cat,
-  count: faker.number.int({ min: 20, max: 150 })
+  count: 6 // Each category has 6 wallpapers
 }));
 
-export const mockWallpapers = generateMockWallpapers(36);
+// Generate wallpapers ensuring each category gets some
+export const mockWallpapers: Wallpaper[] = (() => {
+  const wallpapers: Wallpaper[] = [];
+  const wallpapersPerCategory = 6; // 6 wallpapers per category
+
+  categories.forEach(category => {
+    for (let i = 0; i < wallpapersPerCategory; i++) {
+      const width = faker.helpers.arrayElement([1920, 2560, 3840]);
+      const height = faker.helpers.arrayElement([1080, 1440, 2160]);
+
+      wallpapers.push({
+        id: faker.string.uuid(),
+        title: `${category} ${i + 1}`,
+        description: `Beautiful ${category.toLowerCase()} wallpaper for your desktop`,
+        category,
+        url: getWallpaperUrl(width, height, category),
+        alt_text: `${category} wallpaper`,
+        width,
+        height: height.toString(),
+        file_size: faker.number.int({ min: 1000000, max: 5000000 }),
+        format: 'webp' as const,
+        created_at: faker.date.past().toISOString(),
+        updated_at: faker.date.recent().toISOString(),
+        downloads: faker.number.int({ min: 50, max: 50000 }),
+        likes: faker.number.int({ min: 5, max: 5000 }),
+        isLiked: false,
+        is_featured: i === 0,
+        tags: [category.toLowerCase(), 'wallpaper', 'hd']
+      });
+    }
+  });
+
+  return wallpapers;
+})();
+
+// Debug: Log categories to verify
+console.log('Mock data categories:', [...new Set(mockWallpapers.map(w => w.category))]);
