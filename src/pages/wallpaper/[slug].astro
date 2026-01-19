@@ -20,7 +20,11 @@ export async function getStaticPaths() {
 
 const { wallpaper } = Astro.props;
 
-// Re-create the slug for canonical URL consistency if needed, or just use Astro.url
+// Fetch related wallpapers (same category, excluding current)
+const allWallpapers = await WallpaperService.getAllWallpapers();
+const relatedWallpapers = allWallpapers
+  .filter(w => w.category === wallpaper.category && w.id !== wallpaper.id)
+  .slice(0, 4);
 ---
 
 <Layout 
@@ -28,13 +32,13 @@ const { wallpaper } = Astro.props;
   description={`Download ${wallpaper.title} wallpaper. ${wallpaper.description || 'High quality tech background.'}`}
   image={wallpaper.url}
 >
-  <div class="max-w-6xl mx-auto">
-    <a href="/wallpapers" class="inline-flex items-center space-x-2 text-brutal-black mb-6 hover:text-brutal-accent transition-colors font-bold font-brutal">
+  <div class="max-w-6xl mx-auto px-4 py-8">
+    <a href="/" class="inline-flex items-center space-x-2 text-brutal-black mb-6 hover:text-brutal-accent transition-colors font-bold font-brutal">
       <ArrowLeft className="w-5 h-5" />
       <span>BACK TO WALLPAPERS</span>
     </a>
 
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 mb-16">
       <!-- Image Display -->
       <div class="bg-brutal-dark-deeper p-2 shadow-brutal border-4 border-brutal-black">
         <div class="relative overflow-hidden group">
@@ -42,6 +46,9 @@ const { wallpaper } = Astro.props;
             src={wallpaper.url} 
             alt={wallpaper.alt_text || wallpaper.title}
             class="w-full h-auto object-cover"
+            width={wallpaper.width || 1920}
+            height={wallpaper.height || 1080}
+            loading="eager"
             transition:name={`wallpaper-${wallpaper.id}`}
           />
         </div>
@@ -61,17 +68,20 @@ const { wallpaper } = Astro.props;
               {wallpaper.resolution}
             </span>
           </div>
-          <p class="text-lg text-brutal-black/80 font-medium">
-            {wallpaper.description}
-          </p>
+          
+          <!-- Editorial Description -->
+          <div class="prose prose-invert mb-6 text-brutal-black">
+            <p class="text-lg font-medium leading-relaxed">
+              {wallpaper.description}
+            </p>
+            <p class="text-base opacity-80 mt-4">
+                This exclusive <strong>{wallpaper.category}</strong> wallpaper was AI-generated to provide a crisp, immersive experience on high-resolution displays. 
+                Perfect for desktop setups, coding environments, or anyone who loves the {wallpaper.category} aesthetic.
+            </p>
+          </div>
         </div>
 
-        <!-- Actions (Client Side Buttons would go here) -->
-        <!-- For MVP SSG, we can put simple links or use the React components client:load -->
-        <!-- We use a custom React component for interactions -->
         <div class="flex flex-col sm:flex-row gap-4">
-            <!-- We will eventually hydrate a Like/Download button here. 
-                 For now standard buttons. -->
              <button class="flex items-center justify-center space-x-2 bg-brutal-neon-green text-brutal-black px-8 py-4 font-brutal font-black text-lg border-4 border-brutal-black shadow-brutal hover:translate-x-1 hover:translate-y-1 hover:shadow-none transition-all cursor-pointer">
                 <Download className="w-6 h-6" />
                 <span>DOWNLOAD WALLPAPER</span>
@@ -104,5 +114,29 @@ const { wallpaper } = Astro.props;
         </div>
       </div>
     </div>
+
+    <!-- Related Wallpapers Section -->
+    {relatedWallpapers.length > 0 && (
+        <section class="mt-20 border-t-4 border-brutal-black/10 pt-10">
+            <h2 class="text-3xl font-brutal font-black uppercase mb-8">Related Wallpapers</h2>
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
+                {relatedWallpapers.map(related => (
+                    <a href={`/wallpaper/${related.title.toLowerCase().replace(/[^a-z0-9]+/g, '-')}-${related.id}`} class="group block border-2 border-brutal-black shadow-brutal hover:translate-y-[-4px] transition-transform">
+                        <div class="aspect-video overflow-hidden">
+                            <img 
+                                src={related.url} 
+                                alt={related.title} 
+                                class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                                loading="lazy"
+                            />
+                        </div>
+                        <div class="p-3 bg-white">
+                            <h3 class="font-bold text-sm truncate">{related.title}</h3>
+                        </div>
+                    </a>
+                ))}
+            </div>
+        </section>
+    )}
   </div>
 </Layout>

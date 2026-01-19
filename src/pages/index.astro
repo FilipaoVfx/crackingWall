@@ -15,6 +15,24 @@ const uniqueCategories = [...new Set(allWallpapers.map(w => w.category))];
   <!-- Hero Section -->
   
 
+  <!-- Editorial Content (SEO) -->
+  <section class="editorial-section">
+    <div class="editorial-content">
+      <h2>Curated AI Wallpapers for Tech Enthusiasts</h2>
+      <p>
+        Welcome to CrackingWall, your premier destination for high-quality, AI-generated wallpapers. 
+        We specialize in futuristic aesthetics, including Cyberpunk, Synthwave, Glitch Art, and Hacker culture visuals. 
+        Our collection is meticulously curated to ensure every background looks stunning on your <span class="highlight">4K monitors</span>, 
+        gaming setups, and mobile devices.
+      </p>
+      <p>
+        Whether you are a developer, a gamer, or a digital artist, meaningful visuals define your workspace. 
+        Explore our diverse categories to find the perfect backdrop that inspires your next big project. 
+        All wallpapers are free to download and optimized for performance.
+      </p>
+    </div>
+  </section>
+
   <!-- Category Filters -->
   <section class="filters-section">
     <div class="filters-container">
@@ -32,7 +50,7 @@ const uniqueCategories = [...new Set(allWallpapers.map(w => w.category))];
   <!-- Wallpapers Grid -->
   <section class="wallpapers-section">
     <div class="wallpapers-grid" id="wallpapers-grid">
-      {displayWallpapers.map((wallpaper) => (
+      {displayWallpapers.map((wallpaper, index) => (
         <a 
           href={`/wallpaper/${wallpaper.title.toLowerCase().replace(/[^a-z0-9]+/g, '-')}-${wallpaper.id}`}
           class="wallpaper-card"
@@ -43,7 +61,9 @@ const uniqueCategories = [...new Set(allWallpapers.map(w => w.category))];
               src={wallpaper.url} 
               alt={wallpaper.alt_text || wallpaper.title}
               class="wallpaper-image"
-              loading="lazy"
+              loading={index < 4 ? "eager" : "lazy"}
+              width="400"
+              height="225"
             />
             <div class="wallpaper-overlay">
               <span class="view-text">VIEW</span>
@@ -153,6 +173,52 @@ const uniqueCategories = [...new Set(allWallpapers.map(w => w.category))];
     margin: 0;
     max-width: 600px;
     margin: 0 auto;
+  }
+
+  /* Editorial Section */
+  .editorial-section {
+    max-width: 900px;
+    margin: 40px auto;
+    padding: 0 20px;
+    text-align: center;
+  }
+
+  .editorial-content {
+    background: #121218;
+    border: 1px solid #333;
+    padding: 30px;
+    border-radius: 8px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .editorial-content::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 4px;
+    height: 100%;
+    background: linear-gradient(to bottom, #b026ff, #00fff9);
+  }
+
+  .editorial-content h2 {
+    font-size: 1.8rem;
+    color: #f0f0f0;
+    margin-bottom: 1rem;
+    font-weight: 800;
+  }
+
+  .editorial-content p {
+    color: #a0a0a0;
+    line-height: 1.6;
+    margin-bottom: 1rem;
+    font-size: 1rem;
+  }
+
+  .editorial-content .highlight {
+    color: #00fff9;
+    font-weight: bold;
   }
 
   /* Filters Section */

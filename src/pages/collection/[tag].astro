@@ -31,14 +31,34 @@ export async function getStaticPaths() {
 }
 
 const { tag, wallpapers } = Astro.props;
+
+// Editorial content map
+const descriptions: Record<string, string> = {
+  cyberpunk: "Dive into a high-tech, low-life world with our Cyberpunk wallpaper collection. Featuring neon-drenched cityscapes, cybernetic enhancements, and dystopian futures, these backgrounds are perfect for fans of the genre.",
+  synthwave: "Experience the retro-futuristic vibes of the 80s with our Synthwave collection. neon grids, sunsets, and fast cars await you in this nostalgic yet modern visual journey.",
+  glitch: "Embrace the beauty of imperfection with our Glitch Art wallpapers. Distorted reality, digital noise, and abstract data corruption create a unique aesthetic for your screens.",
+  hacker: "Enter the matrix with our Hacker culture wallpapers. Binary code flows, terminal interfaces, and cybersecurity themes designed for the digital native.",
+  anime: "Stunning AI-generated Anime style wallpapers featuring vibrant characters, epic landscapes, and futuristic techno-fantasy scenes.",
+  abstract: "Mind-bending Abstract digital art that plays with light, color, and geometry to create mesmerizing backgrounds for your desktop and mobile devices."
+};
+
+const defaultDescription = `Explore our curated selection of ${tag} wallpapers. Each image is AI-generated to provide a unique, high-resolution background for your device.`;
+
+const descriptionText = descriptions[tag.toLowerCase()] || defaultDescription;
 ---
 
-<Layout title={`${tag} Wallpapers | CrackingWall`} description={`Browse ${tag} wallpapers.`}>
-  <div class="mb-8 text-center">
+<Layout title={`${tag} Wallpapers | CrackingWall`} description={`Browse ${tag} wallpapers. ${descriptionText}`}>
+  <div class="mb-8 text-center editorial-header">
     <h1 class="text-4xl font-brutal font-black uppercase mb-4">
       {tag} Collection
     </h1>
-    <p class="text-brutal-black/60 font-bold">{wallpapers.length} Wallpapers</p>
+    <div class="max-w-3xl mx-auto px-4">
+        <p class="text-lg text-brutal-black/80 font-medium mb-4">{descriptionText}</p>
+        <p class="text-sm text-gray-500">
+            Discover {wallpapers.length} high-quality {tag} backgrounds, optimized for 4K and mobile displays. 
+            Free to download and guaranteed to make your setup stand out.
+        </p>
+    </div>
   </div>
 
   <WallpapersGridContainer 
@@ -46,3 +66,10 @@ const { tag, wallpapers } = Astro.props;
     initialWallpapers={wallpapers} 
   />
 </Layout>
+
+<style>
+    .editorial-header {
+        padding: 40px 0;
+        background: radial-gradient(circle at center, rgba(176, 38, 255, 0.1) 0%, transparent 70%);
+    }
+</style>
