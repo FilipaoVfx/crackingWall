@@ -1,0 +1,113 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout title="About Us - CrackingWall" description="Learn more about CrackingWall and our mission to provide high-quality AI generated art.">
+  <div class="about-container">
+    <div class="content-wrapper">
+      <h1 class="glitch-title">About CrackingWall</h1>
+      
+      <div class="text-content">
+        <p class="intro">
+            Welcome to CrackingWall, a digital art gallery dedicated to exploring the boundaries of AI-generated aesthetics.
+        </p>
+
+        <h2>Artistic Vision</h2>
+        <p>
+            Our collection focuses on <strong>Cyberpunk</strong>, <strong>Futuristic Technology</strong>, 
+            <strong>Glitch Art</strong>, and <strong>Abstract Digital</strong> visuals. We aim to capture the essence of a high-tech future 
+            through visual storytelling and design.
+        </p>
+
+        <div class="disclaimer-box">
+            <h3>⚠️ Content Disclaimer</h3>
+            <p>
+                This site features AI-generated digital artwork inspired by cyberpunk, futuristic technology, and science fiction aesthetics. 
+                <strong>It does not promote, facilitate, or depict real-world hacking, cracking, illegal software, or security breaches.</strong> 
+                All terms used (such as "glitch", "system", "breach" in artistic context) are purely thematic and related to the 
+                fictional narratives of the artwork.
+            </p>
+        </div>
+
+        <h2>Our Mission</h2>
+        <p>
+            We provide creators, developers, and gamers with high-resolution wallpapers that inspire and define their digital workspaces.
+            Everything you see is created with a focus on artistic expression and visual impact.
+        </p>
+      </div>
+    </div>
+  </div>
+</Layout>
+
+<style>
+  .about-container {
+    min-height: 80vh;
+    display: flex;
+    justify-content: center;
+    padding: 60px 20px;
+    background: #0a0a0f;
+    color: #f0f0f0;
+  }
+
+  .content-wrapper {
+    max-width: 800px;
+    width: 100%;
+  }
+
+  .glitch-title {
+    font-size: clamp(2.5rem, 5vw, 4rem);
+    font-weight: 900;
+    margin-bottom: 2rem;
+    color: #f0f0f0;
+    text-shadow: 2px 2px 0px #b026ff, -2px -2px 0px #00fff9;
+  }
+
+  .text-content {
+    background: #121218;
+    border: 1px solid #333;
+    padding: 40px;
+    border-radius: 8px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+  }
+
+  h2 {
+    color: #00fff9;
+    font-size: 1.8rem;
+    margin-top: 2rem;
+    margin-bottom: 1rem;
+    font-weight: 800;
+  }
+
+  p {
+    line-height: 1.8;
+    color: #a0a0a0;
+    margin-bottom: 1.5rem;
+    font-size: 1.1rem;
+  }
+
+  strong {
+    color: #f0f0f0;
+  }
+
+  .disclaimer-box {
+    margin: 3rem 0;
+    padding: 2rem;
+    border: 2px solid #b026ff;
+    background: rgba(176, 38, 255, 0.05);
+    border-radius: 6px;
+  }
+
+  .disclaimer-box h3 {
+    margin-top: 0;
+    color: #b026ff;
+    font-size: 1.4rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .disclaimer-box p {
+    margin-bottom: 0;
+    color: #d0d0d0;
+  }
+</style>

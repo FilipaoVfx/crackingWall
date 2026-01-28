@@ -37,7 +37,7 @@ const descriptions: Record<string, string> = {
   cyberpunk: "Dive into a high-tech, low-life world with our Cyberpunk wallpaper collection. Featuring neon-drenched cityscapes, cybernetic enhancements, and dystopian futures, these backgrounds are perfect for fans of the genre.",
   synthwave: "Experience the retro-futuristic vibes of the 80s with our Synthwave collection. neon grids, sunsets, and fast cars await you in this nostalgic yet modern visual journey.",
   glitch: "Embrace the beauty of imperfection with our Glitch Art wallpapers. Distorted reality, digital noise, and abstract data corruption create a unique aesthetic for your screens.",
-  hacker: "Enter the matrix with our Hacker culture wallpapers. Binary code flows, terminal interfaces, and cybersecurity themes designed for the digital native.",
+  hacker: "Enter the digital realm with our High-Tech culture wallpapers. Binary code flows, terminal interfaces, and cyber-security themes designed for the digital native.",
   anime: "Stunning AI-generated Anime style wallpapers featuring vibrant characters, epic landscapes, and futuristic techno-fantasy scenes.",
   abstract: "Mind-bending Abstract digital art that plays with light, color, and geometry to create mesmerizing backgrounds for your desktop and mobile devices."
 };
@@ -50,7 +50,7 @@ const descriptionText = descriptions[tag.toLowerCase()] || defaultDescription;
 <Layout title={`${tag} Wallpapers | CrackingWall`} description={`Browse ${tag} wallpapers. ${descriptionText}`}>
   <div class="mb-8 text-center editorial-header">
     <h1 class="text-4xl font-brutal font-black uppercase mb-4">
-      {tag} Collection
+      {tag === 'hacker' ? 'Digital Systems' : tag} Collection
     </h1>
     <div class="max-w-3xl mx-auto px-4">
         <p class="text-lg text-brutal-black/80 font-medium mb-4">{descriptionText}</p>

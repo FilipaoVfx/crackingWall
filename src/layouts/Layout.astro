@@ -10,7 +10,7 @@ interface Props {
 
 const { 
   title, 
-  description = "Download and explore high-quality tech wallpapers, cyberpunk art, glitch visuals, and hacker aesthetics.", 
+  description = "Download and explore high-quality tech wallpapers, cyberpunk art, glitch visuals, and futuristic aesthetics.",  
   image = "/og-image.webp" 
 } = Astro.props;
 
@@ -54,6 +54,9 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
     </main>
     
     <footer style="text-align: center; padding: 2rem; color: rgba(160, 160, 160, 0.8); font-size: 0.875rem;">
+      <div style="margin-bottom: 1rem;">
+        <a href="/about/" style="color: inherit; text-decoration: none; margin: 0 10px;">About & Disclaimer</a>
+      </div>
       <p>&copy; {new Date().getFullYear()} CrackingWall. All rights reserved.</p>
     </footer>
   </body>

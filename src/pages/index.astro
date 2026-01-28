@@ -21,7 +21,7 @@ const uniqueCategories = [...new Set(allWallpapers.map(w => w.category))];
       <h2>Curated AI Wallpapers for Tech Enthusiasts</h2>
       <p>
         Welcome to CrackingWall, your premier destination for high-quality, AI-generated wallpapers. 
-        We specialize in futuristic aesthetics, including Cyberpunk, Synthwave, Glitch Art, and Hacker culture visuals. 
+        We specialize in futuristic aesthetics, including Cyberpunk, Synthwave, Glitch Art, and Digital culture visuals. 
         Our collection is meticulously curated to ensure every background looks stunning on your <span class="highlight">4K monitors</span>, 
         gaming setups, and mobile devices.
       </p>
@@ -52,7 +52,7 @@ const uniqueCategories = [...new Set(allWallpapers.map(w => w.category))];
     <div class="wallpapers-grid" id="wallpapers-grid">
       {displayWallpapers.map((wallpaper, index) => (
         <a 
-          href={`/wallpaper/${wallpaper.title.toLowerCase().replace(/[^a-z0-9]+/g, '-')}-${wallpaper.id}`}
+          href={`/wallpaper/${wallpaper.title.toLowerCase().replace(/[^a-z0-9]+/g, '-')}-${wallpaper.id}/`}
           class="wallpaper-card"
           data-category={wallpaper.category.toLowerCase()}
         >
