@@ -82,7 +82,13 @@ const relatedWallpapers = allWallpapers
         </div>
 
         <div class="flex flex-col sm:flex-row gap-4">
-             <button class="flex items-center justify-center space-x-2 bg-brutal-neon-green text-brutal-black px-8 py-4 font-brutal font-black text-lg border-4 border-brutal-black shadow-brutal hover:translate-x-1 hover:translate-y-1 hover:shadow-none transition-all cursor-pointer">
+             <button 
+              id="download-btn"
+              data-url={wallpaper.url}
+              data-id={wallpaper.id}
+              data-filename={`wallpaper-${wallpaper.id}.${wallpaper.format || 'jpg'}`}
+              class="flex items-center justify-center space-x-2 bg-brutal-neon-green text-brutal-black px-8 py-4 font-brutal font-black text-lg border-4 border-brutal-black shadow-brutal hover:translate-x-1 hover:translate-y-1 hover:shadow-none transition-all cursor-pointer"
+             >
                 <Download className="w-6 h-6" />
                 <span>DOWNLOAD WALLPAPER</span>
              </button>
@@ -140,3 +146,56 @@ const relatedWallpapers = allWallpapers
     )}
   </div>
 </Layout>
+
+<script>
+  import { WallpaperService } from '../../services/wallpaperService';
+
+  const downloadBtn = document.getElementById('download-btn');
+  
+  if (downloadBtn) {
+    downloadBtn.addEventListener('click', async () => {
+      const url = downloadBtn.getAttribute('data-url');
+      const id = downloadBtn.getAttribute('data-id');
+      const filename = downloadBtn.getAttribute('data-filename');
+      
+      if (!url) return;
+
+      // Track download
+      if (id) {
+        try {
+          await WallpaperService.incrementWallpaperDownloads(id);
+        } catch (e) {
+          console.error('Failed to increment download count', e);
+        }
+      }
+
+      try {
+        // Try to fetch as blob first (better for forced download with filename)
+        const response = await fetch(url);
+        if (!response.ok) throw new Error('Network response was not ok');
+        
+        const blob = await response.blob();
+        const blobUrl = window.URL.createObjectURL(blob);
+        
+        const a = document.createElement('a');
+        a.href = blobUrl;
+        a.download = filename || 'wallpaper.jpg';
+        document.body.appendChild(a);
+        a.click();
+        
+        window.URL.revokeObjectURL(blobUrl);
+        document.body.removeChild(a);
+      } catch (error) {
+        console.error('Download failed via fetch, falling back to direct link:', error);
+        // Fallback for CORS issues
+        const a = document.createElement('a');
+        a.href = url;
+        a.target = '_blank';
+        a.download = filename || 'wallpaper.jpg';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+      }
+    });
+  }
+</script>

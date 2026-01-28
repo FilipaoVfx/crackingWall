@@ -130,6 +130,8 @@ export const WallpapersGridContainer: React.FC<WallpapersGridContainerProps> = (
 
             // Download logic
             const response = await fetch(wallpaper.url);
+            if (!response.ok) throw new Error('Network response was not ok');
+
             const blob = await response.blob();
             const url = window.URL.createObjectURL(blob);
             const a = document.createElement('a');
@@ -140,7 +142,15 @@ export const WallpapersGridContainer: React.FC<WallpapersGridContainerProps> = (
             window.URL.revokeObjectURL(url);
             a.remove();
         } catch (error) {
-            console.error('Error downloading wallpaper:', error);
+            console.error('Error downloading wallpaper via fetch, trying direct link:', error);
+            // Fallback for CORS issues
+            const a = document.createElement('a');
+            a.href = wallpaper.url;
+            a.target = '_blank';
+            a.download = `wallpaper-${id}.${wallpaper.format || 'jpg'}`;
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
         }
     };
 
