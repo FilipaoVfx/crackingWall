@@ -1,0 +1,393 @@
+---
+export const prerender = true;
+import Layout from '../layouts/Layout.astro';
+import { WallpaperService } from '../services/wallpaperService';
+import '../styles/home.css';
+
+// Fetch wallpapers for display
+const allWallpapers = await WallpaperService.getAllWallpapers();
+const displayWallpapers = allWallpapers.slice(0, 30); // Show first 30
+
+// Extract unique categories from actual data
+const uniqueCategories = [...new Set(allWallpapers.map(w => w.category))];
+---
+
+<Layout title="CrackingWall - Tech Culture Wallpapers">
+  <!-- Hero Section -->
+  
+
+  <!-- Editorial Content (SEO) -->
+  <section class="editorial-section">
+    <div class="editorial-content">
+      <h2>Professional Digital Topographies for Subliminal Focus</h2>
+      <p>
+        Welcome to CrakingWall, a premier digital gallery dedicated to the curation of high-fidelity, original digital artworks focusing on the "invisible observer" of technology. 
+        We specialize in sophisticated futuristic aesthetics, spanning rain-slicked Cyberpunk metropolises, nostalgic Synthwave horizons, 
+        avant-garde Glitch art, and the raw beauty of Code Brutalism. Each piece is meticulously color-graded with intentional chromatic dissonance 
+        and resolution-optimized to ensure unparalleled visual clarity on <span class="highlight">Ultra-HD 4K displays</span> and professional setups.
+      </p>
+      <p>
+        For the modern developer, designer, and digital native, a workspace is more than just a setup—it is a digital identity. 
+        Our collection offers a diverse array of non-distracting, high-contrast backgrounds engineered to foster deep work and 
+        creative inspiration, exploring specific movements like Retro-Hardware and Cyber-Gothic aesthetics. Every artifact in our gallery is available for high-speed download, ensuring your environment 
+        remains as refined as your craft.
+      </p>
+    </div>
+  </section>
+
+  <!-- Category Filters -->
+  <section class="filters-section">
+    <div class="filters-container">
+      <button class="filter-btn active" data-category="all">
+        ALL
+      </button>
+      {uniqueCategories.map((category) => (
+        <button class="filter-btn" data-category={category.toLowerCase()}>
+          {category.toUpperCase()}
+        </button>
+      ))}
+    </div>
+  </section>
+
+  <!-- Wallpapers Grid -->
+  <section class="wallpapers-section">
+    <div class="wallpapers-grid" id="wallpapers-grid">
+      {displayWallpapers.map((wallpaper, index) => (
+        <a 
+          href={`/${wallpaper.category.toLowerCase()}/${wallpaper.title.toLowerCase().replace(/[^a-z0-9]+/g, '-')}-${wallpaper.id}/`}
+          class="wallpaper-card"
+          data-category={wallpaper.category.toLowerCase()}
+        >
+          <div class="wallpaper-image-container">
+            <img 
+              src={wallpaper.url} 
+              alt={wallpaper.alt_text || wallpaper.title}
+              class="wallpaper-image"
+              loading={index < 4 ? "eager" : "lazy"}
+              width="400"
+              height="225"
+            />
+            <div class="wallpaper-overlay">
+              <span class="view-text">VIEW</span>
+            </div>
+          </div>
+          <div class="wallpaper-info">
+            <h3 class="wallpaper-title">{wallpaper.title}</h3>
+            <div class="wallpaper-meta">
+              <span class="category-badge">{wallpaper.category}</span>
+              <span class="stats">
+                ❤️ {wallpaper.likes} · ⬇️ {wallpaper.downloads}
+              </span>
+            </div>
+          </div>
+        </a>
+      ))}
+    </div>
+  </section>
+</Layout>
+
+<script>
+  // Client-side filtering
+  document.addEventListener('DOMContentLoaded', () => {
+    const filterBtns = document.querySelectorAll('.filter-btn');
+    const wallpaperCards = document.querySelectorAll('.wallpaper-card');
+
+    filterBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const category = btn.getAttribute('data-category');
+        
+        // Update active button
+        filterBtns.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+
+        // Filter wallpapers
+        wallpaperCards.forEach(card => {
+          const cardCategory = card.getAttribute('data-category');
+          if (category === 'all' || cardCategory === category) {
+            card.style.display = 'block';
+          } else {
+            card.style.display = 'none';
+          }
+        });
+      });
+    });
+  });
+</script>
+
+<style>
+  /* Hero Section */
+  .hero {
+    min-height: 50vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 60px 20px;
+    background: linear-gradient(135deg, #050509 0%, #1a1a2e 100%);
+    position: relative;
+    overflow: hidden;
+    border: 2px solid transparent;
+    animation: neonBorder 3s infinite;
+    margin: 20px;
+    border-radius: 10px;
+  }
+
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: -2px;
+    left: -2px;
+    right: -2px;
+    bottom: -2px;
+    background: linear-gradient(45deg, #b026ff, #8a2be2, #9400d3);
+    z-index: -1;
+    border-radius: 12px;
+    opacity: 0.7;
+  }
+
+  .hero-content {
+    position: relative;
+    z-index: 10;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 40px;
+    background: rgba(10, 10, 15, 0.8);
+    border-radius: 8px;
+    backdrop-filter: blur(5px);
+    border: 1px solid rgba(138, 43, 226, 0.3);
+  }
+
+  .hero-title {
+    font-size: clamp(2.5rem, 6vw, 4.5rem);
+    font-weight: 900;
+    background: linear-gradient(90deg, #b026ff, #8a2be2, #9400d3);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin: 0 0 1rem;
+    line-height: 1.1;
+    letter-spacing: -1px;
+    text-shadow: 0 0 10px rgba(176, 38, 255, 0.3);
+  }
+
+  .hero-subtitle {
+    font-size: clamp(1rem, 2vw, 1.2rem);
+    color: #a0a0a0;
+    margin: 0;
+    max-width: 600px;
+    margin: 0 auto;
+  }
+
+  /* Editorial Section */
+  .editorial-section {
+    max-width: 1400px;
+    margin: 20px auto;
+    padding: 0 20px;
+    text-align: center;
+  }
+
+  .editorial-content {
+    background: #121218;
+    border: 1px solid #333;
+    padding: 24px 40px;
+    border-radius: 8px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .editorial-content::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 4px;
+    height: 100%;
+    background: linear-gradient(to bottom, #b026ff, #00fff9);
+  }
+
+  .editorial-content h2 {
+    font-size: 1.8rem;
+    color: #f0f0f0;
+    margin-bottom: 1rem;
+    font-weight: 800;
+  }
+
+  .editorial-content p {
+    color: #a0a0a0;
+    line-height: 1.5;
+    margin-bottom: 0.8rem;
+    font-size: 1rem;
+  }
+
+  .editorial-content .highlight {
+    color: #00fff9;
+    font-weight: bold;
+  }
+
+  /* Filters Section */
+  .filters-section {
+    max-width: 1400px;
+    margin: 40px auto 20px;
+    padding: 0 20px;
+  }
+
+  .filters-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    justify-content: center;
+  }
+
+  .filter-btn {
+    background: #121218;
+    color: #f0f0f0;
+    border: 3px solid #00fff9;
+    padding: 12px 24px;
+    font-size: 0.9rem;
+    font-weight: 900;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border-radius: 6px;
+    box-shadow: 0 0 15px rgba(0, 255, 249, 0.3);
+  }
+
+  .filter-btn:hover {
+    background: #00fff9;
+    color: #0a0a0f;
+    transform: translateY(-2px);
+    box-shadow: 0 0 25px rgba(0, 255, 249, 0.6);
+  }
+
+  .filter-btn.active {
+    background: linear-gradient(135deg, #b026ff, #8a2be2);
+    border-color: #b026ff;
+    color: white;
+    box-shadow: 0 0 25px rgba(176, 38, 255, 0.6);
+  }
+
+  /* Wallpapers Section */
+  .wallpapers-section {
+    max-width: 1400px;
+    margin: 40px auto;
+    padding: 0 20px;
+  }
+
+  .wallpapers-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 24px;
+  }
+
+  .wallpaper-card {
+    background: #121218;
+    border: 3px solid #00fff9;
+    border-radius: 8px;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    color: inherit;
+    box-shadow: 0 0 20px rgba(0, 255, 249, 0.3);
+  }
+
+  .wallpaper-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 0 40px rgba(0, 255, 249, 0.6),
+                0 10px 30px rgba(0, 0, 0, 0.5);
+    border-color: #b026ff;
+  }
+
+  .wallpaper-image-container {
+    position: relative;
+    width: 100%;
+    height: 200px;
+    overflow: hidden;
+  }
+
+  .wallpaper-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+  }
+
+  .wallpaper-card:hover .wallpaper-image {
+    transform: scale(1.1);
+  }
+
+  .wallpaper-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  .wallpaper-card:hover .wallpaper-overlay {
+    opacity: 1;
+  }
+
+  .view-text {
+    color: #00fff9;
+    font-size: 1.5rem;
+    font-weight: 900;
+    text-shadow: 0 0 10px #00fff9;
+  }
+
+  .wallpaper-info {
+    padding: 16px;
+  }
+
+  .wallpaper-title {
+    font-size: 1.1rem;
+    font-weight: 800;
+    color: #f0f0f0;
+    margin: 0 0 8px 0;
+    text-transform: uppercase;
+  }
+
+  .wallpaper-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .category-badge {
+    background: linear-gradient(135deg, #b026ff, #8a2be2);
+    color: white;
+    padding: 4px 12px;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+  }
+
+  .stats {
+    color: #a0a0a0;
+    font-size: 0.85rem;
+    font-weight: 600;
+  }
+
+  @media (max-width: 768px) {
+    .wallpapers-grid {
+      grid-template-columns: 1fr;
+      gap: 20px;
+    }
+
+    .wallpaper-image-container {
+      height: 240px;
+    }
+
+    .filters-container {
+      gap: 8px;
+    }
+
+    .filter-btn {
+      padding: 10px 16px;
+      font-size: 0.8rem;
+    }
+  }
+</style>

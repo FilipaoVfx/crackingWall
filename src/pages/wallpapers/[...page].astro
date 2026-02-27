@@ -1,0 +1,47 @@
+---
+export const prerender = true;
+import Layout from '../../layouts/Layout.astro';
+import { WallpaperService } from '../../services/wallpaperService';
+import { WallpapersGridContainer } from '../../components/WallpapersGridContainer';
+
+export async function getStaticPaths({ paginate }) {
+  const wallpapers = await WallpaperService.getAllWallpapers();
+  
+  // Paginate 12 items per page
+  return paginate(wallpapers, { pageSize: 12 });
+}
+
+const { page } = Astro.props;
+// page.data contains the slice
+---
+
+<Layout title="Browse Wallpapers | CrackingWall" description="Explore our entire collection of curated digital wallpapers.">
+  <div class="mb-8 text-center">
+    <h1 class="text-4xl font-brutal font-black uppercase mb-4">
+      All Wallpapers
+    </h1>
+    <p class="text-brutal-black/60 font-bold">
+      Page {page.currentPage} of {page.lastPage}
+    </p>
+  </div>
+
+  <WallpapersGridContainer 
+    client:load 
+    initialWallpapers={page.data} 
+  />
+
+  <!-- Pagination Controls -->
+  <div class="flex justify-center space-x-4 mt-12 mb-8">
+    {page.url.prev ? (
+      <a href={page.url.prev} class="px-6 py-2 bg-brutal-white border-4 border-brutal-black shadow-brutal font-bold hover:translate-x-1 hover:translate-y-1 hover:shadow-none transition-all">
+        PREVIOUS
+      </a>
+    ) : null}
+    
+    {page.url.next ? (
+      <a href={page.url.next} class="px-6 py-2 bg-brutal-accent text-white border-4 border-brutal-black shadow-brutal font-bold hover:translate-x-1 hover:translate-y-1 hover:shadow-none transition-all">
+        NEXT
+      </a>
+    ) : null}
+  </div>
+</Layout>

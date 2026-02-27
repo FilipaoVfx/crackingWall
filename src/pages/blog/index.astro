@@ -1,0 +1,33 @@
+---
+export const prerender = true;
+import Layout from '../../layouts/Layout.astro';
+---
+
+<Layout title="Blog - CrakingWall | Tech Culture & Setup Guides" description="Articles about developer setups, cyberpunk aesthetics, and digital culture.">
+  <div class="max-w-4xl mx-auto px-4 py-12">
+    <h1 class="text-5xl font-brutal font-black uppercase mb-12 text-center drop-shadow-[2px_2px_0_#b026ff]">Transmissions</h1>
+    
+    <div class="grid gap-8">
+      {/* Article 1 */}
+      <a href="/blog/best-cyberpunk-wallpapers-developers/" class="block bg-brutal-dark-deeper border-2 border-brutal-dark-border p-6 hover:border-brutal-neon-cyan transition-colors group">
+        <h2 class="text-2xl font-brutal font-bold text-white group-hover:text-brutal-neon-cyan mb-2">Best Cyberpunk Wallpapers for Developers</h2>
+        <p class="text-gray-400 font-mono text-sm mb-4">Enhance your productivity and workspace aesthetics with these top digital art choices.</p>
+        <span class="text-brutal-neon-cyan font-mono text-xs uppercase tracking-widest">Read More -></span>
+      </a>
+
+      {/* Article 2 */}
+      <a href="/blog/terminal-setup-aesthetic-guide/" class="block bg-brutal-dark-deeper border-2 border-brutal-dark-border p-6 hover:border-brutal-neon-pink transition-colors group">
+        <h2 class="text-2xl font-brutal font-bold text-white group-hover:text-brutal-neon-pink mb-2">The Ultimate Terminal Setup Aesthetic Guide</h2>
+        <p class="text-gray-400 font-mono text-sm mb-4">A complete guide to making your terminal look incredibly futuristic and visually coherent.</p>
+        <span class="text-brutal-neon-pink font-mono text-xs uppercase tracking-widest">Read More -></span>
+      </a>
+
+      {/* Article 3 */}
+      <a href="/blog/digital-underground-art/" class="block bg-brutal-dark-deeper border-2 border-brutal-dark-border p-6 hover:border-brutal-neon-yellow transition-colors group">
+        <h2 class="text-2xl font-brutal font-bold text-white group-hover:text-brutal-neon-yellow mb-2">Defining Digital Underground Art in Modern Context</h2>
+        <p class="text-gray-400 font-mono text-sm mb-4">Exploring the roots of glitch, tech culture, and digital landscapes as a formal aesthetic.</p>
+        <span class="text-brutal-neon-yellow font-mono text-xs uppercase tracking-widest">Read More -></span>
+      </a>
+    </div>
+  </div>
+</Layout>

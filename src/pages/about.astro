@@ -1,0 +1,190 @@
+---
+export const prerender = true;
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout title="About CrakingWall - Tech Culture Wallpapers" description="Learn more about CrakingWall, a niche platform for high-resolution cyberpunk and tech culture wallpapers.">
+  <div class="about-container">
+    <div class="content-wrapper">
+      <h1 class="glitch-title">About CrakingWall</h1>
+      
+      <div class="text-content">
+        <h2 class="first-heading">What Is CrakingWall?</h2>
+        <p>
+          CrakingWall is a niche digital wallpaper platform focused on high-resolution cyberpunk, futuristic, glitch-inspired, and tech culture backgrounds.
+        </p>
+        <p>
+          The website provides curated premium wallpapers designed specifically for desktop environments, including 1080p, 1440p, 4K, and ultrawide monitors.
+        </p>
+        <p>
+          Unlike general wallpaper aggregators, CrakingWall concentrates on a cohesive tech aesthetic rooted in developer culture, science fiction atmospheres, and modern digital minimalism.
+        </p>
+
+        <h2>What Makes CrakingWall Different?</h2>
+        <p>
+          CrakingWall is not a wallpaper scraping site.
+        </p>
+        <p>All wallpapers are:</p>
+        <ul>
+          <li><strong>Original digital artworks</strong></li>
+          <li>Curated for visual coherence</li>
+          <li>Optimized for desktop usability</li>
+          <li>Designed around a consistent futuristic identity</li>
+        </ul>
+
+        <p>The platform prioritizes:</p>
+        <ul>
+          <li>Clean composition with intentional chromatic dissonance (e.g., neon green on absolute black)</li>
+          <li>Strong contrast for readability and focus</li>
+          <li>Immersive digital atmospheres with layers of technical information</li>
+          <li>Art that suggests action — the narrative of the invisible observer working within the machine</li>
+        </ul>
+
+        <h2>Target Audience</h2>
+        <p>CrakingWall is built for:</p>
+        <ul>
+          <li>Developers</li>
+          <li>Designers</li>
+          <li>Gamers</li>
+          <li>Tech enthusiasts</li>
+          <li>Digital creators</li>
+          <li>Anyone who considers their desktop environment part of their identity.</li>
+        </ul>
+
+        <h2>Technical Optimization</h2>
+        <p>All wallpapers are optimized for:</p>
+        <ul>
+          <li>High-resolution desktop displays</li>
+          <li>Modern GPUs and large monitors</li>
+          <li>Dark-mode setups</li>
+          <li>Minimal visual noise</li>
+        </ul>
+        <p>Each image is exported in optimized formats to balance quality and performance.</p>
+
+        <h2>Digital Art Transparency & The Manifesto</h2>
+        <p>
+          All images on CrakingWall are highly curated digital artworks, guided by our internal aesthetic manifesto.
+        </p>
+        <p>
+          They are assembled and refined stringently to tell the story of the "invisible observer" — the symbiotic relationship between human developers and the machines they build.
+        </p>
+        <p>
+          The platform operates as a curated gallery focusing on human editorial value, tracking movements such as Code Brutalism, Retro-Hardware, and Technical Vaporwave to provide the most cohesive technological culture desktop experience.
+        </p>
+
+        <div class="disclaimer-box">
+            <h3>⚠️ Content Clarification</h3>
+            <p>
+              CrakingWall features fictional digital artwork inspired by cyberpunk aesthetics, speculative technology, and digital environments.
+            </p>
+            <p class="mt-4">
+              All terminology related to systems, glitches, or digital disruption is purely artistic and metaphorical, celebrating the culture of software development and network engineering.
+            </p>
+        </div>
+
+        <h2>Mission Statement</h2>
+        <p>
+          CrakingWall exists to provide high-quality, culture-driven tech wallpapers that transform digital workspaces into intentional environments.
+        </p>
+        <p>
+          The focus is depth, cohesion, and identity — not mass aggregation.
+        </p>
+      </div>
+    </div>
+  </div>
+</Layout>
+
+<style>
+  .about-container {
+    min-height: 80vh;
+    display: flex;
+    justify-content: center;
+    padding: 60px 20px;
+    background: #0a0a0f;
+    color: #f0f0f0;
+  }
+
+  .content-wrapper {
+    max-width: 800px;
+    width: 100%;
+  }
+
+  .glitch-title {
+    font-size: clamp(2.5rem, 5vw, 4rem);
+    font-weight: 900;
+    margin-bottom: 2rem;
+    color: #f0f0f0;
+    text-shadow: 2px 2px 0px #b026ff, -2px -2px 0px #00fff9;
+  }
+
+  .text-content {
+    background: #121218;
+    border: 1px solid #333;
+    padding: 40px;
+    border-radius: 8px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+  }
+
+  h2 {
+    color: #00fff9;
+    font-size: 1.8rem;
+    margin-top: 2rem;
+    margin-bottom: 1rem;
+    font-weight: 800;
+  }
+
+  p {
+    line-height: 1.8;
+    color: #a0a0a0;
+    margin-bottom: 1.5rem;
+    font-size: 1.1rem;
+  }
+
+  strong {
+    color: #f0f0f0;
+  }
+
+  ul {
+    list-style-type: disc;
+    padding-left: 20px;
+    margin-bottom: 1.5rem;
+    color: #a0a0a0;
+  }
+
+  li {
+    margin-bottom: 0.5rem;
+    font-size: 1.1rem;
+    line-height: 1.6;
+  }
+
+  .disclaimer-box {
+    margin: 3rem 0;
+    padding: 2rem;
+    border: 2px solid #b026ff;
+    background: rgba(176, 38, 255, 0.05);
+    border-radius: 6px;
+  }
+
+  .disclaimer-box h3 {
+    margin-top: 0;
+    color: #b026ff;
+    font-size: 1.4rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 1rem;
+  }
+
+  .disclaimer-box p {
+    margin-bottom: 0;
+    color: #d0d0d0;
+  }
+
+  .first-heading {
+    margin-top: 0;
+  }
+
+  .mt-4 {
+    margin-top: 1rem;
+  }
+</style>

@@ -1,0 +1,82 @@
+---
+export const prerender = true;
+import Layout from '../../layouts/Layout.astro';
+import { WallpaperService } from '../../services/wallpaperService';
+import { WallpapersGridContainer } from '../../components/WallpapersGridContainer';
+import SEO from '../../components/SEO.astro';
+
+export async function getStaticPaths() {
+  try {
+    const wallpapers = await WallpaperService.getAllWallpapers();
+    
+    if (!wallpapers || wallpapers.length === 0) {
+      return [];
+    }
+    
+    // Extract unique categories
+    const categories = [...new Set(wallpapers.map(w => w.category))];
+    
+    return categories.map(category => {
+      const filtered = wallpapers.filter(w => w.category === category);
+      return {
+        params: { category: category.toLowerCase() },
+        props: { category, wallpapers: filtered },
+      };
+    });
+  } catch (error) {
+    console.error('Error in getStaticPaths:', error);
+    return [];
+  }
+}
+
+const { category, wallpapers } = Astro.props;
+
+// Editorial content map
+const descriptions: Record<string, string> = {
+  cyberpunk: "Immerse yourself in a meticulously curated gallery of high-fidelity cyberpunk visuals. Our collection spans rain-slicked neon metropolitan landscapes, intricate cybernetic augmentations, and speculative dystopian architectures designed for the modern digital workspace.",
+  synthwave: "Revitalize your desktop with the retro-futuristic essence of the eighties. Featuring vibrant neon topologies, nostalgic sunset horizons, and aerodynamic vehicular captures, our synthwave collection bridges the gap between past visions and future aesthetics.",
+  glitch: "Discover the artistic potential of digital imperfection through our avant-garde glitch art series. These wallpapers explore distorted realities, rhythmic data corruption, and structured digital noise to create a unique visual identity for your screens.",
+  "tech culture": "A sophisticated homage to the structures of modern computing. This collection features elegant terminal interfaces, abstract code visualizations, and the raw aesthetic of digital systems, crafted for the discerning tech enthusiast.",
+  minimalist: "Achieve ultimate digital clarity with our collection of minimalist wallpapers. Each composition emphasizes geometric balance, negative space, and a refined color palette to foster a distraction-free environment for deep creative work.",
+  abstract: "Elevate your visual experience with mind-bending digital abstractions. Our gallery explores the intersection of light, geometry, and fluid physics to provide mesmerizing, professionally rendered backgrounds that redefine digital art.",
+  nature: "Experience a breath of futuristic organic beauty. Our nature collection pairs breathtaking natural topographies with subtle digital enhancements, creating a harmonious balance between the raw power of the earth and the precision of technology.",
+  dark: "Optimize your professional workspace with our selection of deep, low-luminance wallpapers. Specifically engineered for OLED fidelity and dark-mode setups, these textures offer sophisticated depth without compromising visual focus."
+};
+
+const defaultDescription = `Explore our curated selection of ${category} wallpapers. High-resolution, professional backgrounds for the modern digital era.`;
+const descriptionText = descriptions[category.toLowerCase()] || defaultDescription;
+const title = `${category} Wallpapers | CrackingWall`;
+---
+
+<Layout title={title} description={descriptionText}>
+  <SEO 
+    slot="seo"
+    title={title}
+    description={descriptionText}
+    canonicalUrl={Astro.url.href}
+  />
+  
+  <div class="mb-8 text-center editorial-header">
+    <h1 class="text-4xl font-brutal font-black uppercase mb-4">
+      {category} Collection
+    </h1>
+    <div class="max-w-3xl mx-auto px-4">
+        <p class="text-lg text-brutal-black/80 font-medium mb-4">{descriptionText}</p>
+        <p class="text-sm text-gray-500">
+            Discover {wallpapers.length} high-quality {category} backgrounds.
+        </p>
+    </div>
+  </div>
+
+  <WallpapersGridContainer 
+    client:load 
+    initialWallpapers={wallpapers} 
+  />
+</Layout>
+
+<style>
+    .editorial-header {
+        padding: 40px 0;
+        background: radial-gradient(circle at center, rgba(176, 38, 255, 0.1) 0%, transparent 70%);
+    }
+</style>

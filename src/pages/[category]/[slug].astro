@@ -1,0 +1,384 @@
+---
+export const prerender = true;
+import Layout from '../../layouts/Layout.astro';
+import { WallpaperService } from '../../services/wallpaperService';
+import { Download, Heart, ArrowLeft, Terminal, Cpu, Layers, Monitor } from 'lucide-react';
+import SEO from '../../components/SEO.astro';
+
+export async function getStaticPaths() {
+  const wallpapers = await WallpaperService.getAllWallpapers();
+  
+  return wallpapers.map((wallpaper) => {
+    // Generate slug safely
+    const titleSlug = (wallpaper.title || 'unnamed').toLowerCase().replace(/[^a-z0-9]+/g, '-');
+    const slug = `${titleSlug}-${wallpaper.id}`;
+    
+    return {
+      params: { 
+        category: (wallpaper.category || 'uncategorized').toLowerCase(),
+        slug 
+      },
+      props: { wallpaper },
+    };
+  });
+}
+
+const { wallpaper } = Astro.props;
+
+if (!wallpaper) {
+  return Astro.redirect('/404');
+}
+
+// Fetch related wallpapers
+const allWallpapers = await WallpaperService.getAllWallpapers();
+const relatedWallpapers = allWallpapers
+  .filter(w => w.category === wallpaper.category && w.id !== wallpaper.id)
+  .slice(0, 4);
+
+const title = `${wallpaper.title} Wallpaper | CrakingWall`;
+const description = `Download ${wallpaper.title} as a premium digital background. ${wallpaper.description}`;
+const canonicalUrl = Astro.url.href;
+
+// ImageObject Schema
+const imageObjectSchema = {
+  "@context": "https://schema.org",
+  "@type": "ImageObject",
+  "name": wallpaper.title,
+  "contentUrl": wallpaper.url,
+  "license": "https://crakingculturewallpaperr.xyz/license",
+  "acquireLicensePage": "https://crakingculturewallpaperr.xyz/license",
+  "creator": {
+    "@type": "Organization",
+    "name": "CrakingWall"
+  },
+  "description": wallpaper.description
+};
+
+---
+
+<Layout title={title} description={description}>
+  <SEO 
+    slot="seo"
+    title={title}
+    description={description}
+    imageUrl={wallpaper.url}
+    canonicalUrl={canonicalUrl}
+  />
+  
+  <script type="application/ld+json" set:html={JSON.stringify(imageObjectSchema)} />
+
+  <div class="cyber-grid"></div>
+
+  <div class="max-w-7xl mx-auto px-6 py-16 relative z-10">
+    <!-- UI Flow: Back link first -->
+    <div class="mb-12">
+       <a href={`/${wallpaper.category.toLowerCase()}/`} class="inline-flex items-center space-x-3 text-white/50 hover:text-neon-cyan transition-all font-mono font-bold group">
+        <ArrowLeft className="w-5 h-5 transform group-hover:-translate-x-1 transition-transform" />
+        <span class="text-xs tracking-tighter uppercase ring-1 ring-current px-3 py-1.5 bg-terminal-bg/50">DIRECTORY:_{wallpaper.category.toUpperCase()}</span>
+      </a>
+    </div>
+
+    <div class="space-y-16">
+      <!-- Wallpaper Hero -->
+      <section class="wallpaper-hero group">
+        <div class="bg-terminal-bg p-3 shadow-[30px_30px_0_rgba(0,0,0,0.5)] border-4 border-white/10 relative overflow-hidden">
+          <div class="absolute inset-0 bg-neon-cyan/5 pointer-events-none z-10"></div>
+          <div class="relative overflow-hidden aspect-[16/9] lg:aspect-auto">
+             <img 
+                src={wallpaper.url} 
+                alt={wallpaper.alt_text || wallpaper.title}
+                class="w-full h-full object-cover transform transition-transform duration-1000 group-hover:scale-105"
+                width={wallpaper.width || 3840}
+                height={wallpaper.height || 2160}
+                loading="eager"
+                transition:name={`wallpaper-${wallpaper.id}`}
+             />
+          </div>
+          <div class="absolute bottom-6 right-6 z-20 opacity-0 group-hover:opacity-100 transition-all transform translate-y-2 group-hover:translate-y-0">
+            <span class="bg-neon-magenta text-white px-4 py-2 font-mono text-xs font-black uppercase shadow-lg">Source: ORIGINAL_FIDELITY_V2</span>
+          </div>
+        </div>
+      </section>
+
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-16 items-start">
+        <!-- Main Content (Left) -->
+        <div class="lg:col-span-7 space-y-12">
+          <div class="space-y-8">
+            <h1 class="text-6xl md:text-9xl font-black uppercase leading-[0.8] tracking-tighter text-white drop-shadow-2xl" style="font-family: 'Exo 2', sans-serif;">
+              {wallpaper.title}
+            </h1>
+            
+            <div class="prose max-w-none">
+              <p class="text-2xl font-light leading-snug text-white/80 tracking-tight max-w-2xl border-l-2 border-neon-magenta pl-6">
+                {wallpaper.description}
+              </p>
+            </div>
+          </div>
+
+          <!-- Resolution Selector UI -->
+          <div class="space-y-6 pt-8 border-t border-white/10">
+            <span class="font-mono text-xs font-black uppercase text-neon-cyan flex items-center gap-3">
+              <Monitor className="w-4 h-4" /> [SELECCIONAR_MODO_DISPLAY]
+            </span>
+            <div class="flex flex-wrap gap-3">
+              {['1080p', '1440p', '4K', 'Ultrawide'].map((res) => (
+                <button class={`res-toggle px-8 py-4 font-mono font-black text-xs border-2 border-white/20 transition-all hover:border-neon-cyan hover:text-neon-cyan ${res === (wallpaper.width >= 3840 ? '4K' : '1440p') ? 'active bg-white text-black border-white shadow-[6px_6px_0_var(--neon-magenta)]' : 'bg-transparent text-white/40'}`}>
+                  {res}
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        <!-- Action Panel (Right) -->
+        <div class="lg:col-span-5 space-y-6 lg:sticky lg:top-24">
+          <!-- Simplified Download Button -->
+          <div class="space-y-4">
+            <button 
+              id="download-btn"
+              data-url={wallpaper.url}
+              data-id={wallpaper.id}
+              data-filename={`wallpaper-${wallpaper.id}.${wallpaper.format || 'jpg'}`}
+              class="terminal-btn w-full group overflow-hidden"
+            >
+              <div class="relative z-10 flex items-center justify-between px-10 py-10">
+                <div class="flex items-center space-x-6">
+                  <Terminal className="w-10 h-10 group-hover:animate-pulse text-neon-green" />
+                  <div class="text-left">
+                    <span class="block text-3xl font-black uppercase tracking-tight" id="btn-label">INITIATE DOWNLOAD</span>
+                  </div>
+                </div>
+                <div class="h-12 w-12 flex items-center justify-center border-2 border-current rounded-full group-hover:bg-neon-cyan group-hover:text-black transition-colors">
+                    <Download className="w-6 h-6" />
+                </div>
+              </div>
+              <div class="absolute inset-0 bg-repeating-scanlines pointer-events-none opacity-20"></div>
+              <div class="btn-progress absolute bottom-0 left-0 h-1.5 bg-neon-cyan transition-all duration-300 shadow-[0_-4px_10px_rgba(0,240,255,0.4)]" style="width: 0%"></div>
+            </button>
+            <div class="flex justify-center items-center px-2">
+              <p class="font-mono text-[9px] uppercase opacity-30 tracking-widest text-white">SYSTEM_STATUS: READY // ENCRYPTED_LINK_ACTIVE</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 4. Glitch Divider -->
+      <div class="glitch-divider w-full h-1 bg-brutal-black/10 relative overflow-hidden my-20">
+        <div class="absolute inset-0 bg-neon-cyan/30 animate-glitch-strip"></div>
+      </div>
+
+      <!-- Related Wallpapers Section -->
+      {relatedWallpapers.length > 0 && (
+          <section class="pt-8">
+              <div class="flex items-end justify-between mb-12">
+                <h2 class="text-4xl md:text-6xl font-black uppercase leading-none tracking-tighter" style="font-family: 'Exo 2', sans-serif;">
+                  RESONANT_ARCHIVE
+                </h2>
+                <span class="font-mono text-xs opacity-50 uppercase">Explore the collective</span>
+              </div>
+              <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+                  {relatedWallpapers.map(related => {
+                      const relatedSlug = `${related.title.toLowerCase().replace(/[^a-z0-9]+/g, '-')}-${related.id}`;
+                      return (
+                      <a href={`/${related.category.toLowerCase()}/${relatedSlug}/`} class="group block bg-terminal-bg border-4 border-brutal-black shadow-brutal hover:translate-y-[-8px] hover:-translate-x-2 transition-all p-1 relative">
+                          <div class="aspect-video overflow-hidden">
+                              <img 
+                                  src={related.url} 
+                                  alt={related.title} 
+                                  class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 opacity-80 group-hover:opacity-100"
+                                  loading="lazy"
+                              />
+                          </div>
+                          <div class="p-4 flex items-center justify-between border-t-2 border-brutal-black mt-1">
+                              <h3 class="font-mono font-black text-xs uppercase text-white truncate">{related.title}</h3>
+                              <Layers className="w-4 h-4 text-neon-cyan opacity-50 group-hover:opacity-100" />
+                          </div>
+                          <div class="absolute top-2 right-2 bg-neon-magenta text-white px-2 py-0.5 font-mono text-[8px] opacity-0 group-hover:opacity-100 transition-opacity">
+                            OPEN_FILE
+                          </div>
+                      </a>
+                  )})}
+              </div>
+          </section>
+      )}
+    </div>
+  </div>
+
+  <!-- Decorative Corner Code -->
+  <div class="fixed bottom-4 left-4 font-mono text-[8px] text-brutal-black/20 pointer-events-none uppercase">
+    0x4A 0x24 0xEE // BUILD_V1.2 // SECURE_SOCKET_LAYER_ACTIVE
+  </div>
+</Layout>
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Exo+2:wght@900&family=JetBrains+Mono:wght@400;700;800&display=swap');
+
+  :root {
+    --brutal-black: #000;
+  }
+
+  .terminal-btn {
+    background: var(--terminal-bg);
+    color: var(--neon-green);
+    border: 3px solid var(--neon-green);
+    position: relative;
+    transition: all 0.2s cubic-bezier(0.23, 1, 0.32, 1);
+    box-shadow: 0 0 10px rgba(0, 255, 156, 0.2);
+  }
+
+  .terminal-btn:hover {
+    border-color: var(--neon-cyan);
+    color: var(--neon-cyan);
+    transform: translateY(-2px);
+    box-shadow: 0 0 25px rgba(0, 240, 255, 0.4);
+    letter-spacing: 0.025em;
+  }
+
+  /* 1. Glitch flicker on hover inherited from index.css */
+  .terminal-btn:hover {
+    animation: flicker 0.2s infinite;
+  }
+
+  .bg-repeating-scanlines {
+    background: repeating-linear-gradient(
+      transparent,
+      transparent 2px,
+      rgba(0, 255, 156, 0.1) 3px,
+      transparent 4px
+    );
+    background-size: 100% 4px;
+  }
+
+  .system-panel::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: radial-gradient(circle at 50% 50%, rgba(0, 240, 255, 0.05), transparent);
+    pointer-events: none;
+  }
+
+  .res-toggle.active {
+    box-shadow: inset 0 0 15px rgba(0, 240, 255, 0.5);
+  }
+
+  .animate-glitch-strip {
+    width: 200%;
+    animation: strip-slide 3s infinite linear;
+  }
+
+  @keyframes strip-slide {
+    0% { transform: translateX(-50%); }
+    100% { transform: translateX(0); }
+  }
+
+  /* Desktop layout refinements */
+  @media (min-width: 1024px) {
+    .wallpaper-hero {
+      margin-top: -2rem;
+    }
+  }
+
+  /* 5. Depth Effects */
+  .system-panel {
+    background-image: 
+      linear-gradient(45deg, transparent 95%, rgba(0, 240, 255, 0.05) 95%),
+      linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5));
+    background-size: 20px 20px, 100% 100%;
+  }
+</style>
+
+<script>
+  import { WallpaperService } from '../../services/wallpaperService';
+
+  // 10. Download Interaction Upgrade
+  const downloadBtn = document.getElementById('download-btn');
+  const btnLabel = document.getElementById('btn-label');
+  const progressLine = document.querySelector('.btn-progress') as HTMLElement;
+  
+  if (downloadBtn && btnLabel && progressLine) {
+    downloadBtn.addEventListener('click', async () => {
+      const url = downloadBtn.getAttribute('data-url');
+      const id = downloadBtn.getAttribute('data-id');
+      const filename = downloadBtn.getAttribute('data-filename');
+      
+      if (!url) return;
+
+      // 10. Start Interaction
+      downloadBtn.style.pointerEvents = 'none';
+      btnLabel.innerText = 'INITIALIZING...';
+      progressLine.style.width = '30%';
+
+      setTimeout(() => {
+        progressLine.style.width = '70%';
+        btnLabel.innerText = 'FETCHING_BITSTREAM...';
+      }, 300);
+
+      // Track download
+      if (id) {
+        try {
+          await WallpaperService.incrementWallpaperDownloads(id);
+        } catch (e) {
+          console.error('Failed to increment download count', e);
+        }
+      }
+
+      try {
+        const response = await fetch(url);
+        if (!response.ok) throw new Error('Network response was not ok');
+        
+        progressLine.style.width = '100%';
+        btnLabel.innerText = 'TRANSFER_COMPLETE';
+
+        const blob = await response.blob();
+        const blobUrl = window.URL.createObjectURL(blob);
+        
+        const a = document.createElement('a');
+        a.href = blobUrl;
+        a.download = filename || 'wallpaper.jpg';
+        document.body.appendChild(a);
+        a.click();
+        
+        window.URL.revokeObjectURL(blobUrl);
+        document.body.removeChild(a);
+
+        // Reset state
+        setTimeout(() => {
+          btnLabel.innerText = 'INITIATE DOWNLOAD';
+          progressLine.style.width = '0%';
+          downloadBtn.style.pointerEvents = 'auto';
+        }, 1500);
+
+      } catch (error) {
+        console.error('Download fallback', error);
+        btnLabel.innerText = 'ERROR: REDIRECTING...';
+        
+        const a = document.createElement('a');
+        a.href = url;
+        a.target = '_blank';
+        a.download = filename || 'wallpaper.jpg';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+
+        setTimeout(() => {
+          btnLabel.innerText = 'INITIATE DOWNLOAD';
+          progressLine.style.width = '0%';
+          downloadBtn.style.pointerEvents = 'auto';
+        }, 1500);
+      }
+    });
+  }
+
+  // Handle Resolution Toggles
+  const resBtns = document.querySelectorAll('.res-toggle');
+  resBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      resBtns.forEach(b => {
+        b.classList.remove('active', 'bg-neon-cyan', 'text-brutal-black', 'shadow-[4px_4px_0_#000]');
+        b.classList.add('bg-transparent', 'text-brutal-black/50');
+      });
+      btn.classList.add('active', 'bg-neon-cyan', 'text-brutal-black', 'shadow-[4px_4px_0_#000]');
+      btn.classList.remove('bg-transparent', 'text-brutal-black/50');
+    });
+  });
+</script>

@@ -1,0 +1,25 @@
+---
+const { title, description, imageUrl, canonicalUrl } = Astro.props;
+
+// Default values if props are missing
+const siteTitle = title || "CrakingCultureWallpaper";
+const siteDescription = description || "Premium digital tech art, cyberpunk aesthetics, and developer culture wallpapers.";
+const siteImage = imageUrl || "/assets/og-image.webp"; // Ensure this image exists or use a placeholder
+const siteUrl = canonicalUrl || Astro.url.href;
+
+---
+
+<title>{siteTitle}</title>
+<meta name="description" content={siteDescription} />
+<link rel="canonical" href={siteUrl} />
+
+<meta property="og:title" content={siteTitle} />
+<meta property="og:description" content={siteDescription} />
+<meta property="og:image" content={siteImage} />
+<meta property="og:type" content="website" />
+<meta property="og:url" content={siteUrl} />
+
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content={siteTitle} />
+<meta name="twitter:description" content={siteDescription} />
+<meta name="twitter:image" content={siteImage} />

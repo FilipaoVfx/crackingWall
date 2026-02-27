@@ -1,0 +1,87 @@
+---
+export const prerender = true;
+import Layout from '../layouts/Layout.astro';
+import ContactForm from '../components/ContactForm';
+---
+
+<Layout 
+  title="Contact Protocol - CrackingWall" 
+  description="Connect with the builders of the ultimate AI wallpaper platform. Secure communications channel."
+>
+  <main class="min-h-screen bg-brutal-dark-bg text-white selection:bg-brutal-neon-cyan selection:text-black">
+    <!-- Grid Overlay Background -->
+    <div class="fixed inset-0 pointer-events-none opacity-20" 
+         style="background-image: linear-gradient(#1a1a2e 1px, transparent 1px), linear-gradient(90deg, #1a1a2e 1px, transparent 1px); background-size: 50px 50px;">
+    </div>
+
+    <div class="relative container mx-auto px-4 py-16 md:py-24">
+      <!-- Header Section -->
+      <header class="max-w-4xl mx-auto mb-16 text-center">
+        <div class="inline-block mb-4 px-4 py-1 bg-brutal-neon-cyan/10 border border-brutal-neon-cyan/30 text-brutal-neon-cyan font-mono text-xs uppercase tracking-widest animate-pulse">
+          // Connection Established //
+        </div>
+        
+        <h1 class="text-5xl md:text-7xl font-brutal font-black uppercase mb-6 tracking-tighter leading-none italic">
+          Get in <span class="text-brutal-neon-pink drop-shadow-[0_0_15px_rgba(255,0,128,0.5)]">Touch</span>
+        </h1>
+        
+        <p class="text-xl text-gray-400 font-mono max-w-2xl mx-auto">
+          Need custom wallpapers? Partnerships? Or just found a bug in the matrix? Our terminal is open for your payload.
+        </p>
+      </header>
+
+      <!-- Contact Content -->
+      <div class="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
+        <!-- Sidebar Info -->
+        <div class="lg:col-span-4 space-y-8 order-2 lg:order-1">
+          <div class="bg-brutal-dark-deeper p-6 border-l-4 border-brutal-neon-yellow shadow-brutal-sm">
+            <h3 class="font-brutal font-black uppercase text-brutal-neon-yellow mb-2">Response Protocol</h3>
+            <p class="text-sm text-gray-400 font-mono">
+              Our agents typically decrypt and respond to all signals within 24-48 standard earth hours.
+            </p>
+          </div>
+
+          <div class="bg-brutal-dark-deeper p-6 border-l-4 border-brutal-neon-cyan shadow-brutal-sm">
+            <h3 class="font-brutal font-black uppercase text-brutal-neon-cyan mb-2">Direct Uplink</h3>
+            <p class="text-sm text-gray-400 font-mono mb-4">
+              For corporate partnerships or priority access.
+            </p>
+            <a href="mailto:contact@crackingwall.art" class="text-lg font-brutal font-black text-white hover:text-brutal-neon-cyan transition-colors truncate block">
+              contact@crackingwall.art
+            </a>
+          </div>
+
+          <div class="bg-brutal-dark-deeper p-6 border-l-4 border-brutal-neon-pink shadow-brutal-sm">
+            <h3 class="font-brutal font-black uppercase text-brutal-neon-pink mb-2">Social Frequency</h3>
+            <div class="flex gap-4 mt-2">
+              <div class="w-10 h-10 bg-black border border-brutal-dark-border flex items-center justify-center hover:border-brutal-neon-pink transition-colors cursor-pointer">
+                <span class="font-mono text-xs">X</span>
+              </div>
+              <div class="w-10 h-10 bg-black border border-brutal-dark-border flex items-center justify-center hover:border-brutal-neon-pink transition-colors cursor-pointer">
+                <span class="font-mono text-xs">IG</span>
+              </div>
+              <div class="w-10 h-10 bg-black border border-brutal-dark-border flex items-center justify-center hover:border-brutal-neon-pink transition-colors cursor-pointer">
+                <span class="font-mono text-xs">DS</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Main Form -->
+        <div class="lg:col-span-8 order-1 lg:order-2">
+          <ContactForm client:load />
+        </div>
+      </div>
+    </div>
+  </main>
+</Layout>
+
+<style>
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+  }
+  .animate-pulse {
+    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+</style>
