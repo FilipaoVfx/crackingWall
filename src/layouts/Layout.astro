@@ -29,6 +29,10 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
     <meta name="generator" content={Astro.generator} />
     <link rel="canonical" href={canonicalURL} />
     
+    <!-- HilltopAds Native Banner Script -->
+    <script async="async" data-cfasync="false" src="https://pl28866886.effectivegatecpm.com/ef6e3b461a71809c904dce507871700c/invoke.js"></script>
+
+    
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website" />
     <meta property="og:url" content={Astro.url} />
@@ -51,7 +55,13 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 
     <main>
       <slot />
+      
+      <!-- Native Ad Banner -->
+      <div class="max-w-7xl mx-auto px-4 my-8 flex justify-center">
+        <div id="container-ef6e3b461a71809c904dce507871700c"></div>
+      </div>
     </main>
+
     
     <footer class="bg-brutal-dark-deeper border-t-4 border-brutal-black py-12 px-4 text-center">
       <div class="max-w-7xl mx-auto">
