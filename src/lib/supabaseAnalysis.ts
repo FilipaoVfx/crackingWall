@@ -11,8 +11,8 @@ const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || import.meta.env.PUBLIC_
 
 export const getAnalysisSupabaseAdmin = () => {
     const isNode = typeof process !== 'undefined';
-    const url = import.meta.env.PUBLIC_SUPABASE_URL || (isNode ? process.env.PUBLIC_SUPABASE_URL : undefined);
-    const key = import.meta.env.SUPABASE_SERVICE_ROLE_KEY || import.meta.env.PUBLIC_SUPABASE_ANON_KEY || (isNode ? (process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.PUBLIC_SUPABASE_ANON_KEY) : undefined);
+    const url = (import.meta as any).env.PUBLIC_SUPABASE_URL || (isNode ? process.env.PUBLIC_SUPABASE_URL : undefined);
+    const key = (import.meta as any).env.SUPABASE_SERVICE_ROLE_KEY || (import.meta as any).env.PUBLIC_SUPABASE_ANON_KEY || (isNode ? (process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.PUBLIC_SUPABASE_ANON_KEY) : undefined);
     
     if (!key) {
         console.warn('Analysis Module: Supabase Keys missing!');

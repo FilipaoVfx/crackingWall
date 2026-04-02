@@ -78,7 +78,7 @@ export const ImageAnalyzer: React.FC = () => {
 
     try {
       setState('analyzing');
-      const res = await fetch('/api/decode', {
+      const res = await fetch('/api/decode.json', {
         method: 'POST',
         body: formData,
       });
@@ -168,8 +168,8 @@ export const ImageAnalyzer: React.FC = () => {
             onDragOver={handleDragOver}
             onDrop={handleDrop}
             className={`relative flex flex-col items-center justify-center w-full h-80 rounded-2xl border-2 border-dashed transition-all duration-300 overflow-hidden group ${(state === 'uploading' || state === 'analyzing') ? 'border-[#00f3ff]/50 bg-[#00f3ff]/5 pointer-events-none'
-                : preview ? 'border-transparent bg-black/50'
-                  : 'border-gray-700 bg-gray-900/40 hover:border-[#ff003c]/70 hover:bg-[#ff003c]/5 cursor-pointer'
+              : preview ? 'border-transparent bg-black/50'
+                : 'border-gray-700 bg-gray-900/40 hover:border-[#ff003c]/70 hover:bg-[#ff003c]/5 cursor-pointer'
               }`}
             onClick={() => !preview && fileInputRef.current?.click()}
           >
