@@ -110,9 +110,10 @@ export const ImageAnalyzer: React.FC = () => {
       }
       setState('success');
     } catch (err: any) {
-      console.error('Analysis error:', err);
+      const fullUrl = new URL('/api/decode', window.location.href).toString();
+      console.error('Analysis error at ' + fullUrl + ':', err);
       setState('error');
-      setErrorMsg(err.message || 'Network error or invalid server response.');
+      setErrorMsg(`[URL: ${fullUrl}] ` + (err.message || 'Network error or invalid server response.'));
     }
   };
 
