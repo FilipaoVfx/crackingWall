@@ -8,7 +8,7 @@ import cloudflare from '@astrojs/cloudflare';
 // https://astro.build/config
 export default defineConfig({
   site: 'https://crakingculturewallpaperr.xyz', // Replace with actual domain
-  trailingSlash: 'always',
+  trailingSlash: 'ignore',
   integrations: [
     react(),
     tailwind({
