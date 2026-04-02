@@ -78,7 +78,7 @@ export const ImageAnalyzer: React.FC = () => {
 
     try {
       setState('analyzing');
-      const res = await fetch('/api/analyze-image/', {
+      const res = await fetch('/api/decode', {
         method: 'POST',
         body: formData,
       });
