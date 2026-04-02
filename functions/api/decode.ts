@@ -1,12 +1,10 @@
-import type { APIRoute } from 'astro';
-import { getAnalysisSupabaseAdmin } from '../../lib/supabaseAnalysis';
-import { PROMPT_IMAGE_ANALYSIS, PROMPT_VERSION } from '../../lib/promptImage';
+import { createClient } from '@supabase/supabase-js';
+import { PROMPT_IMAGE_ANALYSIS, PROMPT_VERSION } from '../../src/lib/promptImage';
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
 const ALLOWED_MIME_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
 const MAX_RUNS_PER_WINDOW = 3;
 
-// Helper to convert ArrayBuffer to Base64 for Cloudflare runtime
 function arrayBufferToBase64(buffer: ArrayBuffer) {
   let binary = '';
   const bytes = new Uint8Array(buffer);
@@ -17,7 +15,10 @@ function arrayBufferToBase64(buffer: ArrayBuffer) {
   return btoa(binary);
 }
 
-export const POST: APIRoute = async ({ request, clientAddress }) => {
+// Cloudflare Pages Function explicit syntax
+export const onRequestPost = async (context: any) => {
+  const { request, env } = context;
+  
   try {
     const formData = await request.formData();
     const imageFile = formData.get('image');
@@ -36,10 +37,10 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
 
     const arrayBuffer = await imageFile.arrayBuffer();
 
-    // 1. Calculate Identity Key based on IP address
-    const identityKey = `ip_${clientAddress || request.headers.get('cf-connecting-ip') || 'unknown'}`;
-
-    // Hash IP for privacy/safety
+    // 1. Calculate Identity Key based on CF proxy IP
+    const clientAddress = request.headers.get('cf-connecting-ip') || 'unknown';
+    const identityKey = `ip_${clientAddress}`;
+    
     const identityHashBuffer = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(identityKey));
     const finalIdentityKey = Array.from(new Uint8Array(identityHashBuffer)).map(b => b.toString(16).padStart(2, '0')).join('');
 
@@ -47,7 +48,15 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
     const hashBuffer = await crypto.subtle.digest('SHA-256', arrayBuffer);
     const hashHex = Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, '0')).join('');
 
-    const supabase = getAnalysisSupabaseAdmin();
+    // Supabase initialization natively hooked to Cloudflare ENV without hacks
+    const supabaseUrl = env.PUBLIC_SUPABASE_URL;
+    const supabaseKey = env.SUPABASE_SERVICE_ROLE_KEY || env.PUBLIC_SUPABASE_ANON_KEY;
+    
+    if (!supabaseUrl || !supabaseKey) {
+      return new Response(JSON.stringify({ error: 'Supabase credentials missing from Cloudflare environment variables' }), { status: 500 });
+    }
+    
+    const supabase = createClient(supabaseUrl, supabaseKey);
 
     // 3. Check Cache
     const { data: cachedResult } = await supabase
@@ -66,11 +75,10 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
     }
 
     // 4. Check Quota
-    // Window start could be today's date (midnight)
     const now = new Date();
     const windowStart = new Date(now.getFullYear(), now.getMonth(), now.getDate()).toISOString();
 
-    const { data: quotaRow, error: quotaError } = await supabase
+    const { data: quotaRow } = await supabase
       .from('usage_windows')
       .select('successful_runs')
       .eq('identity_key', finalIdentityKey)
@@ -84,7 +92,6 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
       }), { status: 429 });
     }
 
-    // Insert or update Quota row
     if (!quotaRow) {
       await supabase.from('usage_windows').insert({
         identity_key: finalIdentityKey,
@@ -93,7 +100,6 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
       });
     }
 
-    // Create a job (Processing state)
     const { data: jobData } = await supabase.from('analysis_jobs').insert({
       identity_key: finalIdentityKey,
       image_hash: hashHex,
@@ -103,15 +109,13 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
 
     // 5. Call OpenRouter API
     const base64Image = arrayBufferToBase64(arrayBuffer);
-    const isNode = typeof process !== 'undefined';
-    const openRouterKey = import.meta.env.OPENROUTER_API_KEY || (isNode ? process.env.OPENROUTER_API_KEY : undefined);
+    const openRouterKey = env.OPENROUTER_API_KEY;
 
     if (!openRouterKey) {
-      // mark job failed
       if (jobData) {
         await supabase.from('analysis_jobs').update({ status: 'failed', error_code: 'NO_AI_KEY' }).eq('id', jobData.id);
       }
-      return new Response(JSON.stringify({ error: 'AI processing not configured' }), { status: 500 });
+      return new Response(JSON.stringify({ error: 'OpenRouter credentials missing natively' }), { status: 500 });
     }
 
     try {
@@ -124,7 +128,7 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
           'X-Title': 'CrackingWall Analysis'
         },
         body: JSON.stringify({
-          model: 'qwen/qwen2.5-vl-32b-instruct', // using openai model via openrouter
+          model: 'qwen/qwen2.5-vl-32b-instruct',
           messages: [
             {
               role: 'user',
@@ -152,27 +156,23 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
       const generatedText = aiData.choices[0].message.content;
       const parsedJson = JSON.parse(generatedText);
 
-      // Increment successful runs
       await supabase.rpc('increment_successful_runs', {
         p_identity_key: finalIdentityKey,
         p_window_start: windowStart
       });
 
-      // Update manual fallback if RPC doesn't exist yet (just in case)
       const runs = (quotaRow ? quotaRow.successful_runs : 0) + 1;
       await supabase.from('usage_windows')
         .update({ successful_runs: runs })
         .eq('identity_key', finalIdentityKey)
         .eq('window_start', windowStart);
 
-      // Cache result
       await supabase.from('image_cache').insert({
         image_hash: hashHex,
         prompt_version: PROMPT_VERSION,
         result_json: parsedJson
       });
 
-      // Update Job
       if (jobData) {
         await supabase.from('analysis_jobs').update({
           status: 'completed',
@@ -187,8 +187,6 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
       }), { status: 200, headers: { 'Content-Type': 'application/json' } });
 
     } catch (err: any) {
-      console.error('AI Processing error:', err);
-      // mark job failed
       if (jobData) {
         await supabase.from('analysis_jobs').update({
           status: 'failed',
@@ -202,4 +200,4 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
   } catch (err: any) {
     return new Response(JSON.stringify({ error: err.message }), { status: 500 });
   }
-}
+};
