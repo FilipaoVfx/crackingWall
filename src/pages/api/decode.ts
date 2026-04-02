@@ -152,10 +152,20 @@ export const POST: APIRoute = async ({ request, locals }) => {
         })
       });
 
-      const aiData = (await aiResponse.json()) as any;
+      const responseText = await aiResponse.text();
+      let aiData;
+      try {
+        aiData = responseText ? JSON.parse(responseText) : {};
+      } catch (e) {
+        throw new Error(`AI response was not valid JSON: ${responseText.substring(0, 100)}`);
+      }
 
       if (!aiResponse.ok) {
-        throw new Error(aiData.error?.message || 'AI request failed');
+        throw new Error(aiData.error?.message || `AI request failed with status ${aiResponse.status}`);
+      }
+
+      if (!aiData.choices || !aiData.choices[0]) {
+        throw new Error("AI returned no results. Data: " + JSON.stringify(aiData));
       }
 
       const generatedText = aiData.choices[0].message.content;
@@ -199,10 +209,28 @@ export const POST: APIRoute = async ({ request, locals }) => {
           finished_at: new Date().toISOString()
         }).eq('id', jobData.id);
       }
-      return new Response(JSON.stringify({ error: 'Analysis failed: ' + err.message }), { status: 500 });
+      return new Response(JSON.stringify({ 
+        error: 'Analysis failed: ' + err.message,
+        diagnostic: {
+          step: "ai_fetch_processing",
+          timestamp: new Date().toISOString()
+        }
+      }), { 
+        status: 500, 
+        headers: { 'Content-Type': 'application/json' } 
+      });
     }
 
   } catch (err: any) {
-    return new Response(JSON.stringify({ error: err.message }), { status: 500 });
+    return new Response(JSON.stringify({ 
+      error: 'Critical serverless error: ' + err.message,
+      diagnostic: {
+        step: "initialize_request",
+        timestamp: new Date().toISOString()
+      }
+    }), { 
+      status: 500, 
+      headers: { 'Content-Type': 'application/json' } 
+    });
   }
 };

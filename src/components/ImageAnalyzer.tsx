@@ -83,15 +83,23 @@ export const ImageAnalyzer: React.FC = () => {
         body: formData,
       });
 
-      const data = await res.json();
+      const contentType = res.headers.get('content-type');
+      let data;
+
+      if (contentType && contentType.includes('application/json')) {
+        data = await res.json();
+      } else {
+        const text = await res.text();
+        throw new Error(`Server returned non-JSON response (${res.status}): ${text.substring(0, 50)}...`);
+      }
 
       if (!res.ok) {
         if (res.status === 429) {
           setState('quota_exceeded');
-          setErrorMsg(data.error || 'Quota exceeded.');
+          setErrorMsg(data.error || 'Quota exceeded (3/day).');
         } else {
           setState('error');
-          setErrorMsg(data.error || 'Internal server error occurred.');
+          setErrorMsg(data.error || `Server error (${res.status}): ${JSON.stringify(data)}`);
         }
         return;
       }
@@ -102,8 +110,9 @@ export const ImageAnalyzer: React.FC = () => {
       }
       setState('success');
     } catch (err: any) {
+      console.error('Analysis error:', err);
       setState('error');
-      setErrorMsg(err.message || 'Network error occurred.');
+      setErrorMsg(err.message || 'Network error or invalid server response.');
     }
   };
 
