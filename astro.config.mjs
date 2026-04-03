@@ -23,6 +23,7 @@ export default defineConfig({
   ],
   output: 'server',
   adapter: cloudflare({
+    platform: 'workers',
     imageService: 'compile'
   }),
   build: {
