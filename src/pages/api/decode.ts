@@ -29,15 +29,15 @@ export const POST: APIRoute = async ({ request, locals }) => {
     const imageFile = formData.get('image');
 
     if (!imageFile || !(imageFile instanceof Blob)) {
-      return new Response(JSON.stringify({ error: 'No valid image provided' }), { status: 400 });
+      return new Response(JSON.stringify({ error: 'No valid image provided' }), { status: 400, headers: { 'Content-Type': 'application/json' } });
     }
 
     if (!ALLOWED_MIME_TYPES.includes(imageFile.type)) {
-      return new Response(JSON.stringify({ error: 'Unsupported file type' }), { status: 400 });
+      return new Response(JSON.stringify({ error: 'Unsupported file type' }), { status: 400, headers: { 'Content-Type': 'application/json' } });
     }
 
     if (imageFile.size > MAX_FILE_SIZE) {
-      return new Response(JSON.stringify({ error: 'File too large (max 5MB)' }), { status: 400 });
+      return new Response(JSON.stringify({ error: 'File too large (max 5MB)' }), { status: 400, headers: { 'Content-Type': 'application/json' } });
     }
 
     const arrayBuffer = await imageFile.arrayBuffer();
@@ -58,7 +58,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
     const supabaseKey = env.SUPABASE_SERVICE_ROLE_KEY || env.PUBLIC_SUPABASE_ANON_KEY || import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
     
     if (!supabaseUrl || !supabaseKey) {
-      return new Response(JSON.stringify({ error: 'Supabase credentials missing from Cloudflare environment variables' }), { status: 500 });
+      return new Response(JSON.stringify({ error: 'Supabase credentials missing from Cloudflare environment variables' }), { status: 500, headers: { 'Content-Type': 'application/json' } });
     }
     
     const supabase = createClient(supabaseUrl, supabaseKey);
@@ -94,7 +94,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
       return new Response(JSON.stringify({
         error: 'You have reached your 3-analysis limit for today',
         status: 'quota_exceeded'
-      }), { status: 429 });
+      }), { status: 429, headers: { 'Content-Type': 'application/json' } });
     }
 
     if (!quotaRow) {
@@ -120,7 +120,15 @@ export const POST: APIRoute = async ({ request, locals }) => {
       if (jobData) {
         await supabase.from('analysis_jobs').update({ status: 'failed', error_code: 'NO_AI_KEY' }).eq('id', jobData.id);
       }
-      return new Response(JSON.stringify({ error: 'OpenRouter credentials missing natively' }), { status: 500 });
+      const availableKeys = env ? Object.keys(env).filter(k => !k.startsWith('ASSETS') && !k.startsWith('CF_')) : [];
+      return new Response(JSON.stringify({ 
+        error: 'OpenRouter credentials missing natively',
+        available_env_keys: availableKeys,
+        hint: 'If you added secrets in Cloudflare Pages, make sure you redeployed the app. If using Workers, use wrangler secret put OPENROUTER_API_KEY.'
+      }), { 
+        status: 500, 
+        headers: { 'Content-Type': 'application/json' } 
+      });
     }
 
     try {
