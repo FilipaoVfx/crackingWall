@@ -1,5 +1,5 @@
 name = "crackingwall"
-compatibility_date = "2024-04-03"
+compatibility_date = "2024-09-23"
 compatibility_flags = ["nodejs_compat"]
 main = "./dist/_worker.js"
 

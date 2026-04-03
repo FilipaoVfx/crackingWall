@@ -24,7 +24,7 @@ export default defineConfig({
   output: 'server',
   adapter: cloudflare({
     platform: 'workers',
-    imageService: 'compile'
+    imageService: 'cloudflare'
   }),
   build: {
     assets: 'assets',
