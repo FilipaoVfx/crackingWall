@@ -1,7 +1,8 @@
+# Source: `wrangler.toml`
+
+```toml
 name = "crackingwall"
 compatibility_date = "2024-04-03"
-compatibility_flags = ["nodejs_compat"]
-main = "./dist/_worker.js"
 
 [assets]
 directory = "./dist"
@@ -9,3 +10,4 @@ directory = "./dist"
 [build]
 command = "npm ci && npm run build"
 watch_dir = "src"
+```
