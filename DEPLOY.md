@@ -9,9 +9,16 @@ This project is configured for Cloudflare Pages (Static).
    - **Build Command**: `npm run build`
    - **Output Directory**: `dist`
 3. **Environment Variables**:
-   - Add your Supabase credentials in the Cloudflare Pages dashboard:
+   - Add required variables in the Cloudflare Pages dashboard:
      - `PUBLIC_SUPABASE_URL`
      - `PUBLIC_SUPABASE_ANON_KEY`
+     - `SUPABASE_SERVICE_ROLE_KEY`
+     - `OPENROUTER_API_KEY`
+   - For secrets in Workers/Pages, prefer encrypted secrets via Wrangler:
+     - `npx wrangler secret put OPENROUTER_API_KEY`
+     - `npx wrangler secret put SUPABASE_SERVICE_ROLE_KEY`
+   - **Important**: For production, `/api/decode` expects Cloudflare runtime bindings. Local fallbacks are only for development.
+   - In Cloudflare dashboard, set these values in the **same environment** you are testing (Production or Preview).
 
 ## Vercel
 1. **Import Project**: Select your repository.
@@ -19,7 +26,7 @@ This project is configured for Cloudflare Pages (Static).
 3. **Build Command**: `npm run build` (or default).
 4. **Output Directory**: `dist` (default).
 5. **Environment Variables**:
-   - Add `PUBLIC_SUPABASE_URL` and `PUBLIC_SUPABASE_ANON_KEY`.
+   - Add `PUBLIC_SUPABASE_URL`, `PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`, and `OPENROUTER_API_KEY`.
 
 ## Local Development
 - Run `npm run dev` to start the Astro dev server.
