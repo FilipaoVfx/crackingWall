@@ -8,6 +8,12 @@ const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
 const ALLOWED_MIME_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
 const MAX_RUNS_PER_WINDOW = 3;
 
+type DecodeEnv = {
+  OPENROUTER_API_KEY: string;
+  PUBLIC_SUPABASE_URL: string;
+  SUPABASE_SERVICE_ROLE_KEY: string;
+};
+
 function arrayBufferToBase64(buffer: ArrayBuffer) {
   let binary = '';
   const bytes = new Uint8Array(buffer);
@@ -18,38 +24,68 @@ function arrayBufferToBase64(buffer: ArrayBuffer) {
   return btoa(binary);
 }
 
-/** Strict Cloudflare runtime env accessor — throws if not available */
-function getRuntimeEnv(locals: App.Locals) {
-  const env = locals?.runtime?.env;
-  if (!env) throw new Error('Cloudflare runtime environment not available');
-  return env;
+/**
+ * Resolves env vars in this order:
+ * 1) Cloudflare runtime env (`locals.runtime.env`) for production workers/pages
+ * 2) Process env (`process.env`) for Node-based local execution
+ * 3) Vite env (`import.meta.env`) as a final local/dev fallback
+ */
+function resolveDecodeEnv(locals: App.Locals): { env: DecodeEnv | null; missing: string[]; source: string } {
+  const runtimeEnv = locals?.runtime?.env;
+
+  const candidateEnv: Record<string, string | undefined> = {
+    OPENROUTER_API_KEY:
+      runtimeEnv?.OPENROUTER_API_KEY ||
+      process.env.OPENROUTER_API_KEY ||
+      import.meta.env.OPENROUTER_API_KEY,
+    PUBLIC_SUPABASE_URL:
+      runtimeEnv?.PUBLIC_SUPABASE_URL ||
+      process.env.PUBLIC_SUPABASE_URL ||
+      import.meta.env.PUBLIC_SUPABASE_URL,
+    SUPABASE_SERVICE_ROLE_KEY:
+      runtimeEnv?.SUPABASE_SERVICE_ROLE_KEY ||
+      process.env.SUPABASE_SERVICE_ROLE_KEY ||
+      import.meta.env.SUPABASE_SERVICE_ROLE_KEY,
+  };
+
+  const missing = Object.entries(candidateEnv)
+    .filter(([, value]) => !value)
+    .map(([key]) => key);
+
+  const source = runtimeEnv
+    ? 'cloudflare_runtime'
+    : process.env.OPENROUTER_API_KEY || process.env.PUBLIC_SUPABASE_URL || process.env.SUPABASE_SERVICE_ROLE_KEY
+      ? 'process_env'
+      : 'import_meta_env';
+
+  if (missing.length > 0) {
+    return { env: null, missing, source };
+  }
+
+  return {
+    env: candidateEnv as DecodeEnv,
+    missing: [],
+    source,
+  };
 }
 
 export const POST: APIRoute = async ({ request, locals }) => {
   try {
-    // --- Strict runtime env access (no import.meta.env fallbacks for secrets) ---
-    const env = getRuntimeEnv(locals);
+    const { env, missing, source } = resolveDecodeEnv(locals);
 
-    // --- Temporary debug logs (remove after confirming env access) ---
-    console.log('Runtime env available:', !!locals?.runtime?.env);
-    console.log('OPENROUTER_API_KEY exists:', !!env.OPENROUTER_API_KEY);
-    console.log('PUBLIC_SUPABASE_URL exists:', !!env.PUBLIC_SUPABASE_URL);
-    console.log('SUPABASE_SERVICE_ROLE_KEY exists:', !!env.SUPABASE_SERVICE_ROLE_KEY);
-
-    // --- Early validation of all required env vars ---
-    const requiredEnvVars = [
-      'OPENROUTER_API_KEY',
-      'PUBLIC_SUPABASE_URL',
-      'SUPABASE_SERVICE_ROLE_KEY',
-    ];
-
-    for (const key of requiredEnvVars) {
-      if (!env[key]) {
-        return new Response(
-          JSON.stringify({ error: `Missing required env variable: ${key}` }),
-          { status: 500, headers: { 'Content-Type': 'application/json' } }
-        );
-      }
+    if (!env) {
+      return new Response(
+        JSON.stringify({
+          error: `Missing required env variables: ${missing.join(', ')}`,
+          diagnostic: {
+            step: 'resolve_environment',
+            source,
+            runtimeEnvAvailable: !!locals?.runtime?.env,
+            timestamp: new Date().toISOString(),
+          },
+        }),
+        { status: 500, headers: { 'Content-Type': 'application/json' } }
+      );
     }
 
     const formData = await request.formData();
@@ -80,11 +116,8 @@ export const POST: APIRoute = async ({ request, locals }) => {
     const hashBuffer = await crypto.subtle.digest('SHA-256', arrayBuffer);
     const hashHex = Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, '0')).join('');
 
-    // Supabase initialization — strictly from Cloudflare runtime env
-    const supabaseUrl = env.PUBLIC_SUPABASE_URL;
-    const supabaseKey = env.SUPABASE_SERVICE_ROLE_KEY;
-
-    const supabase = createClient(supabaseUrl, supabaseKey);
+    // Supabase initialization
+    const supabase = createClient(env.PUBLIC_SUPABASE_URL, env.SUPABASE_SERVICE_ROLE_KEY);
 
     // 3. Check Cache
     const { data: cachedResult } = await supabase
@@ -135,16 +168,15 @@ export const POST: APIRoute = async ({ request, locals }) => {
       status: 'processing'
     }).select('id').single();
 
-    // 5. Call OpenRouter API — key strictly from Cloudflare runtime env
+    // 5. Call OpenRouter API
     const base64Image = arrayBufferToBase64(arrayBuffer);
-    const openRouterKey = env.OPENROUTER_API_KEY;
 
     try {
       const aiResponse = await fetch('https://openrouter.ai/api/v1/chat/completions', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${openRouterKey}`,
+          'Authorization': `Bearer ${env.OPENROUTER_API_KEY}`,
           'HTTP-Referer': 'https://crackingwall.com',
           'X-Title': 'CrackingWall Analysis'
         },
