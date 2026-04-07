@@ -17,6 +17,8 @@ This project is configured for Cloudflare Pages (Static).
    - For secrets in Workers/Pages, prefer encrypted secrets via Wrangler:
      - `npx wrangler secret put OPENROUTER_API_KEY`
      - `npx wrangler secret put SUPABASE_SERVICE_ROLE_KEY`
+   - **Important**: For production, `/api/decode` expects Cloudflare runtime bindings. Local fallbacks are only for development.
+   - In Cloudflare dashboard, set these values in the **same environment** you are testing (Production or Preview).
 
 ## Vercel
 1. **Import Project**: Select your repository.
