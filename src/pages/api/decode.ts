@@ -71,6 +71,13 @@ function resolveDecodeEnv(
 }
 
 export const POST: APIRoute = async ({ request, locals }) => {
+  const requestId =
+    request.headers.get('cf-ray') ||
+    request.headers.get('x-request-id') ||
+    crypto.randomUUID();
+
+  let jobId: string | null = null;
+
   try {
     const { env, missing, source } = resolveDecodeEnv(locals);
 
@@ -121,7 +128,6 @@ export const POST: APIRoute = async ({ request, locals }) => {
 
     const arrayBuffer = await imageFile.arrayBuffer();
 
-    // 1. Calculate Identity Key based on CF proxy IP
     const clientAddress = request.headers.get('cf-connecting-ip') || 'unknown';
     const identityKey = `ip_${clientAddress}`;
 
@@ -133,7 +139,6 @@ export const POST: APIRoute = async ({ request, locals }) => {
       .map((b) => b.toString(16).padStart(2, '0'))
       .join('');
 
-    // 2. Hash Image
     const hashBuffer = await crypto.subtle.digest('SHA-256', arrayBuffer);
     const hashHex = Array.from(new Uint8Array(hashBuffer))
       .map((b) => b.toString(16).padStart(2, '0'))
@@ -151,7 +156,17 @@ export const POST: APIRoute = async ({ request, locals }) => {
       .select('result_json')
       .eq('image_hash', hashHex)
       .eq('prompt_version', PROMPT_VERSION)
-      .single();
+      .maybeSingle();
+
+    if (cacheError) {
+      throw new DecodeApiError({
+        message: 'Failed to read image cache',
+        status: 500,
+        stage: 'cache_lookup',
+        code: 'SUPABASE_CACHE_READ',
+        details: cacheError.message,
+      });
+    }
 
     if (cachedResult && cachedResult.result_json) {
       return new Response(
@@ -164,7 +179,6 @@ export const POST: APIRoute = async ({ request, locals }) => {
       );
     }
 
-    // 4. Check Quota
     const now = new Date();
     const windowStart = new Date(
       now.getFullYear(),
@@ -172,12 +186,22 @@ export const POST: APIRoute = async ({ request, locals }) => {
       now.getDate()
     ).toISOString();
 
-    const { data: quotaRow } = await supabase
+    const { data: quotaRow, error: quotaError } = await supabase
       .from('usage_windows')
       .select('successful_runs')
       .eq('identity_key', finalIdentityKey)
       .eq('window_start', windowStart)
       .maybeSingle();
+
+    if (quotaError) {
+      throw new DecodeApiError({
+        message: 'Failed to check usage quota',
+        status: 500,
+        stage: 'quota_check',
+        code: 'SUPABASE_QUOTA_READ',
+        details: quotaError.message,
+      });
+    }
 
     if (quotaRow && quotaRow.successful_runs >= MAX_RUNS_PER_WINDOW) {
       return new Response(
@@ -190,11 +214,21 @@ export const POST: APIRoute = async ({ request, locals }) => {
     }
 
     if (!quotaRow) {
-      await supabase.from('usage_windows').insert({
+      const { error: initWindowError } = await supabase.from('usage_windows').insert({
         identity_key: finalIdentityKey,
         window_start: windowStart,
         successful_runs: 0,
       });
+
+      if (initWindowError) {
+        throw new DecodeApiError({
+          message: 'Failed to initialize quota window',
+          status: 500,
+          stage: 'quota_initialize',
+          code: 'SUPABASE_QUOTA_INIT',
+          details: initWindowError.message,
+        });
+      }
     }
 
     const { data: jobData } = await supabase
@@ -253,6 +287,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
           `AI response was not valid JSON: ${responseText.substring(0, 100)}`
         );
       }
+    }
 
       if (!aiResponse.ok) {
         const upstreamMessage =
@@ -271,13 +306,24 @@ export const POST: APIRoute = async ({ request, locals }) => {
         throw new Error(`AI returned no results. Data: ${JSON.stringify(aiData)}`);
       }
 
-      const generatedText = aiData.choices[0].message.content;
-      const parsedJson = JSON.parse(generatedText);
+    let parsedJson: any;
+    try {
+      parsedJson = JSON.parse(generatedText);
+    } catch {
+      throw new DecodeApiError({
+        message: 'OpenRouter completion was not valid JSON',
+        status: 502,
+        stage: 'openrouter_response_parse',
+        code: 'OPENROUTER_INVALID_OUTPUT_JSON',
+        details: generatedText.slice(0, 200),
+      });
+    }
 
       await supabase.rpc('increment_successful_runs', {
         p_identity_key: finalIdentityKey,
         p_window_start: windowStart,
       });
+    }
 
       const runs = (quotaRow ? quotaRow.successful_runs : 0) + 1;
       await supabase
@@ -291,6 +337,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
         prompt_version: PROMPT_VERSION,
         result_json: parsedJson,
       });
+    }
 
       if (jobData) {
         await supabase
