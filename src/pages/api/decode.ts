@@ -8,245 +8,468 @@ const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
 const ALLOWED_MIME_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
 const MAX_RUNS_PER_WINDOW = 3;
 
+type DecodeEnv = {
+  OPENROUTER_API_KEY: string;
+  PUBLIC_SUPABASE_URL: string;
+  SUPABASE_SERVICE_ROLE_KEY: string;
+};
+
+class DecodeApiError extends Error {
+  status: number;
+  stage: string;
+  code: string;
+  details?: string;
+
+  constructor(params: {
+    message: string;
+    status: number;
+    stage: string;
+    code: string;
+    details?: string;
+  }) {
+    super(params.message);
+    this.name = 'DecodeApiError';
+    this.status = params.status;
+    this.stage = params.stage;
+    this.code = params.code;
+    this.details = params.details;
+  }
+}
+
 function arrayBufferToBase64(buffer: ArrayBuffer) {
   let binary = '';
   const bytes = new Uint8Array(buffer);
-  const len = bytes.byteLength;
-  for (let i = 0; i < len; i++) {
+
+  for (let i = 0; i < bytes.byteLength; i++) {
     binary += String.fromCharCode(bytes[i]);
   }
+
   return btoa(binary);
 }
 
-/** Strict Cloudflare runtime env accessor — throws if not available */
-function getRuntimeEnv(locals: App.Locals) {
-  const env = locals?.runtime?.env;
-  if (!env) throw new Error('Cloudflare runtime environment not available');
-  return env;
+function resolveDecodeEnv(
+  locals: App.Locals
+): { env: DecodeEnv | null; missing: string[]; source: string } {
+  const runtimeEnv = locals?.runtime?.env;
+  const isDev = import.meta.env.DEV;
+
+  const candidateEnv: Record<string, string | undefined> = {
+    OPENROUTER_API_KEY:
+      runtimeEnv?.OPENROUTER_API_KEY ||
+      (isDev
+        ? process.env.OPENROUTER_API_KEY || import.meta.env.OPENROUTER_API_KEY
+        : undefined),
+    PUBLIC_SUPABASE_URL:
+      runtimeEnv?.PUBLIC_SUPABASE_URL ||
+      (isDev
+        ? process.env.PUBLIC_SUPABASE_URL || import.meta.env.PUBLIC_SUPABASE_URL
+        : undefined),
+    SUPABASE_SERVICE_ROLE_KEY:
+      runtimeEnv?.SUPABASE_SERVICE_ROLE_KEY ||
+      (isDev
+        ? process.env.SUPABASE_SERVICE_ROLE_KEY ||
+          import.meta.env.SUPABASE_SERVICE_ROLE_KEY
+        : undefined),
+  };
+
+  const missing = Object.entries(candidateEnv)
+    .filter(([, value]) => !value)
+    .map(([key]) => key);
+
+  const source = runtimeEnv
+    ? 'cloudflare_runtime'
+    : isDev
+      ? 'local_dev_fallback'
+      : 'missing_cloudflare_runtime';
+
+  if (missing.length > 0) {
+    return { env: null, missing, source };
+  }
+
+  return { env: candidateEnv as DecodeEnv, missing: [], source };
+}
+
+function jsonResponse(payload: unknown, status = 200) {
+  return new Response(JSON.stringify(payload), {
+    status,
+    headers: { 'Content-Type': 'application/json' },
+  });
 }
 
 export const POST: APIRoute = async ({ request, locals }) => {
+  const requestId =
+    request.headers.get('cf-ray') ||
+    request.headers.get('x-request-id') ||
+    crypto.randomUUID();
+
+  let jobId: string | null = null;
+
   try {
-    // --- Strict runtime env access (no import.meta.env fallbacks for secrets) ---
-    const env = getRuntimeEnv(locals);
+    const { env, missing, source } = resolveDecodeEnv(locals);
 
-    // --- Temporary debug logs (remove after confirming env access) ---
-    console.log('Runtime env available:', !!locals?.runtime?.env);
-    console.log('OPENROUTER_API_KEY exists:', !!env.OPENROUTER_API_KEY);
-    console.log('PUBLIC_SUPABASE_URL exists:', !!env.PUBLIC_SUPABASE_URL);
-    console.log('SUPABASE_SERVICE_ROLE_KEY exists:', !!env.SUPABASE_SERVICE_ROLE_KEY);
-
-    // --- Early validation of all required env vars ---
-    const requiredEnvVars = [
-      'OPENROUTER_API_KEY',
-      'PUBLIC_SUPABASE_URL',
-      'SUPABASE_SERVICE_ROLE_KEY',
-    ];
-
-    for (const key of requiredEnvVars) {
-      if (!env[key]) {
-        return new Response(
-          JSON.stringify({ error: `Missing required env variable: ${key}` }),
-          { status: 500, headers: { 'Content-Type': 'application/json' } }
-        );
-      }
+    if (!env) {
+      throw new DecodeApiError({
+        message: `Missing required env variables: ${missing.join(', ')}`,
+        status: 500,
+        stage: 'resolve_environment',
+        code: 'MISSING_ENV',
+        details: `source=${source}`,
+      });
     }
 
     const formData = await request.formData();
     const imageFile = formData.get('image');
 
     if (!imageFile || !(imageFile instanceof Blob)) {
-      return new Response(JSON.stringify({ error: 'No valid image provided' }), { status: 400, headers: { 'Content-Type': 'application/json' } });
+      throw new DecodeApiError({
+        message: 'No valid image provided',
+        status: 400,
+        stage: 'validate_input',
+        code: 'INVALID_IMAGE',
+      });
     }
 
     if (!ALLOWED_MIME_TYPES.includes(imageFile.type)) {
-      return new Response(JSON.stringify({ error: 'Unsupported file type' }), { status: 400, headers: { 'Content-Type': 'application/json' } });
+      throw new DecodeApiError({
+        message: 'Unsupported file type',
+        status: 400,
+        stage: 'validate_input',
+        code: 'UNSUPPORTED_MIME',
+        details: `mime=${imageFile.type}`,
+      });
     }
 
     if (imageFile.size > MAX_FILE_SIZE) {
-      return new Response(JSON.stringify({ error: 'File too large (max 5MB)' }), { status: 400, headers: { 'Content-Type': 'application/json' } });
+      throw new DecodeApiError({
+        message: 'File too large (max 5MB)',
+        status: 400,
+        stage: 'validate_input',
+        code: 'FILE_TOO_LARGE',
+      });
     }
 
     const arrayBuffer = await imageFile.arrayBuffer();
 
-    // 1. Calculate Identity Key based on CF proxy IP
     const clientAddress = request.headers.get('cf-connecting-ip') || 'unknown';
     const identityKey = `ip_${clientAddress}`;
 
-    const identityHashBuffer = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(identityKey));
-    const finalIdentityKey = Array.from(new Uint8Array(identityHashBuffer)).map(b => b.toString(16).padStart(2, '0')).join('');
+    const identityHashBuffer = await crypto.subtle.digest(
+      'SHA-256',
+      new TextEncoder().encode(identityKey)
+    );
+    const finalIdentityKey = Array.from(new Uint8Array(identityHashBuffer))
+      .map((b) => b.toString(16).padStart(2, '0'))
+      .join('');
 
-    // 2. Hash Image
     const hashBuffer = await crypto.subtle.digest('SHA-256', arrayBuffer);
-    const hashHex = Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, '0')).join('');
+    const hashHex = Array.from(new Uint8Array(hashBuffer))
+      .map((b) => b.toString(16).padStart(2, '0'))
+      .join('');
 
-    // Supabase initialization — strictly from Cloudflare runtime env
-    const supabaseUrl = env.PUBLIC_SUPABASE_URL;
-    const supabaseKey = env.SUPABASE_SERVICE_ROLE_KEY;
+    const supabase = createClient(
+      env.PUBLIC_SUPABASE_URL,
+      env.SUPABASE_SERVICE_ROLE_KEY
+    );
 
-    const supabase = createClient(supabaseUrl, supabaseKey);
-
-    // 3. Check Cache
-    const { data: cachedResult } = await supabase
+    const { data: cachedResult, error: cacheError } = await supabase
       .from('image_cache')
       .select('result_json')
       .eq('image_hash', hashHex)
       .eq('prompt_version', PROMPT_VERSION)
-      .single();
+      .maybeSingle();
 
-    if (cachedResult && cachedResult.result_json) {
-      return new Response(JSON.stringify({
-        status: 'cached',
-        result: cachedResult.result_json,
-        message: 'Returning existing result for this image'
-      }), { status: 200, headers: { 'Content-Type': 'application/json' } });
+    if (cacheError) {
+      throw new DecodeApiError({
+        message: 'Failed to read image cache',
+        status: 500,
+        stage: 'cache_lookup',
+        code: 'SUPABASE_CACHE_READ',
+        details: cacheError.message,
+      });
     }
 
-    // 4. Check Quota
-    const now = new Date();
-    const windowStart = new Date(now.getFullYear(), now.getMonth(), now.getDate()).toISOString();
+    if (cachedResult?.result_json) {
+      return jsonResponse({
+        status: 'cached',
+        requestId,
+        result: cachedResult.result_json,
+        message: 'Returning existing result for this image',
+      });
+    }
 
-    const { data: quotaRow } = await supabase
+    const now = new Date();
+    const windowStart = new Date(
+      now.getFullYear(),
+      now.getMonth(),
+      now.getDate()
+    ).toISOString();
+
+    const { data: quotaRow, error: quotaError } = await supabase
       .from('usage_windows')
       .select('successful_runs')
       .eq('identity_key', finalIdentityKey)
       .eq('window_start', windowStart)
       .maybeSingle();
 
+    if (quotaError) {
+      throw new DecodeApiError({
+        message: 'Failed to check usage quota',
+        status: 500,
+        stage: 'quota_check',
+        code: 'SUPABASE_QUOTA_READ',
+        details: quotaError.message,
+      });
+    }
+
     if (quotaRow && quotaRow.successful_runs >= MAX_RUNS_PER_WINDOW) {
-      return new Response(JSON.stringify({
-        error: 'You have reached your 3-analysis limit for today',
-        status: 'quota_exceeded'
-      }), { status: 429, headers: { 'Content-Type': 'application/json' } });
+      return jsonResponse(
+        {
+          error: 'You have reached your 3-analysis limit for today',
+          status: 'quota_exceeded',
+          requestId,
+        },
+        429
+      );
     }
 
     if (!quotaRow) {
-      await supabase.from('usage_windows').insert({
+      const { error: initWindowError } = await supabase.from('usage_windows').insert({
         identity_key: finalIdentityKey,
         window_start: windowStart,
-        successful_runs: 0
+        successful_runs: 0,
       });
+
+      if (initWindowError) {
+        throw new DecodeApiError({
+          message: 'Failed to initialize quota window',
+          status: 500,
+          stage: 'quota_initialize',
+          code: 'SUPABASE_QUOTA_INIT',
+          details: initWindowError.message,
+        });
+      }
     }
 
-    const { data: jobData } = await supabase.from('analysis_jobs').insert({
-      identity_key: finalIdentityKey,
-      image_hash: hashHex,
-      prompt_version: PROMPT_VERSION,
-      status: 'processing'
-    }).select('id').single();
-
-    // 5. Call OpenRouter API — key strictly from Cloudflare runtime env
-    const base64Image = arrayBufferToBase64(arrayBuffer);
-    const openRouterKey = env.OPENROUTER_API_KEY;
-
-    try {
-      const aiResponse = await fetch('https://openrouter.ai/api/v1/chat/completions', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${openRouterKey}`,
-          'HTTP-Referer': 'https://crackingwall.com',
-          'X-Title': 'CrackingWall Analysis'
-        },
-        body: JSON.stringify({
-          model: 'qwen/qwen2.5-vl-32b-instruct',
-          messages: [
-            {
-              role: 'user',
-              content: [
-                { type: 'text', text: PROMPT_IMAGE_ANALYSIS },
-                {
-                  type: 'image_url',
-                  image_url: {
-                    url: `data:${imageFile.type};base64,${base64Image}`
-                  }
-                }
-              ]
-            }
-          ],
-          response_format: { type: 'json_object' }
-        })
-      });
-
-      const responseText = await aiResponse.text();
-      let aiData;
-      try {
-        aiData = responseText ? JSON.parse(responseText) : {};
-      } catch (e) {
-        throw new Error(`AI response was not valid JSON: ${responseText.substring(0, 100)}`);
-      }
-
-      if (!aiResponse.ok) {
-        throw new Error(aiData.error?.message || `AI request failed with status ${aiResponse.status}`);
-      }
-
-      if (!aiData.choices || !aiData.choices[0]) {
-        throw new Error('AI returned no results. Data: ' + JSON.stringify(aiData));
-      }
-
-      const generatedText = aiData.choices[0].message.content;
-      const parsedJson = JSON.parse(generatedText);
-
-      await supabase.rpc('increment_successful_runs', {
-        p_identity_key: finalIdentityKey,
-        p_window_start: windowStart
-      });
-
-      const runs = (quotaRow ? quotaRow.successful_runs : 0) + 1;
-      await supabase.from('usage_windows')
-        .update({ successful_runs: runs })
-        .eq('identity_key', finalIdentityKey)
-        .eq('window_start', windowStart);
-
-      await supabase.from('image_cache').insert({
+    const { data: jobData, error: jobInsertError } = await supabase
+      .from('analysis_jobs')
+      .insert({
+        identity_key: finalIdentityKey,
         image_hash: hashHex,
         prompt_version: PROMPT_VERSION,
-        result_json: parsedJson
-      });
+        status: 'processing',
+      })
+      .select('id')
+      .single();
 
-      if (jobData) {
-        await supabase.from('analysis_jobs').update({
-          status: 'completed',
-          result_json: parsedJson,
-          finished_at: new Date().toISOString()
-        }).eq('id', jobData.id);
-      }
-
-      return new Response(JSON.stringify({
-        status: 'completed',
-        result: parsedJson
-      }), { status: 200, headers: { 'Content-Type': 'application/json' } });
-
-    } catch (err: any) {
-      if (jobData) {
-        await supabase.from('analysis_jobs').update({
-          status: 'failed',
-          error_code: err.message || 'AI_ERROR',
-          finished_at: new Date().toISOString()
-        }).eq('id', jobData.id);
-      }
-      return new Response(JSON.stringify({
-        error: 'Analysis failed: ' + err.message,
-        diagnostic: {
-          step: 'ai_fetch_processing',
-          timestamp: new Date().toISOString()
-        }
-      }), {
+    if (jobInsertError || !jobData?.id) {
+      throw new DecodeApiError({
+        message: 'Failed to create analysis job',
         status: 500,
-        headers: { 'Content-Type': 'application/json' }
+        stage: 'job_create',
+        code: 'SUPABASE_JOB_CREATE',
+        details: jobInsertError?.message,
       });
     }
 
-  } catch (err: any) {
-    return new Response(JSON.stringify({
-      error: 'Critical serverless error: ' + err.message,
-      diagnostic: {
-        step: 'initialize_request',
-        timestamp: new Date().toISOString()
-      }
-    }), {
-      status: 500,
-      headers: { 'Content-Type': 'application/json' }
+    jobId = jobData.id;
+
+    const base64Image = arrayBufferToBase64(arrayBuffer);
+
+    const aiResponse = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${env.OPENROUTER_API_KEY}`,
+        'HTTP-Referer': 'https://crackingwall.com',
+        'X-Title': 'CrackingWall Analysis',
+      },
+      body: JSON.stringify({
+        model: 'qwen/qwen2.5-vl-32b-instruct',
+        messages: [
+          {
+            role: 'user',
+            content: [
+              { type: 'text', text: PROMPT_IMAGE_ANALYSIS },
+              {
+                type: 'image_url',
+                image_url: {
+                  url: `data:${imageFile.type};base64,${base64Image}`,
+                },
+              },
+            ],
+          },
+        ],
+        response_format: { type: 'json_object' },
+      }),
     });
+
+    const responseText = await aiResponse.text();
+
+    let aiData: any = {};
+    if (responseText) {
+      try {
+        aiData = JSON.parse(responseText);
+      } catch {
+        throw new DecodeApiError({
+          message: 'OpenRouter did not return valid JSON',
+          status: 502,
+          stage: 'openrouter_parse',
+          code: 'OPENROUTER_BAD_JSON',
+          details: responseText.slice(0, 200),
+        });
+      }
+    }
+
+    if (!aiResponse.ok) {
+      const upstreamMessage =
+        aiData?.error?.message ||
+        `OpenRouter request failed with status ${aiResponse.status}`;
+
+      throw new DecodeApiError({
+        message:
+          aiResponse.status === 401
+            ? 'OpenRouter rejected the API key (401). Verify OPENROUTER_API_KEY in Cloudflare secrets.'
+            : upstreamMessage,
+        status: aiResponse.status === 429 ? 429 : 502,
+        stage: 'openrouter_request',
+        code:
+          aiResponse.status === 401
+            ? 'OPENROUTER_UNAUTHORIZED'
+            : 'OPENROUTER_HTTP_ERROR',
+      });
+    }
+
+    const generatedText = aiData?.choices?.[0]?.message?.content;
+    if (!generatedText || typeof generatedText !== 'string') {
+      throw new DecodeApiError({
+        message: 'OpenRouter returned an empty completion payload',
+        status: 502,
+        stage: 'openrouter_response',
+        code: 'OPENROUTER_EMPTY_CHOICE',
+      });
+    }
+
+    let parsedJson: any;
+    try {
+      parsedJson = JSON.parse(generatedText);
+    } catch {
+      throw new DecodeApiError({
+        message: 'OpenRouter completion was not valid JSON',
+        status: 502,
+        stage: 'openrouter_response_parse',
+        code: 'OPENROUTER_INVALID_OUTPUT_JSON',
+        details: generatedText.slice(0, 200),
+      });
+    }
+
+    const { error: runsRpcError } = await supabase.rpc('increment_successful_runs', {
+      p_identity_key: finalIdentityKey,
+      p_window_start: windowStart,
+    });
+
+    if (runsRpcError) {
+      throw new DecodeApiError({
+        message: 'Failed to increment successful runs',
+        status: 500,
+        stage: 'quota_increment',
+        code: 'SUPABASE_QUOTA_INCREMENT',
+        details: runsRpcError.message,
+      });
+    }
+
+    const runs = (quotaRow?.successful_runs ?? 0) + 1;
+    const { error: usageUpdateError } = await supabase
+      .from('usage_windows')
+      .update({ successful_runs: runs })
+      .eq('identity_key', finalIdentityKey)
+      .eq('window_start', windowStart);
+
+    if (usageUpdateError) {
+      throw new DecodeApiError({
+        message: 'Failed to update usage window',
+        status: 500,
+        stage: 'quota_update',
+        code: 'SUPABASE_USAGE_UPDATE',
+        details: usageUpdateError.message,
+      });
+    }
+
+    const { error: cacheInsertError } = await supabase.from('image_cache').insert({
+      image_hash: hashHex,
+      prompt_version: PROMPT_VERSION,
+      result_json: parsedJson,
+    });
+
+    if (cacheInsertError) {
+      throw new DecodeApiError({
+        message: 'Failed to persist image cache',
+        status: 500,
+        stage: 'cache_write',
+        code: 'SUPABASE_CACHE_WRITE',
+        details: cacheInsertError.message,
+      });
+    }
+
+    const { error: completeJobError } = await supabase
+      .from('analysis_jobs')
+      .update({
+        status: 'completed',
+        result_json: parsedJson,
+        finished_at: new Date().toISOString(),
+      })
+      .eq('id', jobId);
+
+    if (completeJobError) {
+      throw new DecodeApiError({
+        message: 'Analysis completed but failed to update job status',
+        status: 500,
+        stage: 'job_complete',
+        code: 'SUPABASE_JOB_COMPLETE',
+        details: completeJobError.message,
+      });
+    }
+
+    return jsonResponse({
+      status: 'completed',
+      requestId,
+      result: parsedJson,
+    });
+  } catch (err: any) {
+    const isKnownError = err instanceof DecodeApiError;
+    const status = isKnownError ? err.status : 500;
+
+    if (jobId) {
+      const { env } = resolveDecodeEnv(locals);
+      if (env) {
+        const supabase = createClient(
+          env.PUBLIC_SUPABASE_URL,
+          env.SUPABASE_SERVICE_ROLE_KEY
+        );
+
+        await supabase
+          .from('analysis_jobs')
+          .update({
+            status: 'failed',
+            error_code: isKnownError ? err.code : 'UNHANDLED_EXCEPTION',
+            finished_at: new Date().toISOString(),
+          })
+          .eq('id', jobId);
+      }
+    }
+
+    return jsonResponse(
+      {
+        error: isKnownError ? err.message : 'Critical serverless error',
+        requestId,
+        diagnostic: {
+          stage: isKnownError ? err.stage : 'unhandled_exception',
+          code: isKnownError ? err.code : 'UNHANDLED_EXCEPTION',
+          details: isKnownError ? err.details : String(err?.message || err),
+          runtimeEnvAvailable: !!locals?.runtime?.env,
+          timestamp: new Date().toISOString(),
+        },
+      },
+      status
+    );
   }
 };
