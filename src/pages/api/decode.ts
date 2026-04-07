@@ -26,32 +26,32 @@ function getRuntimeEnv(locals: App.Locals) {
 }
 
 export const POST: APIRoute = async ({ request, locals }) => {
-  // --- Strict runtime env access (no import.meta.env fallbacks for secrets) ---
-  const env = getRuntimeEnv(locals);
-
-  // --- Temporary debug logs (remove after confirming env access) ---
-  console.log('Runtime env available:', !!locals?.runtime?.env);
-  console.log('OPENROUTER_API_KEY exists:', !!env.OPENROUTER_API_KEY);
-  console.log('PUBLIC_SUPABASE_URL exists:', !!env.PUBLIC_SUPABASE_URL);
-  console.log('SUPABASE_SERVICE_ROLE_KEY exists:', !!env.SUPABASE_SERVICE_ROLE_KEY);
-
-  // --- Early validation of all required env vars ---
-  const requiredEnvVars = [
-    'OPENROUTER_API_KEY',
-    'PUBLIC_SUPABASE_URL',
-    'SUPABASE_SERVICE_ROLE_KEY',
-  ];
-
-  for (const key of requiredEnvVars) {
-    if (!env[key]) {
-      return new Response(
-        JSON.stringify({ error: `Missing required env variable: ${key}` }),
-        { status: 500, headers: { 'Content-Type': 'application/json' } }
-      );
-    }
-  }
-
   try {
+    // --- Strict runtime env access (no import.meta.env fallbacks for secrets) ---
+    const env = getRuntimeEnv(locals);
+
+    // --- Temporary debug logs (remove after confirming env access) ---
+    console.log('Runtime env available:', !!locals?.runtime?.env);
+    console.log('OPENROUTER_API_KEY exists:', !!env.OPENROUTER_API_KEY);
+    console.log('PUBLIC_SUPABASE_URL exists:', !!env.PUBLIC_SUPABASE_URL);
+    console.log('SUPABASE_SERVICE_ROLE_KEY exists:', !!env.SUPABASE_SERVICE_ROLE_KEY);
+
+    // --- Early validation of all required env vars ---
+    const requiredEnvVars = [
+      'OPENROUTER_API_KEY',
+      'PUBLIC_SUPABASE_URL',
+      'SUPABASE_SERVICE_ROLE_KEY',
+    ];
+
+    for (const key of requiredEnvVars) {
+      if (!env[key]) {
+        return new Response(
+          JSON.stringify({ error: `Missing required env variable: ${key}` }),
+          { status: 500, headers: { 'Content-Type': 'application/json' } }
+        );
+      }
+    }
+
     const formData = await request.formData();
     const imageFile = formData.get('image');
 
