@@ -18,11 +18,38 @@ function arrayBufferToBase64(buffer: ArrayBuffer) {
   return btoa(binary);
 }
 
+/** Strict Cloudflare runtime env accessor — throws if not available */
+function getRuntimeEnv(locals: App.Locals) {
+  const env = locals?.runtime?.env;
+  if (!env) throw new Error('Cloudflare runtime environment not available');
+  return env;
+}
+
 export const POST: APIRoute = async ({ request, locals }) => {
-  // Cloudflare environment variables are available in locals.runtime.env
-  // @ts-ignore
-  const runtime = locals.runtime;
-  const env = runtime?.env || import.meta.env;
+  // --- Strict runtime env access (no import.meta.env fallbacks for secrets) ---
+  const env = getRuntimeEnv(locals);
+
+  // --- Temporary debug logs (remove after confirming env access) ---
+  console.log('Runtime env available:', !!locals?.runtime?.env);
+  console.log('OPENROUTER_API_KEY exists:', !!env.OPENROUTER_API_KEY);
+  console.log('PUBLIC_SUPABASE_URL exists:', !!env.PUBLIC_SUPABASE_URL);
+  console.log('SUPABASE_SERVICE_ROLE_KEY exists:', !!env.SUPABASE_SERVICE_ROLE_KEY);
+
+  // --- Early validation of all required env vars ---
+  const requiredEnvVars = [
+    'OPENROUTER_API_KEY',
+    'PUBLIC_SUPABASE_URL',
+    'SUPABASE_SERVICE_ROLE_KEY',
+  ];
+
+  for (const key of requiredEnvVars) {
+    if (!env[key]) {
+      return new Response(
+        JSON.stringify({ error: `Missing required env variable: ${key}` }),
+        { status: 500, headers: { 'Content-Type': 'application/json' } }
+      );
+    }
+  }
 
   try {
     const formData = await request.formData();
@@ -45,7 +72,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
     // 1. Calculate Identity Key based on CF proxy IP
     const clientAddress = request.headers.get('cf-connecting-ip') || 'unknown';
     const identityKey = `ip_${clientAddress}`;
-    
+
     const identityHashBuffer = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(identityKey));
     const finalIdentityKey = Array.from(new Uint8Array(identityHashBuffer)).map(b => b.toString(16).padStart(2, '0')).join('');
 
@@ -53,14 +80,10 @@ export const POST: APIRoute = async ({ request, locals }) => {
     const hashBuffer = await crypto.subtle.digest('SHA-256', arrayBuffer);
     const hashHex = Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, '0')).join('');
 
-    // Supabase initialization
-    const supabaseUrl = env.PUBLIC_SUPABASE_URL || import.meta.env.PUBLIC_SUPABASE_URL;
-    const supabaseKey = env.SUPABASE_SERVICE_ROLE_KEY || env.PUBLIC_SUPABASE_ANON_KEY || import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
-    
-    if (!supabaseUrl || !supabaseKey) {
-      return new Response(JSON.stringify({ error: 'Supabase credentials missing from Cloudflare environment variables' }), { status: 500, headers: { 'Content-Type': 'application/json' } });
-    }
-    
+    // Supabase initialization — strictly from Cloudflare runtime env
+    const supabaseUrl = env.PUBLIC_SUPABASE_URL;
+    const supabaseKey = env.SUPABASE_SERVICE_ROLE_KEY;
+
     const supabase = createClient(supabaseUrl, supabaseKey);
 
     // 3. Check Cache
@@ -112,24 +135,9 @@ export const POST: APIRoute = async ({ request, locals }) => {
       status: 'processing'
     }).select('id').single();
 
-    // 5. Call OpenRouter API
+    // 5. Call OpenRouter API — key strictly from Cloudflare runtime env
     const base64Image = arrayBufferToBase64(arrayBuffer);
-    const openRouterKey = env.OPENROUTER_API_KEY || import.meta.env.OPENROUTER_API_KEY;
-
-    if (!openRouterKey) {
-      if (jobData) {
-        await supabase.from('analysis_jobs').update({ status: 'failed', error_code: 'NO_AI_KEY' }).eq('id', jobData.id);
-      }
-      const availableKeys = env ? Object.keys(env).filter(k => !k.startsWith('ASSETS') && !k.startsWith('CF_')) : [];
-      return new Response(JSON.stringify({ 
-        error: 'OpenRouter credentials missing natively',
-        available_env_keys: availableKeys,
-        hint: 'If you added secrets in Cloudflare Pages, make sure you redeployed the app. If using Workers, use wrangler secret put OPENROUTER_API_KEY.'
-      }), { 
-        status: 500, 
-        headers: { 'Content-Type': 'application/json' } 
-      });
-    }
+    const openRouterKey = env.OPENROUTER_API_KEY;
 
     try {
       const aiResponse = await fetch('https://openrouter.ai/api/v1/chat/completions', {
@@ -173,7 +181,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
       }
 
       if (!aiData.choices || !aiData.choices[0]) {
-        throw new Error("AI returned no results. Data: " + JSON.stringify(aiData));
+        throw new Error('AI returned no results. Data: ' + JSON.stringify(aiData));
       }
 
       const generatedText = aiData.choices[0].message.content;
@@ -217,28 +225,28 @@ export const POST: APIRoute = async ({ request, locals }) => {
           finished_at: new Date().toISOString()
         }).eq('id', jobData.id);
       }
-      return new Response(JSON.stringify({ 
+      return new Response(JSON.stringify({
         error: 'Analysis failed: ' + err.message,
         diagnostic: {
-          step: "ai_fetch_processing",
+          step: 'ai_fetch_processing',
           timestamp: new Date().toISOString()
         }
-      }), { 
-        status: 500, 
-        headers: { 'Content-Type': 'application/json' } 
+      }), {
+        status: 500,
+        headers: { 'Content-Type': 'application/json' }
       });
     }
 
   } catch (err: any) {
-    return new Response(JSON.stringify({ 
+    return new Response(JSON.stringify({
       error: 'Critical serverless error: ' + err.message,
       diagnostic: {
-        step: "initialize_request",
+        step: 'initialize_request',
         timestamp: new Date().toISOString()
       }
-    }), { 
-      status: 500, 
-      headers: { 'Content-Type': 'application/json' } 
+    }), {
+      status: 500,
+      headers: { 'Content-Type': 'application/json' }
     });
   }
 };
