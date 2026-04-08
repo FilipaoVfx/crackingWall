@@ -51,36 +51,33 @@ function resolveDecodeEnv(
   locals: App.Locals
 ): { env: DecodeEnv | null; missing: string[]; source: string } {
   const runtimeEnv = locals?.runtime?.env;
-  const isDev = import.meta.env.DEV;
+
+  // Provide a safe fallback for process.env across different runtimes
+  const safeProcessEnv = typeof process !== 'undefined' ? process.env : {};
 
   const candidateEnv: Record<string, string | undefined> = {
     OPENROUTER_API_KEY:
       runtimeEnv?.OPENROUTER_API_KEY ||
-      (isDev
-        ? process.env.OPENROUTER_API_KEY || import.meta.env.OPENROUTER_API_KEY
-        : undefined),
+      import.meta.env.OPENROUTER_API_KEY ||
+      safeProcessEnv.OPENROUTER_API_KEY,
     PUBLIC_SUPABASE_URL:
       runtimeEnv?.PUBLIC_SUPABASE_URL ||
-      (isDev
-        ? process.env.PUBLIC_SUPABASE_URL || import.meta.env.PUBLIC_SUPABASE_URL
-        : undefined),
+      import.meta.env.PUBLIC_SUPABASE_URL ||
+      safeProcessEnv.PUBLIC_SUPABASE_URL,
     SUPABASE_SERVICE_ROLE_KEY:
       runtimeEnv?.SUPABASE_SERVICE_ROLE_KEY ||
-      (isDev
-        ? process.env.SUPABASE_SERVICE_ROLE_KEY ||
-          import.meta.env.SUPABASE_SERVICE_ROLE_KEY
-        : undefined),
+      import.meta.env.SUPABASE_SERVICE_ROLE_KEY ||
+      safeProcessEnv.SUPABASE_SERVICE_ROLE_KEY,
   };
 
   const missing = Object.entries(candidateEnv)
     .filter(([, value]) => !value)
     .map(([key]) => key);
 
-  const source = runtimeEnv
-    ? 'cloudflare_runtime'
-    : isDev
-      ? 'local_dev_fallback'
-      : 'missing_cloudflare_runtime';
+  let source = 'unknown';
+  if (runtimeEnv?.OPENROUTER_API_KEY) source = 'cloudflare_runtime';
+  else if (import.meta.env.OPENROUTER_API_KEY) source = 'import_meta_env';
+  else if (safeProcessEnv.OPENROUTER_API_KEY) source = 'process_env';
 
   if (missing.length > 0) {
     return { env: null, missing, source };
