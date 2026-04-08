@@ -11,6 +11,6 @@ command = "npm ci && npm run build"
 watch_dir = "src"
 
 [vars]
-OPENROUTER_API_KEY = "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"
+OPENROUTER_API_KEY = ""
 PUBLIC_SUPABASE_URL = ""
 SUPABASE_SERVICE_ROLE_KEY = ""
