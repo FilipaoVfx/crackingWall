@@ -36,54 +36,60 @@ class DecodeApiError extends Error {
   }
 }
 
-function arrayBufferToBase64(buffer: ArrayBuffer) {
-  let binary = '';
+function arrayBufferToBase64(buffer: ArrayBuffer): string {
   const bytes = new Uint8Array(buffer);
+  // Chunked conversion — avoids O(n²) string concat that crashes Cloudflare Workers
+  const CHUNK_SIZE = 8192;
+  const chunks: string[] = [];
 
-  for (let i = 0; i < bytes.byteLength; i++) {
-    binary += String.fromCharCode(bytes[i]);
+  for (let i = 0; i < bytes.length; i += CHUNK_SIZE) {
+    const chunk = bytes.subarray(i, i + CHUNK_SIZE);
+    chunks.push(String.fromCharCode(...chunk));
   }
 
-  return btoa(binary);
+  return btoa(chunks.join(''));
 }
 
 function resolveDecodeEnv(
   locals: App.Locals
 ): { env: DecodeEnv | null; missing: string[]; source: string } {
+  // Priority 1: Cloudflare runtime bindings (production on CF Pages/Workers)
   const runtimeEnv = locals?.runtime?.env;
 
-  // Provide a safe fallback for process.env across different runtimes
+  // Priority 2: Astro env (works in dev via .env / .dev.vars)
+  // Priority 3: process.env fallback (Node-based runtimes)
   const safeProcessEnv = typeof process !== 'undefined' ? process.env : {};
 
-  const candidateEnv: Record<string, string | undefined> = {
-    OPENROUTER_API_KEY:
-      runtimeEnv?.OPENROUTER_API_KEY ||
-      import.meta.env.OPENROUTER_API_KEY ||
-      safeProcessEnv.OPENROUTER_API_KEY,
-    PUBLIC_SUPABASE_URL:
-      runtimeEnv?.PUBLIC_SUPABASE_URL ||
-      import.meta.env.PUBLIC_SUPABASE_URL ||
-      safeProcessEnv.PUBLIC_SUPABASE_URL,
-    SUPABASE_SERVICE_ROLE_KEY:
-      runtimeEnv?.SUPABASE_SERVICE_ROLE_KEY ||
-      import.meta.env.SUPABASE_SERVICE_ROLE_KEY ||
-      safeProcessEnv.SUPABASE_SERVICE_ROLE_KEY,
-  };
+  const keys: (keyof DecodeEnv)[] = [
+    'OPENROUTER_API_KEY',
+    'PUBLIC_SUPABASE_URL',
+    'SUPABASE_SERVICE_ROLE_KEY',
+  ];
 
-  const missing = Object.entries(candidateEnv)
-    .filter(([, value]) => !value)
-    .map(([key]) => key);
+  const resolved: Record<string, string | undefined> = {};
+  const sources: Record<string, string> = {};
 
-  let source = 'unknown';
-  if (runtimeEnv?.OPENROUTER_API_KEY) source = 'cloudflare_runtime';
-  else if (import.meta.env.OPENROUTER_API_KEY) source = 'import_meta_env';
-  else if (safeProcessEnv.OPENROUTER_API_KEY) source = 'process_env';
+  for (const key of keys) {
+    if (runtimeEnv?.[key]) {
+      resolved[key] = runtimeEnv[key];
+      sources[key] = 'cloudflare_runtime';
+    } else if (import.meta.env[key]) {
+      resolved[key] = import.meta.env[key];
+      sources[key] = 'import_meta';
+    } else if (safeProcessEnv[key]) {
+      resolved[key] = safeProcessEnv[key];
+      sources[key] = 'process_env';
+    }
+  }
+
+  const missing = keys.filter((k) => !resolved[k]);
+  const source = sources['OPENROUTER_API_KEY'] || 'unknown';
 
   if (missing.length > 0) {
     return { env: null, missing, source };
   }
 
-  return { env: candidateEnv as DecodeEnv, missing: [], source };
+  return { env: resolved as DecodeEnv, missing: [], source };
 }
 
 function jsonResponse(payload: unknown, status = 200) {
@@ -463,7 +469,9 @@ export const POST: APIRoute = async ({ request, locals }) => {
           stage: isKnownError ? err.stage : 'unhandled_exception',
           code: isKnownError ? err.code : 'UNHANDLED_EXCEPTION',
           details: isKnownError ? err.details : String(err?.message || err),
+          stack: !isKnownError ? String(err?.stack || '').slice(0, 300) : undefined,
           runtimeEnvAvailable: !!locals?.runtime?.env,
+          runtimeEnvKeys: Object.keys(locals?.runtime?.env || {}),
           timestamp: new Date().toISOString(),
         },
       },

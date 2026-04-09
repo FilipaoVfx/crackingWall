@@ -11,6 +11,9 @@ command = "npm ci && npm run build"
 watch_dir = "src"
 
 [vars]
-OPENROUTER_API_KEY = "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"
+# ⚠️ DO NOT put secrets here — they are exposed in git history.
+# Set these in Cloudflare Dashboard > Pages > Settings > Environment Variables:
+#   - OPENROUTER_API_KEY
+#   - SUPABASE_SERVICE_ROLE_KEY
+# Only non-secret vars below:
 PUBLIC_SUPABASE_URL = "https://cauitdpbsedajkuodsaf.supabase.co"
-SUPABASE_SERVICE_ROLE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNhdWl0ZHBic2VkYWprdW9kc2FmIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1ODMzOTk5OSwiZXhwIjoyMDczOTE1OTk5fQ.ABqc3_V5kRdZ935Ca493R2FUBAy-FcfeaKhqnOEsB_Q"
