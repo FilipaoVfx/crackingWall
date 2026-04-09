@@ -6,7 +6,8 @@ export const prerender = false;
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
 const ALLOWED_MIME_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
-const MAX_RUNS_PER_WINDOW = 3;
+const QUOTA_ANON = 2;   // anonymous users: 2 per day (by IP)
+const QUOTA_AUTH = 6;   // authenticated users: 6 per day (by user_id)
 
 type DecodeEnv = {
   OPENROUTER_API_KEY: string;
@@ -153,28 +154,54 @@ export const POST: APIRoute = async ({ request, locals }) => {
 
     const arrayBuffer = await imageFile.arrayBuffer();
 
-    const clientAddress = request.headers.get('cf-connecting-ip') || 'unknown';
-    const identityKey = `ip_${clientAddress}`;
-
-    const identityHashBuffer = await crypto.subtle.digest(
-      'SHA-256',
-      new TextEncoder().encode(identityKey)
+    const supabase = createClient(
+      env.PUBLIC_SUPABASE_URL,
+      env.SUPABASE_SERVICE_ROLE_KEY
     );
 
-    const finalIdentityKey = Array.from(new Uint8Array(identityHashBuffer))
-      .map((b) => b.toString(16).padStart(2, '0'))
-      .join('');
+    // --- Resolve identity: authenticated user_id or hashed IP ---
+    let userId: string | null = null;
+    let identityType: 'user' | 'ip' = 'ip';
+    let maxRuns = QUOTA_ANON;
+
+    const authHeader = request.headers.get('authorization');
+    const accessToken = authHeader?.startsWith('Bearer ')
+      ? authHeader.slice(7)
+      : null;
+
+    if (accessToken) {
+      const { data: { user }, error: authError } = await supabase.auth.getUser(accessToken);
+      if (!authError && user) {
+        userId = user.id;
+        identityType = 'user';
+        maxRuns = QUOTA_AUTH;
+      }
+    }
+
+    // For auth users: identity = user_id. For anon: identity = hashed IP.
+    let finalIdentityKey: string;
+    if (userId) {
+      finalIdentityKey = userId;
+    } else {
+      const clientAddress =
+        request.headers.get('cf-connecting-ip') ||
+        request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ||
+        'unknown';
+      const identityHashBuffer = await crypto.subtle.digest(
+        'SHA-256',
+        new TextEncoder().encode(`ip_${clientAddress}`)
+      );
+      finalIdentityKey = Array.from(new Uint8Array(identityHashBuffer))
+        .map((b) => b.toString(16).padStart(2, '0'))
+        .join('');
+    }
 
     const hashBuffer = await crypto.subtle.digest('SHA-256', arrayBuffer);
     const hashHex = Array.from(new Uint8Array(hashBuffer))
       .map((b) => b.toString(16).padStart(2, '0'))
       .join('');
 
-    const supabase = createClient(
-      env.PUBLIC_SUPABASE_URL,
-      env.SUPABASE_SERVICE_ROLE_KEY
-    );
-
+    // --- Cache lookup ---
     const { data: cachedResult, error: cacheError } = await supabase
       .from('image_cache')
       .select('result_json')
@@ -201,6 +228,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
       });
     }
 
+    // --- Quota check ---
     const now = new Date();
     const windowStart = new Date(
       now.getFullYear(),
@@ -225,33 +253,18 @@ export const POST: APIRoute = async ({ request, locals }) => {
       });
     }
 
-    if (quotaRow && quotaRow.successful_runs >= MAX_RUNS_PER_WINDOW) {
+    if (quotaRow && quotaRow.successful_runs >= maxRuns) {
       return jsonResponse(
         {
-          error: 'You have reached your 3-analysis limit for today',
+          error: identityType === 'user'
+            ? `You have reached your ${QUOTA_AUTH}-analysis limit for today`
+            : `You have reached your ${QUOTA_ANON}-analysis limit for today. Sign in for ${QUOTA_AUTH} daily analyses.`,
           status: 'quota_exceeded',
           requestId,
+          quota: { limit: maxRuns, used: quotaRow.successful_runs, type: identityType },
         },
         429
       );
-    }
-
-    if (!quotaRow) {
-      const { error: initWindowError } = await supabase.from('usage_windows').insert({
-        identity_key: finalIdentityKey,
-        window_start: windowStart,
-        successful_runs: 0,
-      });
-
-      if (initWindowError) {
-        throw new DecodeApiError({
-          message: 'Failed to initialize quota window',
-          status: 500,
-          stage: 'quota_initialize',
-          code: 'SUPABASE_QUOTA_INIT',
-          details: initWindowError.message,
-        });
-      }
     }
 
     const { data: jobData, error: jobInsertError } = await supabase
@@ -366,9 +379,12 @@ export const POST: APIRoute = async ({ request, locals }) => {
       });
     }
 
+    // Atomic upsert: creates row if missing, increments if exists
     const { error: runsRpcError } = await supabase.rpc('increment_successful_runs', {
       p_identity_key: finalIdentityKey,
       p_window_start: windowStart,
+      p_user_id: userId,
+      p_identity_type: identityType,
     });
 
     if (runsRpcError) {
@@ -378,23 +394,6 @@ export const POST: APIRoute = async ({ request, locals }) => {
         stage: 'quota_increment',
         code: 'SUPABASE_QUOTA_INCREMENT',
         details: runsRpcError.message,
-      });
-    }
-
-    const runs = (quotaRow?.successful_runs ?? 0) + 1;
-    const { error: usageUpdateError } = await supabase
-      .from('usage_windows')
-      .update({ successful_runs: runs })
-      .eq('identity_key', finalIdentityKey)
-      .eq('window_start', windowStart);
-
-    if (usageUpdateError) {
-      throw new DecodeApiError({
-        message: 'Failed to update usage window',
-        status: 500,
-        stage: 'quota_update',
-        code: 'SUPABASE_USAGE_UPDATE',
-        details: usageUpdateError.message,
       });
     }
 

@@ -1,6 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { UploadCloud, Image as ImageIcon, Loader2, AlertCircle, CheckCircle, Info, ChevronDown, ChevronUp } from 'lucide-react';
+import { supabase } from '../lib/supabase';
 
 type UploadState = 'idle' | 'uploading' | 'analyzing' | 'success' | 'error' | 'quota_exceeded';
 
@@ -78,8 +79,17 @@ export const ImageAnalyzer: React.FC = () => {
 
     try {
       setState('analyzing');
+
+      // Send auth token if user is logged in
+      const headers: Record<string, string> = {};
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session?.access_token) {
+        headers['Authorization'] = `Bearer ${session.access_token}`;
+      }
+
       const res = await fetch('/api/decode', {
         method: 'POST',
+        headers,
         body: formData,
       });
 
@@ -96,7 +106,7 @@ export const ImageAnalyzer: React.FC = () => {
       if (!res.ok) {
         if (res.status === 429) {
           setState('quota_exceeded');
-          setErrorMsg(data.error || 'Quota exceeded (3/day).');
+          setErrorMsg(data.error || 'Daily analysis quota exceeded.');
         } else {
           setState('error');
           setErrorMsg(data.error || `Server error (${res.status}): ${JSON.stringify(data)}`);
