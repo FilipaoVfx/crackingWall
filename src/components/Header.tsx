@@ -43,6 +43,7 @@ export const Header: React.FC<HeaderProps> = ({ onSearchChange, onAuthClick }) =
           <div className="hidden md:flex items-center space-x-6">
             <nav className="flex space-x-6 font-brutal font-bold text-white uppercase text-sm mr-4">
               <a href="/blog/" className="hover:text-brutal-neon-cyan hover:underline decoration-2 underline-offset-4 transition-all">Blog</a>
+              <a href="/ascii-lab/" className="hover:text-brutal-neon-green hover:underline decoration-2 underline-offset-4 transition-all">ASCII Lab</a>
               <a href="/about/" className="hover:text-brutal-neon-pink hover:underline decoration-2 underline-offset-4 transition-all">About</a>
               <a href="/contact/" className="hover:text-brutal-neon-yellow hover:underline decoration-2 underline-offset-4 transition-all">Contact</a>
             </nav>

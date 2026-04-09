@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(//c/Users/usuario/Documents/code/crackingWall-main/crackingWall-main/**)",
+      "Bash(npx skills:*)",
+      "Bash(mkdir:*)",
+      "Bash(npx astro:*)"
+    ]
+  }
+}

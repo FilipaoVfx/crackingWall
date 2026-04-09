@@ -1,0 +1,9 @@
+---
+export const prerender = true;
+import Layout from '../layouts/Layout.astro';
+import { AsciiLab } from '../features/ascii-video';
+---
+
+<Layout title="ASCII Lab — CrakingWall" description="Sube un video y conviértelo en arte ASCII animado. Laboratorio experimental de cultura tech.">
+  <AsciiLab client:only="react" />
+</Layout>

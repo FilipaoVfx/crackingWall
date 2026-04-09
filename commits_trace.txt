@@ -1,0 +1,18 @@
+﻿f2926775f729e5744df9b4e81eb361040ff5a37e|Philipao0122|2026-04-07 20:40:42 -0500|CloudflarefeatureImage
+a98718fa1bdfa174baf96794831f2d8c1203d2c1|Juan Felipe Gonzalez Arango|2026-04-07 19:00:32 -0500|Refactor error handling with DecodeApiError class
+564a68c29ce385dd45a69c7e6fe04c82d00b4da8|Juan Felipe Gonzalez Arango|2026-04-07 18:56:09 -0500|Merge branch 'main' into codex/fix-environment-variable-issues-2b2g8b
+23d7ebaa4b66548413376670e58f7bef47311505|Juan Felipe Gonzalez Arango|2026-04-07 18:51:59 -0500|decode: add actionable diagnostics for 500 errors
+f803038354f53f23b21944b2212a56c97d357b95|Juan Felipe Gonzalez Arango|2026-04-07 18:21:16 -0500|Fix decode.ts formatting and merge-safe structure
+12016da0fe81e5ad7a8340011c8a70329df2d10b|Juan Felipe Gonzalez Arango|2026-04-07 18:14:27 -0500|Enforce Cloudflare runtime env bindings for decode API
+b0bab097d909af5eadbbc10e938c97530fd427f2|Philipao0122|2026-04-07 17:28:08 -0500|fix: wrap all handler logic in outer try/catch to prevent uncaught throws
+aaf7c7755f29ce8534dcb359565bf157a64fb11a|Philipao0122|2026-04-07 17:22:09 -0500|CloudflareFunctionsEnv
+20aaf21ee089b9b73dac01a11d4557ee8fd30cf5|Philipao0122|2026-04-03 18:08:40 -0500|CloudflareFunctionssv9
+d855cbdb46b79ef099c1ec7f8a5b985af6f88a01|Philipao0122|2026-04-02 16:49:40 -0500|CloudflareFunctionFixv4
+a381fcb9c23007ea491b4e1bd62cd56cf66c322e|Philipao0122|2026-04-02 16:40:45 -0500|CloudflareFunctionFixv3
+50666a6d971a5011c70a39859e472140ec86b16e|Philipao0122|2026-04-02 16:36:51 -0500|CloudflareFunctionFixv2
+1569d5020f867d3f914eb81a5368c9c72ebe9a51|Philipao0122|2026-04-02 16:27:28 -0500|CloudflareFunctionFix
+93f654600ee9d7f7415262a605e40ec90e81d15c|Philipao|2026-04-02 00:41:44 -0500|Decouple API from Astro and move to Cloudflare Native Functions
+edab6671d0a29d60787a5a3c14f66ed4cd75eef4|Philipao|2026-04-02 00:29:05 -0500|Fix Astro trailingSlash & Cloudflare routing config
+bd4acc29d821fcbf363772b664b38dfff2937f41|Philipao|2026-04-02 00:19:31 -0500|Fix Cloudflare 404 changing explicit extension to .json
+985b51f96dc074c69aa96d3f49da3d2ef9ad9a55|Philipao|2026-04-01 23:58:01 -0500|featureAnalyzeImgv2
+99013791064db8399c3d4bab206311f1ced5b09f|Philipao|2026-04-01 23:41:01 -0500|featureAnalyzeImg

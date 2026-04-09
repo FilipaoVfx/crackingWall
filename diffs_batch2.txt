@@ -1,0 +1,1187 @@
+﻿commit aaf7c7755f29ce8534dcb359565bf157a64fb11a
+Author: Philipao0122 <juanku2003@gmail.com>
+Date:   Tue Apr 7 17:22:09 2026 -0500
+
+    CloudflareFunctionsEnv
+
+diff --git a/src/pages/api/decode.ts b/src/pages/api/decode.ts
+index c83ce65..780468e 100644
+--- a/src/pages/api/decode.ts
++++ b/src/pages/api/decode.ts
+@@ -18,11 +18,38 @@ function arrayBufferToBase64(buffer: ArrayBuffer) {
+   return btoa(binary);
+ }
+ 
++/** Strict Cloudflare runtime env accessor ÔÇö throws if not available */
++function getRuntimeEnv(locals: App.Locals) {
++  const env = locals?.runtime?.env;
++  if (!env) throw new Error('Cloudflare runtime environment not available');
++  return env;
++}
++
+ export const POST: APIRoute = async ({ request, locals }) => {
+-  // Cloudflare environment variables are available in locals.runtime.env
+-  // @ts-ignore
+-  const runtime = locals.runtime;
+-  const env = runtime?.env || import.meta.env;
++  // --- Strict runtime env access (no import.meta.env fallbacks for secrets) ---
++  const env = getRuntimeEnv(locals);
++
++  // --- Temporary debug logs (remove after confirming env access) ---
++  console.log('Runtime env available:', !!locals?.runtime?.env);
++  console.log('OPENROUTER_API_KEY exists:', !!env.OPENROUTER_API_KEY);
++  console.log('PUBLIC_SUPABASE_URL exists:', !!env.PUBLIC_SUPABASE_URL);
++  console.log('SUPABASE_SERVICE_ROLE_KEY exists:', !!env.SUPABASE_SERVICE_ROLE_KEY);
++
++  // --- Early validation of all required env vars ---
++  const requiredEnvVars = [
++    'OPENROUTER_API_KEY',
++    'PUBLIC_SUPABASE_URL',
++    'SUPABASE_SERVICE_ROLE_KEY',
++  ];
++
++  for (const key of requiredEnvVars) {
++    if (!env[key]) {
++      return new Response(
++        JSON.stringify({ error: `Missing required env variable: ${key}` }),
++        { status: 500, headers: { 'Content-Type': 'application/json' } }
++      );
++    }
++  }
+ 
+   try {
+     const formData = await request.formData();
+@@ -45,7 +72,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
+     // 1. Calculate Identity Key based on CF proxy IP
+     const clientAddress = request.headers.get('cf-connecting-ip') || 'unknown';
+     const identityKey = `ip_${clientAddress}`;
+-    
++
+     const identityHashBuffer = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(identityKey));
+     const finalIdentityKey = Array.from(new Uint8Array(identityHashBuffer)).map(b => b.toString(16).padStart(2, '0')).join('');
+ 
+@@ -53,14 +80,10 @@ export const POST: APIRoute = async ({ request, locals }) => {
+     const hashBuffer = await crypto.subtle.digest('SHA-256', arrayBuffer);
+     const hashHex = Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, '0')).join('');
+ 
+-    // Supabase initialization
+-    const supabaseUrl = env.PUBLIC_SUPABASE_URL || import.meta.env.PUBLIC_SUPABASE_URL;
+-    const supabaseKey = env.SUPABASE_SERVICE_ROLE_KEY || env.PUBLIC_SUPABASE_ANON_KEY || import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
+-    
+-    if (!supabaseUrl || !supabaseKey) {
+-      return new Response(JSON.stringify({ error: 'Supabase credentials missing from Cloudflare environment variables' }), { status: 500, headers: { 'Content-Type': 'application/json' } });
+-    }
+-    
++    // Supabase initialization ÔÇö strictly from Cloudflare runtime env
++    const supabaseUrl = env.PUBLIC_SUPABASE_URL;
++    const supabaseKey = env.SUPABASE_SERVICE_ROLE_KEY;
++
+     const supabase = createClient(supabaseUrl, supabaseKey);
+ 
+     // 3. Check Cache
+@@ -112,24 +135,9 @@ export const POST: APIRoute = async ({ request, locals }) => {
+       status: 'processing'
+     }).select('id').single();
+ 
+-    // 5. Call OpenRouter API
++    // 5. Call OpenRouter API ÔÇö key strictly from Cloudflare runtime env
+     const base64Image = arrayBufferToBase64(arrayBuffer);
+-    const openRouterKey = env.OPENROUTER_API_KEY || import.meta.env.OPENROUTER_API_KEY;
+-
+-    if (!openRouterKey) {
+-      if (jobData) {
+-        await supabase.from('analysis_jobs').update({ status: 'failed', error_code: 'NO_AI_KEY' }).eq('id', jobData.id);
+-      }
+-      const availableKeys = env ? Object.keys(env).filter(k => !k.startsWith('ASSETS') && !k.startsWith('CF_')) : [];
+-      return new Response(JSON.stringify({ 
+-        error: 'OpenRouter credentials missing natively',
+-        available_env_keys: availableKeys,
+-        hint: 'If you added secrets in Cloudflare Pages, make sure you redeployed the app. If using Workers, use wrangler secret put OPENROUTER_API_KEY.'
+-      }), { 
+-        status: 500, 
+-        headers: { 'Content-Type': 'application/json' } 
+-      });
+-    }
++    const openRouterKey = env.OPENROUTER_API_KEY;
+ 
+     try {
+       const aiResponse = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+@@ -173,7 +181,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
+       }
+ 
+       if (!aiData.choices || !aiData.choices[0]) {
+-        throw new Error("AI returned no results. Data: " + JSON.stringify(aiData));
++        throw new Error('AI returned no results. Data: ' + JSON.stringify(aiData));
+       }
+ 
+       const generatedText = aiData.choices[0].message.content;
+@@ -217,28 +225,28 @@ export const POST: APIRoute = async ({ request, locals }) => {
+           finished_at: new Date().toISOString()
+         }).eq('id', jobData.id);
+       }
+-      return new Response(JSON.stringify({ 
++      return new Response(JSON.stringify({
+         error: 'Analysis failed: ' + err.message,
+         diagnostic: {
+-          step: "ai_fetch_processing",
++          step: 'ai_fetch_processing',
+           timestamp: new Date().toISOString()
+         }
+-      }), { 
+-        status: 500, 
+-        headers: { 'Content-Type': 'application/json' } 
++      }), {
++        status: 500,
++        headers: { 'Content-Type': 'application/json' }
+       });
+     }
+ 
+   } catch (err: any) {
+-    return new Response(JSON.stringify({ 
++    return new Response(JSON.stringify({
+       error: 'Critical serverless error: ' + err.message,
+       diagnostic: {
+-        step: "initialize_request",
++        step: 'initialize_request',
+         timestamp: new Date().toISOString()
+       }
+-    }), { 
+-      status: 500, 
+-      headers: { 'Content-Type': 'application/json' } 
++    }), {
++      status: 500,
++      headers: { 'Content-Type': 'application/json' }
+     });
+   }
+ };
+
+commit 20aaf21ee089b9b73dac01a11d4557ee8fd30cf5
+Author: Philipao0122 <juanku2003@gmail.com>
+Date:   Fri Apr 3 18:08:40 2026 -0500
+
+    CloudflareFunctionssv9
+
+diff --git a/src/pages/api/decode.ts b/src/pages/api/decode.ts
+index c153aef..c83ce65 100644
+--- a/src/pages/api/decode.ts
++++ b/src/pages/api/decode.ts
+@@ -29,15 +29,15 @@ export const POST: APIRoute = async ({ request, locals }) => {
+     const imageFile = formData.get('image');
+ 
+     if (!imageFile || !(imageFile instanceof Blob)) {
+-      return new Response(JSON.stringify({ error: 'No valid image provided' }), { status: 400 });
++      return new Response(JSON.stringify({ error: 'No valid image provided' }), { status: 400, headers: { 'Content-Type': 'application/json' } });
+     }
+ 
+     if (!ALLOWED_MIME_TYPES.includes(imageFile.type)) {
+-      return new Response(JSON.stringify({ error: 'Unsupported file type' }), { status: 400 });
++      return new Response(JSON.stringify({ error: 'Unsupported file type' }), { status: 400, headers: { 'Content-Type': 'application/json' } });
+     }
+ 
+     if (imageFile.size > MAX_FILE_SIZE) {
+-      return new Response(JSON.stringify({ error: 'File too large (max 5MB)' }), { status: 400 });
++      return new Response(JSON.stringify({ error: 'File too large (max 5MB)' }), { status: 400, headers: { 'Content-Type': 'application/json' } });
+     }
+ 
+     const arrayBuffer = await imageFile.arrayBuffer();
+@@ -58,7 +58,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
+     const supabaseKey = env.SUPABASE_SERVICE_ROLE_KEY || env.PUBLIC_SUPABASE_ANON_KEY || import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
+     
+     if (!supabaseUrl || !supabaseKey) {
+-      return new Response(JSON.stringify({ error: 'Supabase credentials missing from Cloudflare environment variables' }), { status: 500 });
++      return new Response(JSON.stringify({ error: 'Supabase credentials missing from Cloudflare environment variables' }), { status: 500, headers: { 'Content-Type': 'application/json' } });
+     }
+     
+     const supabase = createClient(supabaseUrl, supabaseKey);
+@@ -94,7 +94,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
+       return new Response(JSON.stringify({
+         error: 'You have reached your 3-analysis limit for today',
+         status: 'quota_exceeded'
+-      }), { status: 429 });
++      }), { status: 429, headers: { 'Content-Type': 'application/json' } });
+     }
+ 
+     if (!quotaRow) {
+@@ -120,7 +120,15 @@ export const POST: APIRoute = async ({ request, locals }) => {
+       if (jobData) {
+         await supabase.from('analysis_jobs').update({ status: 'failed', error_code: 'NO_AI_KEY' }).eq('id', jobData.id);
+       }
+-      return new Response(JSON.stringify({ error: 'OpenRouter credentials missing natively' }), { status: 500 });
++      const availableKeys = env ? Object.keys(env).filter(k => !k.startsWith('ASSETS') && !k.startsWith('CF_')) : [];
++      return new Response(JSON.stringify({ 
++        error: 'OpenRouter credentials missing natively',
++        available_env_keys: availableKeys,
++        hint: 'If you added secrets in Cloudflare Pages, make sure you redeployed the app. If using Workers, use wrangler secret put OPENROUTER_API_KEY.'
++      }), { 
++        status: 500, 
++        headers: { 'Content-Type': 'application/json' } 
++      });
+     }
+ 
+     try {
+
+commit 93f654600ee9d7f7415262a605e40ec90e81d15c
+Author: Philipao <juanku2003@gmail.com>
+Date:   Thu Apr 2 00:41:44 2026 -0500
+
+    Decouple API from Astro and move to Cloudflare Native Functions
+
+diff --git a/src/pages/api/decode.ts b/functions/api/decode.ts
+similarity index 80%
+rename from src/pages/api/decode.ts
+rename to functions/api/decode.ts
+index e288d4d..82f4bbb 100644
+--- a/src/pages/api/decode.ts
++++ b/functions/api/decode.ts
+@@ -1,12 +1,10 @@
+-import type { APIRoute } from 'astro';
+-import { getAnalysisSupabaseAdmin } from '../../lib/supabaseAnalysis';
+-import { PROMPT_IMAGE_ANALYSIS, PROMPT_VERSION } from '../../lib/promptImage';
++import { createClient } from '@supabase/supabase-js';
++import { PROMPT_IMAGE_ANALYSIS, PROMPT_VERSION } from '../../src/lib/promptImage';
+ 
+ const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
+ const ALLOWED_MIME_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
+ const MAX_RUNS_PER_WINDOW = 3;
+ 
+-// Helper to convert ArrayBuffer to Base64 for Cloudflare runtime
+ function arrayBufferToBase64(buffer: ArrayBuffer) {
+   let binary = '';
+   const bytes = new Uint8Array(buffer);
+@@ -17,7 +15,10 @@ function arrayBufferToBase64(buffer: ArrayBuffer) {
+   return btoa(binary);
+ }
+ 
+-export const POST: APIRoute = async ({ request, clientAddress }) => {
++// Cloudflare Pages Function explicit syntax
++export const onRequestPost = async (context: any) => {
++  const { request, env } = context;
++  
+   try {
+     const formData = await request.formData();
+     const imageFile = formData.get('image');
+@@ -36,10 +37,10 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
+ 
+     const arrayBuffer = await imageFile.arrayBuffer();
+ 
+-    // 1. Calculate Identity Key based on IP address
+-    const identityKey = `ip_${clientAddress || request.headers.get('cf-connecting-ip') || 'unknown'}`;
+-
+-    // Hash IP for privacy/safety
++    // 1. Calculate Identity Key based on CF proxy IP
++    const clientAddress = request.headers.get('cf-connecting-ip') || 'unknown';
++    const identityKey = `ip_${clientAddress}`;
++    
+     const identityHashBuffer = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(identityKey));
+     const finalIdentityKey = Array.from(new Uint8Array(identityHashBuffer)).map(b => b.toString(16).padStart(2, '0')).join('');
+ 
+@@ -47,7 +48,15 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
+     const hashBuffer = await crypto.subtle.digest('SHA-256', arrayBuffer);
+     const hashHex = Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, '0')).join('');
+ 
+-    const supabase = getAnalysisSupabaseAdmin();
++    // Supabase initialization natively hooked to Cloudflare ENV without hacks
++    const supabaseUrl = env.PUBLIC_SUPABASE_URL;
++    const supabaseKey = env.SUPABASE_SERVICE_ROLE_KEY || env.PUBLIC_SUPABASE_ANON_KEY;
++    
++    if (!supabaseUrl || !supabaseKey) {
++      return new Response(JSON.stringify({ error: 'Supabase credentials missing from Cloudflare environment variables' }), { status: 500 });
++    }
++    
++    const supabase = createClient(supabaseUrl, supabaseKey);
+ 
+     // 3. Check Cache
+     const { data: cachedResult } = await supabase
+@@ -66,11 +75,10 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
+     }
+ 
+     // 4. Check Quota
+-    // Window start could be today's date (midnight)
+     const now = new Date();
+     const windowStart = new Date(now.getFullYear(), now.getMonth(), now.getDate()).toISOString();
+ 
+-    const { data: quotaRow, error: quotaError } = await supabase
++    const { data: quotaRow } = await supabase
+       .from('usage_windows')
+       .select('successful_runs')
+       .eq('identity_key', finalIdentityKey)
+@@ -84,7 +92,6 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
+       }), { status: 429 });
+     }
+ 
+-    // Insert or update Quota row
+     if (!quotaRow) {
+       await supabase.from('usage_windows').insert({
+         identity_key: finalIdentityKey,
+@@ -93,7 +100,6 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
+       });
+     }
+ 
+-    // Create a job (Processing state)
+     const { data: jobData } = await supabase.from('analysis_jobs').insert({
+       identity_key: finalIdentityKey,
+       image_hash: hashHex,
+@@ -103,15 +109,13 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
+ 
+     // 5. Call OpenRouter API
+     const base64Image = arrayBufferToBase64(arrayBuffer);
+-    const isNode = typeof process !== 'undefined';
+-    const openRouterKey = (import.meta as any).env.OPENROUTER_API_KEY || (isNode ? process.env.OPENROUTER_API_KEY : undefined);
++    const openRouterKey = env.OPENROUTER_API_KEY;
+ 
+     if (!openRouterKey) {
+-      // mark job failed
+       if (jobData) {
+         await supabase.from('analysis_jobs').update({ status: 'failed', error_code: 'NO_AI_KEY' }).eq('id', jobData.id);
+       }
+-      return new Response(JSON.stringify({ error: 'AI processing not configured' }), { status: 500 });
++      return new Response(JSON.stringify({ error: 'OpenRouter credentials missing natively' }), { status: 500 });
+     }
+ 
+     try {
+@@ -124,7 +128,7 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
+           'X-Title': 'CrackingWall Analysis'
+         },
+         body: JSON.stringify({
+-          model: 'qwen/qwen2.5-vl-32b-instruct', // using openai model via openrouter
++          model: 'qwen/qwen2.5-vl-32b-instruct',
+           messages: [
+             {
+               role: 'user',
+@@ -152,27 +156,23 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
+       const generatedText = aiData.choices[0].message.content;
+       const parsedJson = JSON.parse(generatedText);
+ 
+-      // Increment successful runs
+       await supabase.rpc('increment_successful_runs', {
+         p_identity_key: finalIdentityKey,
+         p_window_start: windowStart
+       });
+ 
+-      // Update manual fallback if RPC doesn't exist yet (just in case)
+       const runs = (quotaRow ? quotaRow.successful_runs : 0) + 1;
+       await supabase.from('usage_windows')
+         .update({ successful_runs: runs })
+         .eq('identity_key', finalIdentityKey)
+         .eq('window_start', windowStart);
+ 
+-      // Cache result
+       await supabase.from('image_cache').insert({
+         image_hash: hashHex,
+         prompt_version: PROMPT_VERSION,
+         result_json: parsedJson
+       });
+ 
+-      // Update Job
+       if (jobData) {
+         await supabase.from('analysis_jobs').update({
+           status: 'completed',
+@@ -187,8 +187,6 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
+       }), { status: 200, headers: { 'Content-Type': 'application/json' } });
+ 
+     } catch (err: any) {
+-      console.error('AI Processing error:', err);
+-      // mark job failed
+       if (jobData) {
+         await supabase.from('analysis_jobs').update({
+           status: 'failed',
+@@ -202,4 +200,4 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
+   } catch (err: any) {
+     return new Response(JSON.stringify({ error: err.message }), { status: 500 });
+   }
+-}
++};
+
+commit bd4acc29d821fcbf363772b664b38dfff2937f41
+Author: Philipao <juanku2003@gmail.com>
+Date:   Thu Apr 2 00:19:31 2026 -0500
+
+    Fix Cloudflare 404 changing explicit extension to .json
+
+diff --git a/src/components/ImageAnalyzer.tsx b/src/components/ImageAnalyzer.tsx
+index a377c96..bad6e41 100644
+--- a/src/components/ImageAnalyzer.tsx
++++ b/src/components/ImageAnalyzer.tsx
+@@ -78,7 +78,7 @@ export const ImageAnalyzer: React.FC = () => {
+ 
+     try {
+       setState('analyzing');
+-      const res = await fetch('/api/decode', {
++      const res = await fetch('/api/decode.json', {
+         method: 'POST',
+         body: formData,
+       });
+@@ -168,8 +168,8 @@ export const ImageAnalyzer: React.FC = () => {
+             onDragOver={handleDragOver}
+             onDrop={handleDrop}
+             className={`relative flex flex-col items-center justify-center w-full h-80 rounded-2xl border-2 border-dashed transition-all duration-300 overflow-hidden group ${(state === 'uploading' || state === 'analyzing') ? 'border-[#00f3ff]/50 bg-[#00f3ff]/5 pointer-events-none'
+-                : preview ? 'border-transparent bg-black/50'
+-                  : 'border-gray-700 bg-gray-900/40 hover:border-[#ff003c]/70 hover:bg-[#ff003c]/5 cursor-pointer'
++              : preview ? 'border-transparent bg-black/50'
++                : 'border-gray-700 bg-gray-900/40 hover:border-[#ff003c]/70 hover:bg-[#ff003c]/5 cursor-pointer'
+               }`}
+             onClick={() => !preview && fileInputRef.current?.click()}
+           >
+diff --git a/src/pages/api/decode.ts b/src/pages/api/decode.ts
+deleted file mode 100644
+index 4797314..0000000
+--- a/src/pages/api/decode.ts
++++ /dev/null
+@@ -1,205 +0,0 @@
+-import type { APIRoute } from 'astro';
+-import { getAnalysisSupabaseAdmin } from '../../lib/supabaseAnalysis';
+-import { PROMPT_IMAGE_ANALYSIS, PROMPT_VERSION } from '../../lib/promptImage';
+-
+-const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
+-const ALLOWED_MIME_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
+-const MAX_RUNS_PER_WINDOW = 3;
+-
+-// Helper to convert ArrayBuffer to Base64 for Cloudflare runtime
+-function arrayBufferToBase64(buffer: ArrayBuffer) {
+-  let binary = '';
+-  const bytes = new Uint8Array(buffer);
+-  const len = bytes.byteLength;
+-  for (let i = 0; i < len; i++) {
+-    binary += String.fromCharCode(bytes[i]);
+-  }
+-  return btoa(binary);
+-}
+-
+-export const POST: APIRoute = async ({ request, clientAddress }) => {
+-  try {
+-    const formData = await request.formData();
+-    const imageFile = formData.get('image');
+-
+-    if (!imageFile || !(imageFile instanceof Blob)) {
+-      return new Response(JSON.stringify({ error: 'No valid image provided' }), { status: 400 });
+-    }
+-
+-    if (!ALLOWED_MIME_TYPES.includes(imageFile.type)) {
+-      return new Response(JSON.stringify({ error: 'Unsupported file type' }), { status: 400 });
+-    }
+-
+-    if (imageFile.size > MAX_FILE_SIZE) {
+-      return new Response(JSON.stringify({ error: 'File too large (max 5MB)' }), { status: 400 });
+-    }
+-
+-    const arrayBuffer = await imageFile.arrayBuffer();
+-
+-    // 1. Calculate Identity Key based on IP address
+-    const identityKey = `ip_${clientAddress || request.headers.get('cf-connecting-ip') || 'unknown'}`;
+-
+-    // Hash IP for privacy/safety
+-    const identityHashBuffer = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(identityKey));
+-    const finalIdentityKey = Array.from(new Uint8Array(identityHashBuffer)).map(b => b.toString(16).padStart(2, '0')).join('');
+-
+-    // 2. Hash Image
+-    const hashBuffer = await crypto.subtle.digest('SHA-256', arrayBuffer);
+-    const hashHex = Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, '0')).join('');
+-
+-    const supabase = getAnalysisSupabaseAdmin();
+-
+-    // 3. Check Cache
+-    const { data: cachedResult } = await supabase
+-      .from('image_cache')
+-      .select('result_json')
+-      .eq('image_hash', hashHex)
+-      .eq('prompt_version', PROMPT_VERSION)
+-      .single();
+-
+-    if (cachedResult && cachedResult.result_json) {
+-      return new Response(JSON.stringify({
+-        status: 'cached',
+-        result: cachedResult.result_json,
+-        message: 'Returning existing result for this image'
+-      }), { status: 200, headers: { 'Content-Type': 'application/json' } });
+-    }
+-
+-    // 4. Check Quota
+-    // Window start could be today's date (midnight)
+-    const now = new Date();
+-    const windowStart = new Date(now.getFullYear(), now.getMonth(), now.getDate()).toISOString();
+-
+-    const { data: quotaRow, error: quotaError } = await supabase
+-      .from('usage_windows')
+-      .select('successful_runs')
+-      .eq('identity_key', finalIdentityKey)
+-      .eq('window_start', windowStart)
+-      .maybeSingle();
+-
+-    if (quotaRow && quotaRow.successful_runs >= MAX_RUNS_PER_WINDOW) {
+-      return new Response(JSON.stringify({
+-        error: 'You have reached your 3-analysis limit for today',
+-        status: 'quota_exceeded'
+-      }), { status: 429 });
+-    }
+-
+-    // Insert or update Quota row
+-    if (!quotaRow) {
+-      await supabase.from('usage_windows').insert({
+-        identity_key: finalIdentityKey,
+-        window_start: windowStart,
+-        successful_runs: 0
+-      });
+-    }
+-
+-    // Create a job (Processing state)
+-    const { data: jobData } = await supabase.from('analysis_jobs').insert({
+-      identity_key: finalIdentityKey,
+-      image_hash: hashHex,
+-      prompt_version: PROMPT_VERSION,
+-      status: 'processing'
+-    }).select('id').single();
+-
+-    // 5. Call OpenRouter API
+-    const base64Image = arrayBufferToBase64(arrayBuffer);
+-    const isNode = typeof process !== 'undefined';
+-    const openRouterKey = import.meta.env.OPENROUTER_API_KEY || (isNode ? process.env.OPENROUTER_API_KEY : undefined);
+-
+-    if (!openRouterKey) {
+-      // mark job failed
+-      if (jobData) {
+-        await supabase.from('analysis_jobs').update({ status: 'failed', error_code: 'NO_AI_KEY' }).eq('id', jobData.id);
+-      }
+-      return new Response(JSON.stringify({ error: 'AI processing not configured' }), { status: 500 });
+-    }
+-
+-    try {
+-      const aiResponse = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+-        method: 'POST',
+-        headers: {
+-          'Content-Type': 'application/json',
+-          'Authorization': `Bearer ${openRouterKey}`,
+-          'HTTP-Referer': 'https://crackingwall.com',
+-          'X-Title': 'CrackingWall Analysis'
+-        },
+-        body: JSON.stringify({
+-          model: 'qwen/qwen2.5-vl-32b-instruct', // using openai model via openrouter
+-          messages: [
+-            {
+-              role: 'user',
+-              content: [
+-                { type: 'text', text: PROMPT_IMAGE_ANALYSIS },
+-                {
+-                  type: 'image_url',
+-                  image_url: {
+-                    url: `data:${imageFile.type};base64,${base64Image}`
+-                  }
+-                }
+-              ]
+-            }
+-          ],
+-          response_format: { type: 'json_object' }
+-        })
+-      });
+-
+-      const aiData = await aiResponse.json();
+-
+-      if (!aiResponse.ok) {
+-        throw new Error(aiData.error?.message || 'AI request failed');
+-      }
+-
+-      const generatedText = aiData.choices[0].message.content;
+-      const parsedJson = JSON.parse(generatedText);
+-
+-      // Increment successful runs
+-      await supabase.rpc('increment_successful_runs', {
+-        p_identity_key: finalIdentityKey,
+-        p_window_start: windowStart
+-      });
+-
+-      // Update manual fallback if RPC doesn't exist yet (just in case)
+-      const runs = (quotaRow ? quotaRow.successful_runs : 0) + 1;
+-      await supabase.from('usage_windows')
+-        .update({ successful_runs: runs })
+-        .eq('identity_key', finalIdentityKey)
+-        .eq('window_start', windowStart);
+-
+-      // Cache result
+-      await supabase.from('image_cache').insert({
+-        image_hash: hashHex,
+-        prompt_version: PROMPT_VERSION,
+-        result_json: parsedJson
+-      });
+-
+-      // Update Job
+-      if (jobData) {
+-        await supabase.from('analysis_jobs').update({
+-          status: 'completed',
+-          result_json: parsedJson,
+-          finished_at: new Date().toISOString()
+-        }).eq('id', jobData.id);
+-      }
+-
+-      return new Response(JSON.stringify({
+-        status: 'completed',
+-        result: parsedJson
+-      }), { status: 200, headers: { 'Content-Type': 'application/json' } });
+-
+-    } catch (err: any) {
+-      console.error('AI Processing error:', err);
+-      // mark job failed
+-      if (jobData) {
+-        await supabase.from('analysis_jobs').update({
+-          status: 'failed',
+-          error_code: err.message || 'AI_ERROR',
+-          finished_at: new Date().toISOString()
+-        }).eq('id', jobData.id);
+-      }
+-      return new Response(JSON.stringify({ error: 'Analysis failed: ' + err.message }), { status: 500 });
+-    }
+-
+-  } catch (err: any) {
+-    return new Response(JSON.stringify({ error: err.message }), { status: 500 });
+-  }
+-}
+
+commit 985b51f96dc074c69aa96d3f49da3d2ef9ad9a55
+Author: Philipao <juanku2003@gmail.com>
+Date:   Wed Apr 1 23:58:01 2026 -0500
+
+    featureAnalyzeImgv2
+
+diff --git a/src/components/ImageAnalyzer.tsx b/src/components/ImageAnalyzer.tsx
+index bfd54ce..a377c96 100644
+--- a/src/components/ImageAnalyzer.tsx
++++ b/src/components/ImageAnalyzer.tsx
+@@ -78,7 +78,7 @@ export const ImageAnalyzer: React.FC = () => {
+ 
+     try {
+       setState('analyzing');
+-      const res = await fetch('/api/analyze-image/', {
++      const res = await fetch('/api/decode', {
+         method: 'POST',
+         body: formData,
+       });
+diff --git a/src/pages/api/decode.ts b/src/pages/api/decode.ts
+new file mode 100644
+index 0000000..4797314
+--- /dev/null
++++ b/src/pages/api/decode.ts
+@@ -0,0 +1,205 @@
++import type { APIRoute } from 'astro';
++import { getAnalysisSupabaseAdmin } from '../../lib/supabaseAnalysis';
++import { PROMPT_IMAGE_ANALYSIS, PROMPT_VERSION } from '../../lib/promptImage';
++
++const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
++const ALLOWED_MIME_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
++const MAX_RUNS_PER_WINDOW = 3;
++
++// Helper to convert ArrayBuffer to Base64 for Cloudflare runtime
++function arrayBufferToBase64(buffer: ArrayBuffer) {
++  let binary = '';
++  const bytes = new Uint8Array(buffer);
++  const len = bytes.byteLength;
++  for (let i = 0; i < len; i++) {
++    binary += String.fromCharCode(bytes[i]);
++  }
++  return btoa(binary);
++}
++
++export const POST: APIRoute = async ({ request, clientAddress }) => {
++  try {
++    const formData = await request.formData();
++    const imageFile = formData.get('image');
++
++    if (!imageFile || !(imageFile instanceof Blob)) {
++      return new Response(JSON.stringify({ error: 'No valid image provided' }), { status: 400 });
++    }
++
++    if (!ALLOWED_MIME_TYPES.includes(imageFile.type)) {
++      return new Response(JSON.stringify({ error: 'Unsupported file type' }), { status: 400 });
++    }
++
++    if (imageFile.size > MAX_FILE_SIZE) {
++      return new Response(JSON.stringify({ error: 'File too large (max 5MB)' }), { status: 400 });
++    }
++
++    const arrayBuffer = await imageFile.arrayBuffer();
++
++    // 1. Calculate Identity Key based on IP address
++    const identityKey = `ip_${clientAddress || request.headers.get('cf-connecting-ip') || 'unknown'}`;
++
++    // Hash IP for privacy/safety
++    const identityHashBuffer = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(identityKey));
++    const finalIdentityKey = Array.from(new Uint8Array(identityHashBuffer)).map(b => b.toString(16).padStart(2, '0')).join('');
++
++    // 2. Hash Image
++    const hashBuffer = await crypto.subtle.digest('SHA-256', arrayBuffer);
++    const hashHex = Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, '0')).join('');
++
++    const supabase = getAnalysisSupabaseAdmin();
++
++    // 3. Check Cache
++    const { data: cachedResult } = await supabase
++      .from('image_cache')
++      .select('result_json')
++      .eq('image_hash', hashHex)
++      .eq('prompt_version', PROMPT_VERSION)
++      .single();
++
++    if (cachedResult && cachedResult.result_json) {
++      return new Response(JSON.stringify({
++        status: 'cached',
++        result: cachedResult.result_json,
++        message: 'Returning existing result for this image'
++      }), { status: 200, headers: { 'Content-Type': 'application/json' } });
++    }
++
++    // 4. Check Quota
++    // Window start could be today's date (midnight)
++    const now = new Date();
++    const windowStart = new Date(now.getFullYear(), now.getMonth(), now.getDate()).toISOString();
++
++    const { data: quotaRow, error: quotaError } = await supabase
++      .from('usage_windows')
++      .select('successful_runs')
++      .eq('identity_key', finalIdentityKey)
++      .eq('window_start', windowStart)
++      .maybeSingle();
++
++    if (quotaRow && quotaRow.successful_runs >= MAX_RUNS_PER_WINDOW) {
++      return new Response(JSON.stringify({
++        error: 'You have reached your 3-analysis limit for today',
++        status: 'quota_exceeded'
++      }), { status: 429 });
++    }
++
++    // Insert or update Quota row
++    if (!quotaRow) {
++      await supabase.from('usage_windows').insert({
++        identity_key: finalIdentityKey,
++        window_start: windowStart,
++        successful_runs: 0
++      });
++    }
++
++    // Create a job (Processing state)
++    const { data: jobData } = await supabase.from('analysis_jobs').insert({
++      identity_key: finalIdentityKey,
++      image_hash: hashHex,
++      prompt_version: PROMPT_VERSION,
++      status: 'processing'
++    }).select('id').single();
++
++    // 5. Call OpenRouter API
++    const base64Image = arrayBufferToBase64(arrayBuffer);
++    const isNode = typeof process !== 'undefined';
++    const openRouterKey = import.meta.env.OPENROUTER_API_KEY || (isNode ? process.env.OPENROUTER_API_KEY : undefined);
++
++    if (!openRouterKey) {
++      // mark job failed
++      if (jobData) {
++        await supabase.from('analysis_jobs').update({ status: 'failed', error_code: 'NO_AI_KEY' }).eq('id', jobData.id);
++      }
++      return new Response(JSON.stringify({ error: 'AI processing not configured' }), { status: 500 });
++    }
++
++    try {
++      const aiResponse = await fetch('https://openrouter.ai/api/v1/chat/completions', {
++        method: 'POST',
++        headers: {
++          'Content-Type': 'application/json',
++          'Authorization': `Bearer ${openRouterKey}`,
++          'HTTP-Referer': 'https://crackingwall.com',
++          'X-Title': 'CrackingWall Analysis'
++        },
++        body: JSON.stringify({
++          model: 'qwen/qwen2.5-vl-32b-instruct', // using openai model via openrouter
++          messages: [
++            {
++              role: 'user',
++              content: [
++                { type: 'text', text: PROMPT_IMAGE_ANALYSIS },
++                {
++                  type: 'image_url',
++                  image_url: {
++                    url: `data:${imageFile.type};base64,${base64Image}`
++                  }
++                }
++              ]
++            }
++          ],
++          response_format: { type: 'json_object' }
++        })
++      });
++
++      const aiData = await aiResponse.json();
++
++      if (!aiResponse.ok) {
++        throw new Error(aiData.error?.message || 'AI request failed');
++      }
++
++      const generatedText = aiData.choices[0].message.content;
++      const parsedJson = JSON.parse(generatedText);
++
++      // Increment successful runs
++      await supabase.rpc('increment_successful_runs', {
++        p_identity_key: finalIdentityKey,
++        p_window_start: windowStart
++      });
++
++      // Update manual fallback if RPC doesn't exist yet (just in case)
++      const runs = (quotaRow ? quotaRow.successful_runs : 0) + 1;
++      await supabase.from('usage_windows')
++        .update({ successful_runs: runs })
++        .eq('identity_key', finalIdentityKey)
++        .eq('window_start', windowStart);
++
++      // Cache result
++      await supabase.from('image_cache').insert({
++        image_hash: hashHex,
++        prompt_version: PROMPT_VERSION,
++        result_json: parsedJson
++      });
++
++      // Update Job
++      if (jobData) {
++        await supabase.from('analysis_jobs').update({
++          status: 'completed',
++          result_json: parsedJson,
++          finished_at: new Date().toISOString()
++        }).eq('id', jobData.id);
++      }
++
++      return new Response(JSON.stringify({
++        status: 'completed',
++        result: parsedJson
++      }), { status: 200, headers: { 'Content-Type': 'application/json' } });
++
++    } catch (err: any) {
++      console.error('AI Processing error:', err);
++      // mark job failed
++      if (jobData) {
++        await supabase.from('analysis_jobs').update({
++          status: 'failed',
++          error_code: err.message || 'AI_ERROR',
++          finished_at: new Date().toISOString()
++        }).eq('id', jobData.id);
++      }
++      return new Response(JSON.stringify({ error: 'Analysis failed: ' + err.message }), { status: 500 });
++    }
++
++  } catch (err: any) {
++    return new Response(JSON.stringify({ error: err.message }), { status: 500 });
++  }
++}
+
+commit 99013791064db8399c3d4bab206311f1ced5b09f
+Author: Philipao <juanku2003@gmail.com>
+Date:   Wed Apr 1 23:41:01 2026 -0500
+
+    featureAnalyzeImg
+
+diff --git a/src/components/ImageAnalyzer.tsx b/src/components/ImageAnalyzer.tsx
+new file mode 100644
+index 0000000..bfd54ce
+--- /dev/null
++++ b/src/components/ImageAnalyzer.tsx
+@@ -0,0 +1,308 @@
++import React, { useState, useRef } from 'react';
++import { motion, AnimatePresence } from 'framer-motion';
++import { UploadCloud, Image as ImageIcon, Loader2, AlertCircle, CheckCircle, Info, ChevronDown, ChevronUp } from 'lucide-react';
++
++type UploadState = 'idle' | 'uploading' | 'analyzing' | 'success' | 'error' | 'quota_exceeded';
++
++interface AnalysisResult {
++  metadata?: any;
++  composition?: any;
++  color_profile?: any;
++  lighting?: any;
++  technical_specs?: any;
++  artistic_elements?: any;
++  typography?: any;
++  generation_parameters?: any;
++}
++
++export const ImageAnalyzer: React.FC = () => {
++  const [state, setState] = useState<UploadState>('idle');
++  const [file, setFile] = useState<File | null>(null);
++  const [preview, setPreview] = useState<string | null>(null);
++  const [errorMsg, setErrorMsg] = useState<string>('');
++  const [result, setResult] = useState<AnalysisResult | null>(null);
++  const [cachedMessage, setCachedMessage] = useState<string>('');
++  const fileInputRef = useRef<HTMLInputElement>(null);
++
++  const [expandedSection, setExpandedSection] = useState<string | null>('composition');
++
++  const handleDragOver = (e: React.DragEvent) => {
++    e.preventDefault();
++    e.stopPropagation();
++  };
++
++  const processFile = (selectedFile: File) => {
++    // Validation
++    const validTypes = ['image/jpeg', 'image/png', 'image/webp'];
++    if (!validTypes.includes(selectedFile.type)) {
++      setErrorMsg('Unsupported file type. Use JPEG, PNG or WEBP.');
++      setState('error');
++      return;
++    }
++    if (selectedFile.size > 5 * 1024 * 1024) {
++      setErrorMsg('File is too large. Maximum size is 5MB.');
++      setState('error');
++      return;
++    }
++
++    setFile(selectedFile);
++    setPreview(URL.createObjectURL(selectedFile));
++    setState('idle'); // ready to analyze
++    submitAnalysis(selectedFile);
++  };
++
++  const handleDrop = (e: React.DragEvent) => {
++    e.preventDefault();
++    e.stopPropagation();
++    if (state === 'uploading' || state === 'analyzing') return;
++
++    if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
++      processFile(e.dataTransfer.files[0]);
++    }
++  };
++
++  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
++    if (e.target.files && e.target.files.length > 0) {
++      processFile(e.target.files[0]);
++    }
++  };
++
++  const submitAnalysis = async (fileToUpload: File) => {
++    setState('uploading');
++    setCachedMessage('');
++    setErrorMsg('');
++    setResult(null);
++
++    const formData = new FormData();
++    formData.append('image', fileToUpload);
++
++    try {
++      setState('analyzing');
++      const res = await fetch('/api/analyze-image/', {
++        method: 'POST',
++        body: formData,
++      });
++
++      const data = await res.json();
++
++      if (!res.ok) {
++        if (res.status === 429) {
++          setState('quota_exceeded');
++          setErrorMsg(data.error || 'Quota exceeded.');
++        } else {
++          setState('error');
++          setErrorMsg(data.error || 'Internal server error occurred.');
++        }
++        return;
++      }
++
++      setResult(data.result);
++      if (data.status === 'cached') {
++        setCachedMessage(data.message);
++      }
++      setState('success');
++    } catch (err: any) {
++      setState('error');
++      setErrorMsg(err.message || 'Network error occurred.');
++    }
++  };
++
++  const reset = () => {
++    setState('idle');
++    setFile(null);
++    setPreview(null);
++    setResult(null);
++    setErrorMsg('');
++    setCachedMessage('');
++    if (fileInputRef.current) {
++      fileInputRef.current.value = '';
++    }
++  };
++
++  const renderJsonSection = (title: string, dataKey: keyof AnalysisResult) => {
++    if (!result || !result[dataKey]) return null;
++    const isExpanded = expandedSection === dataKey;
++
++    return (
++      <div className="border border-white/10 rounded-lg overflow-hidden mb-3 bg-black/40 backdrop-blur-md">
++        <button
++          onClick={() => setExpandedSection(isExpanded ? null : dataKey)}
++          className="w-full px-4 py-3 flex justify-between items-center hover:bg-white/5 transition-colors text-left"
++        >
++          <span className="font-brutal font-bold text-sm uppercase tracking-widest text-[#00f3ff]">{title}</span>
++          {isExpanded ? <ChevronUp size={18} className="text-gray-400" /> : <ChevronDown size={18} className="text-gray-400" />}
++        </button>
++        <AnimatePresence>
++          {isExpanded && (
++            <motion.div
++              initial={{ height: 0, opacity: 0 }}
++              animate={{ height: 'auto', opacity: 1 }}
++              exit={{ height: 0, opacity: 0 }}
++              className="overflow-hidden"
++            >
++              <div className="p-4 border-t border-white/5 font-mono text-sm text-gray-300 whitespace-pre-wrap">
++                {JSON.stringify(result[dataKey], null, 2)}
++              </div>
++            </motion.div>
++          )}
++        </AnimatePresence>
++      </div>
++    );
++  };
++
++  return (
++    <section className="w-full max-w-5xl mx-auto py-16 px-4">
++      <div className="text-center mb-10">
++        <h2 className="text-4xl md:text-5xl font-brutal font-black uppercase text-transparent bg-clip-text bg-gradient-to-r from-[#00f3ff] to-[#ff003c] mb-4">
++          AI VisuaL Protocol
++        </h2>
++        <p className="text-gray-400 font-mono text-sm md:text-base max-w-2xl mx-auto">
++          Upload any image to decode its stylistic DNA. Our visual analysis engine breaks down composition, color profiles, lighting, and technical specifications into structured telemetry.
++        </p>
++      </div>
++
++      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
++        {/* Left Column: Upload & Preview */}
++        <div className="flex flex-col gap-4">
++          <div
++            onDragOver={handleDragOver}
++            onDrop={handleDrop}
++            className={`relative flex flex-col items-center justify-center w-full h-80 rounded-2xl border-2 border-dashed transition-all duration-300 overflow-hidden group ${(state === 'uploading' || state === 'analyzing') ? 'border-[#00f3ff]/50 bg-[#00f3ff]/5 pointer-events-none'
++                : preview ? 'border-transparent bg-black/50'
++                  : 'border-gray-700 bg-gray-900/40 hover:border-[#ff003c]/70 hover:bg-[#ff003c]/5 cursor-pointer'
++              }`}
++            onClick={() => !preview && fileInputRef.current?.click()}
++          >
++            {preview ? (
++              <div className="relative w-full h-full">
++                <img src={preview} alt="Preview" className="w-full h-full object-cover opacity-80" />
++                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent flex flex-col justify-end p-6">
++                  {state !== 'analyzing' && state !== 'uploading' && (
++                    <button
++                      onClick={reset}
++                      className="absolute top-4 right-4 bg-black/60 hover:bg-white/10 p-2 rounded-full text-white backdrop-blur-md transition-all"
++                    >
++                      Reset
++                    </button>
++                  )}
++                  <div className="flex items-center gap-3">
++                    {state === 'analyzing' ? (
++                      <div className="flex items-center gap-3 text-[#00f3ff] bg-black/60 px-4 py-2 rounded-full backdrop-blur-md">
++                        <Loader2 className="animate-spin" size={20} />
++                        <span className="font-mono text-sm font-bold uppercase">Decoding Vectors...</span>
++                      </div>
++                    ) : state === 'success' ? (
++                      <div className="flex items-center gap-3 text-[#00ff9d] bg-black/60 px-4 py-2 rounded-full backdrop-blur-md">
++                        <CheckCircle size={20} />
++                        <span className="font-mono text-sm font-bold uppercase">Analysis Complete</span>
++                      </div>
++                    ) : state === 'error' || state === 'quota_exceeded' ? (
++                      <div className="flex items-center gap-3 text-[#ff003c] bg-black/60 px-4 py-2 rounded-full backdrop-blur-md">
++                        <AlertCircle size={20} />
++                        <span className="font-mono text-sm font-bold uppercase">Scan Failed</span>
++                      </div>
++                    ) : null}
++                  </div>
++                </div>
++              </div>
++            ) : (
++              <div className="flex flex-col items-center justify-center text-gray-400 group-hover:text-white transition-colors p-6 text-center">
++                <UploadCloud size={48} className="mb-4 text-gray-500 group-hover:text-[#ff003c] transition-colors" />
++                <p className="font-brutal font-bold text-lg mb-2 uppercase">INITIATE UPLOAD</p>
++                <p className="font-mono text-xs text-gray-500 max-w-[250px]">Drag & drop your visual artifact here, or click to browse files. (JPEG, PNG, WEBP max 5MB)</p>
++              </div>
++            )}
++            <input
++              type="file"
++              ref={fileInputRef}
++              className="hidden"
++              accept="image/jpeg, image/png, image/webp"
++              onChange={handleFileChange}
++            />
++          </div>
++
++          <AnimatePresence>
++            {state === 'error' && (
++              <motion.div
++                initial={{ opacity: 0, y: -10 }}
++                animate={{ opacity: 1, y: 0 }}
++                exit={{ opacity: 0, y: -10 }}
++                className="bg-[#ff003c]/20 border border-[#ff003c]/50 text-[#ff003c] px-4 py-3 rounded-xl flex items-start gap-3"
++              >
++                <AlertCircle className="shrink-0 mt-0.5" size={18} />
++                <p className="font-mono text-sm">{errorMsg}</p>
++              </motion.div>
++            )}
++            {state === 'quota_exceeded' && (
++              <motion.div
++                initial={{ opacity: 0, y: -10 }}
++                animate={{ opacity: 1, y: 0 }}
++                exit={{ opacity: 0, y: -10 }}
++                className="bg-[#ffb700]/20 border border-[#ffb700]/50 text-[#ffb700] px-4 py-3 rounded-xl flex items-start gap-3"
++              >
++                <AlertCircle className="shrink-0 mt-0.5" size={18} />
++                <p className="font-mono text-sm">{errorMsg}</p>
++              </motion.div>
++            )}
++            {cachedMessage && (
++              <motion.div
++                initial={{ opacity: 0, y: -10 }}
++                animate={{ opacity: 1, y: 0 }}
++                exit={{ opacity: 0, y: -10 }}
++                className="bg-[#00f3ff]/20 border border-[#00f3ff]/50 text-[#00f3ff] px-4 py-3 rounded-xl flex items-center gap-3"
++              >
++                <Info className="shrink-0" size={18} />
++                <p className="font-mono text-sm">{cachedMessage}</p>
++              </motion.div>
++            )}
++          </AnimatePresence>
++        </div>
++
++        {/* Right Column: Results */}
++        <div className="h-[600px] flex flex-col">
++          <div className="flex-1 bg-black/60 border border-white/10 rounded-2xl p-6 backdrop-blur-xl shadow-2xl overflow-hidden flex flex-col">
++            <h3 className="text-xl font-brutal font-bold uppercase text-white mb-6 flex items-center gap-3 pb-4 border-b border-white/10">
++              <ImageIcon className="text-[#ff003c]" />
++              Telemetry Feed
++            </h3>
++
++            <div className="flex-1 overflow-y-auto pr-2 custom-scrollbar">
++              {!result && state !== 'analyzing' && (
++                <div className="h-full flex flex-col items-center justify-center text-gray-500 font-mono text-sm text-center">
++                  <div className="w-16 h-16 border border-gray-700 border-dashed rounded-full flex items-center justify-center mb-4">
++                    <span className="w-2 h-2 bg-gray-700 rounded-full animate-pulse"></span>
++                  </div>
++                  Waiting for visual data input...
++                </div>
++              )}
++
++              {state === 'analyzing' && (
++                <div className="h-full flex flex-col items-center justify-center text-[#00f3ff] font-mono text-sm">
++                  <Loader2 className="animate-spin w-12 h-12 mb-6 opacity-80" />
++                  <p className="animate-pulse">Extracting metadata vectors...</p>
++                  <p className="animate-pulse delay-75 mt-2 opacity-50">Analyzing visual hierarchy...</p>
++                </div>
++              )}
++
++              {result && (
++                <motion.div
++                  initial={{ opacity: 0 }}
++                  animate={{ opacity: 1 }}
++                  className="space-y-4"
++                >
++                  {renderJsonSection('Composition', 'composition')}
++                  {renderJsonSection('Color Profile', 'color_profile')}
++                  {renderJsonSection('Lighting', 'lighting')}
++                  {renderJsonSection('Technical Specs', 'technical_specs')}
++                  {renderJsonSection('Artistic Elements', 'artistic_elements')}
++                  {renderJsonSection('Typography', 'typography')}
++                  {renderJsonSection('Generation Prompts', 'generation_parameters')}
++                </motion.div>
++              )}
++            </div>
++          </div>
++        </div>
++      </div>
++    </section>
++  );
++};
