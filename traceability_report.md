@@ -193,5 +193,87 @@ The catch block now includes two new fields:
 - [ ] **RECOMMENDED**: Add `wrangler.toml` secrets scanning to CI to prevent future exposure
 
 ---
+
+## 🔒 Feature: Auth-Aware Rate Limiting (2026-04-09)
+
+### Problem
+The rate limiting system had three critical flaws:
+1. **No auth/anon distinction** — All users (logged in or not) shared the same limit of 3/day
+2. **Identity was always IP-based** — Authenticated users got no benefit from having an account
+3. **Double-increment bug** — `increment_successful_runs` RPC was called AND a manual `.update()` ran after it, causing `successful_runs` to increment by 2 per analysis instead of 1
+
+### Solution Architecture
+
+#### Quota Rules
+| User Type | Identity Key | Daily Limit | Identification Method |
+|-----------|-------------|-------------|----------------------|
+| **Anonymous** | SHA-256 hash of IP | **2/day** | `cf-connecting-ip` header → `x-forwarded-for` fallback |
+| **Authenticated** | Supabase `user.id` (UUID) | **6/day** | JWT from `Authorization: Bearer <token>` → verified via `supabase.auth.getUser()` |
+
+#### Database Changes (migration: `add_auth_aware_rate_limiting`)
+
+```sql
+-- New columns on usage_windows
+ALTER TABLE usage_windows
+  ADD COLUMN user_id uuid REFERENCES auth.users(id),
+  ADD COLUMN identity_type text NOT NULL DEFAULT 'ip' CHECK (identity_type IN ('ip', 'user'));
+
+-- Unique constraint for atomic upsert
+CREATE UNIQUE INDEX idx_usage_windows_identity_window
+  ON usage_windows(identity_key, window_start);
+```
+
+#### Rewritten RPC: `increment_successful_runs`
+The old RPC was a simple `UPDATE`. The new version is an **atomic upsert** — it creates the `usage_windows` row if it doesn't exist, or increments if it does, in a single query. This eliminates:
+- The separate "initialize quota window" INSERT that could race
+- The manual `.update()` call that caused the double-increment bug
+
+```sql
+INSERT INTO usage_windows (identity_key, window_start, user_id, identity_type, successful_runs)
+VALUES (p_identity_key, p_window_start, p_user_id, p_identity_type, 1)
+ON CONFLICT (identity_key, window_start)
+DO UPDATE SET successful_runs = usage_windows.successful_runs + 1
+RETURNING successful_runs;
+```
+
+#### Backend Flow (`decode.ts`)
+```
+Request arrives
+  → Extract Authorization header
+  → If Bearer token present → supabase.auth.getUser(token)
+    → Valid? → identity = user_id, limit = 6
+    → Invalid/missing? → identity = hashed IP, limit = 2
+  → Check usage_windows for (identity_key, today)
+  → If runs >= limit → 429 with dynamic message
+  → Process image...
+  → Atomic upsert via RPC (single increment, no race conditions)
+```
+
+#### Frontend Flow (`ImageAnalyzer.tsx`)
+```
+User clicks upload
+  → supabase.auth.getSession()
+  → If session exists → add Authorization: Bearer <access_token> to fetch headers
+  → POST /api/decode with FormData + auth header
+  → On 429 → show server-provided message (which tells anon users to sign in)
+```
+
+#### 429 Response Format (enhanced)
+```json
+{
+  "error": "You have reached your 2-analysis limit for today. Sign in for 6 daily analyses.",
+  "status": "quota_exceeded",
+  "requestId": "...",
+  "quota": { "limit": 2, "used": 2, "type": "ip" }
+}
+```
+
+### Updated File Traceability
+
+| Date | Commit Hash | Author | Change Description | Problem Solved |
+| :--- | :--- | :--- | :--- | :--- |
+| Apr 09 | `2d1a583` | Claude + Philipao | Auth-aware rate limiting, atomic upsert RPC, frontend auth token | Rate limit didn't distinguish auth/anon, double-increment bug, no incentive to create accounts |
+
+---
 *Last updated: 2026-04-09*
 *Analysis based on Git Commit History and live debugging session.*
