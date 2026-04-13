@@ -1,4 +1,20 @@
+# CrackingWall — wallpaper discovery site
+# Allow all search engines and AI assistants for maximum discoverability
+
 User-agent: *
 Allow: /
+Disallow: /api/
 
+# Sitemaps
 Sitemap: https://crakingculturewallpaperr.xyz/sitemap-index.xml
+Sitemap: https://crakingculturewallpaperr.xyz/image-sitemap.xml
+
+# Block known abusive scrapers only
+User-agent: Bytespider
+Disallow: /
+
+User-agent: AhrefsBot
+Crawl-delay: 10
+
+User-agent: SemrushBot
+Crawl-delay: 10
