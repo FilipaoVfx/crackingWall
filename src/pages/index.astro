@@ -59,11 +59,12 @@ const uniqueCategories = [...new Set(allWallpapers.map(w => w.category))];
           data-category={wallpaper.category.toLowerCase()}
         >
           <div class="wallpaper-image-container">
-            <img 
-              src={wallpaper.url} 
+            <img
+              src={wallpaper.url}
               alt={wallpaper.alt_text || wallpaper.title}
               class="wallpaper-image"
               loading={index < 4 ? "eager" : "lazy"}
+              decoding={index < 4 ? "sync" : "async"}
               width="400"
               height="225"
             />

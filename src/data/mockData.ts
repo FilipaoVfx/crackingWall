@@ -38,7 +38,7 @@ export const mockWallpapers: Wallpaper[] = (() => {
         url: getWallpaperUrl(width, height, category),
         alt_text: `${category} wallpaper`,
         width,
-        height: height.toString(),
+        height,
         file_size: faker.number.int({ min: 1000000, max: 5000000 }),
         format: 'webp' as const,
         created_at: faker.date.past().toISOString(),

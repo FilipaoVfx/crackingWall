@@ -39,19 +39,62 @@ const title = `${wallpaper.title} Wallpaper | CrakingWall`;
 const description = `Download ${wallpaper.title} as a premium digital background. ${wallpaper.description}`;
 const canonicalUrl = Astro.url.href;
 
-// ImageObject Schema
+// ImageObject Schema — enriched with SEO fields
 const imageObjectSchema = {
   "@context": "https://schema.org",
   "@type": "ImageObject",
   "name": wallpaper.title,
+  "description": wallpaper.description,
   "contentUrl": wallpaper.url,
+  "thumbnailUrl": wallpaper.url,
+  "width": { "@type": "QuantitativeValue", "value": wallpaper.width || 3840 },
+  "height": { "@type": "QuantitativeValue", "value": wallpaper.height || 2160 },
+  "encodingFormat": `image/${wallpaper.format || 'jpeg'}`,
+  "keywords": wallpaper.tags?.join(', ') || wallpaper.category,
   "license": "https://crakingculturewallpaperr.xyz/license",
   "acquireLicensePage": "https://crakingculturewallpaperr.xyz/license",
   "creator": {
     "@type": "Organization",
-    "name": "CrakingWall"
+    "name": "CrackingWall",
+    "url": "https://crakingculturewallpaperr.xyz"
   },
-  "description": wallpaper.description
+  "interactionStatistic": [
+    {
+      "@type": "InteractionCounter",
+      "interactionType": "https://schema.org/DownloadAction",
+      "userInteractionCount": wallpaper.downloads || 0
+    },
+    {
+      "@type": "InteractionCounter",
+      "interactionType": "https://schema.org/LikeAction",
+      "userInteractionCount": wallpaper.likes || 0
+    }
+  ]
+};
+
+// BreadcrumbList Schema
+const breadcrumbSchema = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Home",
+      "item": "https://crakingculturewallpaperr.xyz/"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": wallpaper.category,
+      "item": `https://crakingculturewallpaperr.xyz/${wallpaper.category.toLowerCase()}/`
+    },
+    {
+      "@type": "ListItem",
+      "position": 3,
+      "name": wallpaper.title
+    }
+  ]
 };
 
 ---
@@ -66,6 +109,7 @@ const imageObjectSchema = {
   />
   
   <script type="application/ld+json" set:html={JSON.stringify(imageObjectSchema)} />
+  <script type="application/ld+json" set:html={JSON.stringify(breadcrumbSchema)} />
 
   <div class="cyber-grid"></div>
 
@@ -84,13 +128,15 @@ const imageObjectSchema = {
         <div class="bg-terminal-bg p-3 shadow-[30px_30px_0_rgba(0,0,0,0.5)] border-4 border-white/10 relative overflow-hidden">
           <div class="absolute inset-0 bg-neon-cyan/5 pointer-events-none z-10"></div>
           <div class="relative overflow-hidden aspect-[16/9] lg:aspect-auto">
-             <img 
-                src={wallpaper.url} 
+             <img
+                src={wallpaper.url}
                 alt={wallpaper.alt_text || wallpaper.title}
                 class="w-full h-full object-cover transform transition-transform duration-1000 group-hover:scale-105"
                 width={wallpaper.width || 3840}
                 height={wallpaper.height || 2160}
                 loading="eager"
+                decoding="async"
+                fetchpriority="high"
                 transition:name={`wallpaper-${wallpaper.id}`}
              />
           </div>
@@ -182,11 +228,14 @@ const imageObjectSchema = {
                       return (
                       <a href={`/${related.category.toLowerCase()}/${relatedSlug}/`} class="group block bg-terminal-bg border-4 border-brutal-black shadow-brutal hover:translate-y-[-8px] hover:-translate-x-2 transition-all p-1 relative">
                           <div class="aspect-video overflow-hidden">
-                              <img 
-                                  src={related.url} 
-                                  alt={related.title} 
+                              <img
+                                  src={related.url}
+                                  alt={related.alt_text || related.title}
                                   class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 opacity-80 group-hover:opacity-100"
                                   loading="lazy"
+                                  decoding="async"
+                                  width={related.width || 400}
+                                  height={related.height || 225}
                               />
                           </div>
                           <div class="p-4 flex items-center justify-between border-t-2 border-brutal-black mt-1">

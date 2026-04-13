@@ -267,12 +267,12 @@ export class WallpaperService {
     }));
   }
 
-  // Buscar wallpapers
+  // Buscar wallpapers (searches title, category, description and tags)
   static async searchWallpapers(query: string, userId?: string): Promise<Wallpaper[]> {
     const { data: wallpapers, error } = await supabase
       .from('wallpapers')
       .select('*')
-      .or(`title.ilike.%${query}%,category.ilike.%${query}%`)
+      .or(`title.ilike.%${query}%,category.ilike.%${query}%,description.ilike.%${query}%`)
       .order('created_at', { ascending: false });
 
     if (error) throw error;

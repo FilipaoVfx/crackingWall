@@ -27,9 +27,12 @@ export const WallpaperCard: React.FC<WallpaperCardProps> = ({
       <div className="relative overflow-hidden">
         <img
           src={wallpaper.url}
-          alt={wallpaper.title}
+          alt={wallpaper.alt_text || wallpaper.title}
           className="w-full h-60 md:h-48 object-cover"
           loading="lazy"
+          decoding="async"
+          width={wallpaper.width || 400}
+          height={wallpaper.height || 225}
         />
 
         {/* Overlay con botones */}

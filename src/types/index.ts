@@ -6,9 +6,9 @@ export interface Wallpaper {
   url: string;
   alt_text: string;
   width: number;
-  height: string;
+  height: number;
   file_size: number;
-  format: 'webp' | 'jpg' | 'png';
+  format: 'webp' | 'jpg' | 'jpeg' | 'png';
   created_at: string;
   updated_at: string;
   downloads: number;
@@ -16,6 +16,9 @@ export interface Wallpaper {
   isLiked?: boolean;
   is_featured?: boolean;
   tags?: string[];
+  slug?: string;
+  mood?: string;
+  resolution?: string;
 }
 
 export interface User {
