@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Search, User, Menu, X, LogOut } from 'lucide-react';
+import React, { useState, useRef, useEffect } from 'react';
+import { Search, User, Menu, X, LogOut, ChevronDown, FlaskConical } from 'lucide-react';
 import { BrutalButton } from './BrutalButton';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../hooks/useAuth';
@@ -12,7 +12,19 @@ interface HeaderProps {
 export const Header: React.FC<HeaderProps> = ({ onSearchChange, onAuthClick }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isLabsOpen, setIsLabsOpen] = useState(false);
+  const labsRef = useRef<HTMLDivElement>(null);
   const { user, signOut } = useAuth();
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (labsRef.current && !labsRef.current.contains(e.target as Node)) {
+        setIsLabsOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const query = e.target.value;
@@ -41,9 +53,44 @@ export const Header: React.FC<HeaderProps> = ({ onSearchChange, onAuthClick }) =
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-6">
-            <nav className="flex space-x-6 font-brutal font-bold text-white uppercase text-sm mr-4">
+            <nav className="flex items-center space-x-6 font-brutal font-bold text-white uppercase text-sm mr-4">
               <a href="/blog/" className="hover:text-brutal-neon-cyan hover:underline decoration-2 underline-offset-4 transition-all">Blog</a>
-              <a href="/ascii-lab/" className="hover:text-brutal-neon-green hover:underline decoration-2 underline-offset-4 transition-all">ASCII Lab</a>
+              <div ref={labsRef} className="relative">
+                <button
+                  onClick={() => setIsLabsOpen(!isLabsOpen)}
+                  className="flex items-center gap-1.5 hover:text-brutal-neon-green transition-all uppercase"
+                >
+                  <FlaskConical className="w-4 h-4" />
+                  Labs
+                  <ChevronDown className={`w-3.5 h-3.5 transition-transform ${isLabsOpen ? 'rotate-180' : ''}`} />
+                </button>
+                <AnimatePresence>
+                  {isLabsOpen && (
+                    <motion.div
+                      initial={{ opacity: 0, y: -8 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -8 }}
+                      transition={{ duration: 0.15 }}
+                      className="absolute top-full left-0 mt-3 w-56 bg-[#0d0f14] border-2 border-brutal-neon-green/40 shadow-[0_0_20px_rgba(0,255,156,0.15)] z-50"
+                    >
+                      <a
+                        href="/ascii-lab/"
+                        className="block px-5 py-3 text-xs hover:bg-brutal-neon-green/10 hover:text-brutal-neon-green transition-all border-b border-white/5"
+                      >
+                        <span className="block text-white font-black">ASCII Lab</span>
+                        <span className="block text-gray-500 font-normal normal-case mt-0.5" style={{ fontSize: '10px' }}>Video → ASCII art converter</span>
+                      </a>
+                      <a
+                        href="/visual-protocol/"
+                        className="block px-5 py-3 text-xs hover:bg-[#ff003c]/10 hover:text-[#ff003c] transition-all"
+                      >
+                        <span className="block text-white font-black">Visual Protocol</span>
+                        <span className="block text-gray-500 font-normal normal-case mt-0.5" style={{ fontSize: '10px' }}>AI image analysis tool</span>
+                      </a>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
               <a href="/about/" className="hover:text-brutal-neon-pink hover:underline decoration-2 underline-offset-4 transition-all">About</a>
               <a href="/contact/" className="hover:text-brutal-neon-yellow hover:underline decoration-2 underline-offset-4 transition-all">Contact</a>
             </nav>

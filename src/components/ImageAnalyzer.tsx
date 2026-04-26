@@ -174,10 +174,10 @@ export const ImageAnalyzer: React.FC = () => {
     <section className="w-full max-w-5xl mx-auto py-16 px-4">
       <div className="text-center mb-10">
         <h2 className="text-4xl md:text-5xl font-brutal font-black uppercase text-transparent bg-clip-text bg-gradient-to-r from-[#00f3ff] to-[#ff003c] mb-4">
-          AI VisuaL Protocol
+          Visual Protocol
         </h2>
         <p className="text-gray-400 font-mono text-sm md:text-base max-w-2xl mx-auto">
-          Upload any image to decode its stylistic DNA. Our visual analysis engine breaks down composition, color profiles, lighting, and technical specifications into structured telemetry.
+          Decode the visual language of any image. Understand composition, color relationships, lighting and hierarchy — turn aesthetic intuition into structured insight.
         </p>
       </div>
 
@@ -228,8 +228,8 @@ export const ImageAnalyzer: React.FC = () => {
             ) : (
               <div className="flex flex-col items-center justify-center text-gray-400 group-hover:text-white transition-colors p-6 text-center">
                 <UploadCloud size={48} className="mb-4 text-gray-500 group-hover:text-[#ff003c] transition-colors" />
-                <p className="font-brutal font-bold text-lg mb-2 uppercase">INITIATE UPLOAD</p>
-                <p className="font-mono text-xs text-gray-500 max-w-[250px]">Drag & drop your visual artifact here, or click to browse files. (JPEG, PNG, WEBP max 5MB)</p>
+                <p className="font-brutal font-bold text-lg mb-2 uppercase">Upload an image</p>
+                <p className="font-mono text-xs text-gray-500 max-w-[250px]">Drag & drop any image here, or click to browse. JPEG, PNG, WEBP — max 5MB.</p>
               </div>
             )}
             <input
@@ -283,7 +283,7 @@ export const ImageAnalyzer: React.FC = () => {
           <div className="flex-1 bg-black/60 border border-white/10 rounded-2xl p-6 backdrop-blur-xl shadow-2xl overflow-hidden flex flex-col">
             <h3 className="text-xl font-brutal font-bold uppercase text-white mb-6 flex items-center gap-3 pb-4 border-b border-white/10">
               <ImageIcon className="text-[#ff003c]" />
-              Telemetry Feed
+              Visual Breakdown
             </h3>
 
             <div className="flex-1 overflow-y-auto pr-2 custom-scrollbar">

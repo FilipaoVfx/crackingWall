@@ -1,0 +1,287 @@
+---
+export const prerender = true;
+import Layout from '../layouts/Layout.astro';
+import { ImageAnalyzer } from '../components/ImageAnalyzer';
+import SEO from '../components/SEO.astro';
+
+const title = "Visual Protocol — Analyze Any Image Like a Designer | CrackingWall";
+const description = "Decode the visual language of any image. Understand composition, color relationships, lighting and hierarchy. A visual analysis tool for designers, creative directors and design students.";
+const canonicalUrl = "https://crakingculturewallpaperr.xyz/visual-protocol/";
+---
+
+<Layout title={title} description={description}>
+  <SEO
+    slot="seo"
+    title={title}
+    description={description}
+    canonicalUrl={canonicalUrl}
+  />
+
+  <script type="application/ld+json" set:html={JSON.stringify({
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "Visual Protocol",
+    "description": description,
+    "url": canonicalUrl,
+    "applicationCategory": "DesignApplication",
+    "operatingSystem": "Web",
+    "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+    "creator": { "@type": "Organization", "name": "CrackingWall", "url": "https://crakingculturewallpaperr.xyz" }
+  })} />
+
+  <!-- Hero Section -->
+  <section class="vp-hero">
+    <div class="vp-hero-content">
+      <span class="vp-badge">LABS / VISUAL PROTOCOL</span>
+      <h1 class="vp-title">Understand why an image works.</h1>
+      <p class="vp-subtitle">
+        Upload any image and decode its visual structure — composition, hierarchy, color and balance.
+        Turn aesthetic intuition into actionable insight.
+      </p>
+      <a href="#analyzer" class="vp-cta">
+        Upload & Analyze
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12l7 7 7-7"/></svg>
+      </a>
+    </div>
+  </section>
+
+  <!-- Value Props -->
+  <section class="vp-features">
+    <div class="vp-features-grid">
+      <div class="vp-feature-card">
+        <div class="vp-feature-icon">🎯</div>
+        <h3>Visual Hierarchy</h3>
+        <p>Understand how the eye moves through an image and what draws attention first.</p>
+      </div>
+      <div class="vp-feature-card">
+        <div class="vp-feature-icon">🎨</div>
+        <h3>Color Relationships</h3>
+        <p>Decode palettes, contrast ratios and chromatic harmony in any composition.</p>
+      </div>
+      <div class="vp-feature-card">
+        <div class="vp-feature-icon">⚖️</div>
+        <h3>Composition Balance</h3>
+        <p>Analyze structural patterns, symmetry, rule of thirds and visual weight distribution.</p>
+      </div>
+      <div class="vp-feature-card">
+        <div class="vp-feature-icon">💡</div>
+        <h3>Lighting & Contrast</h3>
+        <p>Break down light sources, shadow dynamics and tonal range for better visual decisions.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Who is it for -->
+  <section class="vp-audience">
+    <h2>Built for visual thinkers</h2>
+    <div class="vp-audience-grid">
+      <div class="vp-audience-item">
+        <span class="vp-audience-role">Designers</span>
+        <span class="vp-audience-desc">Improve your work by understanding what makes great designs tick.</span>
+      </div>
+      <div class="vp-audience-item">
+        <span class="vp-audience-role">Creative Directors</span>
+        <span class="vp-audience-desc">Justify creative decisions with structured visual analysis.</span>
+      </div>
+      <div class="vp-audience-item">
+        <span class="vp-audience-role">Design Students</span>
+        <span class="vp-audience-desc">Learn design principles by analyzing real-world images.</span>
+      </div>
+      <div class="vp-audience-item">
+        <span class="vp-audience-role">Content Creators</span>
+        <span class="vp-audience-desc">Decode the aesthetics behind high-performing visual content.</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- The Tool -->
+  <section id="analyzer" class="vp-tool-section">
+    <ImageAnalyzer client:load />
+  </section>
+</Layout>
+
+<style>
+  .vp-hero {
+    min-height: 50vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 80px 20px 60px;
+    position: relative;
+    background: radial-gradient(ellipse at 50% 0%, rgba(0,243,255,0.08) 0%, transparent 60%);
+  }
+
+  .vp-hero-content {
+    max-width: 700px;
+  }
+
+  .vp-badge {
+    display: inline-block;
+    font-family: monospace;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: #00f3ff;
+    border: 1px solid rgba(0,243,255,0.3);
+    padding: 6px 16px;
+    border-radius: 20px;
+    margin-bottom: 24px;
+    background: rgba(0,243,255,0.05);
+  }
+
+  .vp-title {
+    font-size: clamp(2.2rem, 5vw, 3.5rem);
+    font-weight: 900;
+    color: #f0f0f0;
+    margin: 0 0 20px;
+    line-height: 1.1;
+    letter-spacing: -1px;
+  }
+
+  .vp-subtitle {
+    font-size: 1.1rem;
+    color: #888;
+    line-height: 1.6;
+    margin: 0 0 32px;
+  }
+
+  .vp-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background: linear-gradient(135deg, #00f3ff, #0088ff);
+    color: #000;
+    font-weight: 800;
+    font-size: 0.95rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    padding: 14px 32px;
+    border-radius: 8px;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    box-shadow: 0 0 20px rgba(0,243,255,0.3);
+  }
+
+  .vp-cta:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 0 40px rgba(0,243,255,0.5);
+  }
+
+  /* Features */
+  .vp-features {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 0 20px 60px;
+  }
+
+  .vp-features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 20px;
+  }
+
+  .vp-feature-card {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 12px;
+    padding: 28px 24px;
+    transition: all 0.3s ease;
+  }
+
+  .vp-feature-card:hover {
+    border-color: rgba(0,243,255,0.3);
+    background: rgba(0,243,255,0.03);
+    transform: translateY(-4px);
+  }
+
+  .vp-feature-icon {
+    font-size: 1.8rem;
+    margin-bottom: 12px;
+  }
+
+  .vp-feature-card h3 {
+    font-size: 1rem;
+    font-weight: 800;
+    color: #f0f0f0;
+    margin: 0 0 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .vp-feature-card p {
+    font-size: 0.85rem;
+    color: #777;
+    line-height: 1.5;
+    margin: 0;
+  }
+
+  /* Audience */
+  .vp-audience {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 0 20px 60px;
+    text-align: center;
+  }
+
+  .vp-audience h2 {
+    font-size: 1.6rem;
+    font-weight: 900;
+    color: #f0f0f0;
+    margin: 0 0 32px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  .vp-audience-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 16px;
+  }
+
+  .vp-audience-item {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 20px 16px;
+    background: rgba(255,255,255,0.02);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 10px;
+    transition: border-color 0.3s;
+  }
+
+  .vp-audience-item:hover {
+    border-color: rgba(255,0,60,0.3);
+  }
+
+  .vp-audience-role {
+    font-weight: 800;
+    font-size: 0.9rem;
+    color: #ff003c;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  .vp-audience-desc {
+    font-size: 0.8rem;
+    color: #666;
+    line-height: 1.4;
+  }
+
+  /* Tool Section */
+  .vp-tool-section {
+    border-top: 1px solid rgba(255,255,255,0.06);
+    background: rgba(0,0,0,0.3);
+    scroll-margin-top: 80px;
+  }
+
+  @media (max-width: 640px) {
+    .vp-features-grid {
+      grid-template-columns: 1fr 1fr;
+    }
+    .vp-audience-grid {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+</style>

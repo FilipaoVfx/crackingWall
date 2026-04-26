@@ -2,8 +2,122 @@
 export const prerender = true;
 import Layout from '../layouts/Layout.astro';
 import { AsciiLab } from '../features/ascii-video';
+import SEO from '../components/SEO.astro';
+
+const title = "ASCII Lab — Convert Video to ASCII Art | CrackingWall";
+const description = "Transform any video into animated ASCII art in your browser. Customize character sets, FPS and resolution. Export as GIF, MP4 or HTML. Free experimental tool.";
+const canonicalUrl = "https://crakingculturewallpaperr.xyz/ascii-lab/";
 ---
 
-<Layout title="ASCII Lab — CrakingWall" description="Sube un video y conviértelo en arte ASCII animado. Laboratorio experimental de cultura tech.">
-  <AsciiLab client:only="react" />
+<Layout title={title} description={description}>
+  <SEO
+    slot="seo"
+    title={title}
+    description={description}
+    canonicalUrl={canonicalUrl}
+  />
+
+  <script type="application/ld+json" set:html={JSON.stringify({
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "ASCII Lab",
+    "description": description,
+    "url": canonicalUrl,
+    "applicationCategory": "MultimediaApplication",
+    "operatingSystem": "Web",
+    "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+    "creator": { "@type": "Organization", "name": "CrackingWall", "url": "https://crakingculturewallpaperr.xyz" }
+  })} />
+
+  <!-- Hero -->
+  <section class="ascii-hero">
+    <div class="ascii-hero-content">
+      <span class="ascii-badge">LABS / ASCII LAB</span>
+      <h1 class="ascii-title">Turn any video into ASCII art.</h1>
+      <p class="ascii-subtitle">
+        Upload a video, tweak the settings, and watch it come alive as animated character art.
+        Export as GIF, MP4 or embed-ready HTML. All processing happens in your browser.
+      </p>
+      <div class="ascii-features-row">
+        <span class="ascii-chip">Real-time preview</span>
+        <span class="ascii-chip">Custom charsets</span>
+        <span class="ascii-chip">GIF / MP4 / HTML export</span>
+        <span class="ascii-chip">100% client-side</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="ascii-tool-section">
+    <AsciiLab client:only="react" />
+  </section>
 </Layout>
+
+<style>
+  .ascii-hero {
+    min-height: 40vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 80px 20px 40px;
+    background: radial-gradient(ellipse at 50% 0%, rgba(57,255,20,0.06) 0%, transparent 60%);
+  }
+
+  .ascii-hero-content {
+    max-width: 650px;
+  }
+
+  .ascii-badge {
+    display: inline-block;
+    font-family: monospace;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: #39ff14;
+    border: 1px solid rgba(57,255,20,0.3);
+    padding: 6px 16px;
+    border-radius: 20px;
+    margin-bottom: 24px;
+    background: rgba(57,255,20,0.05);
+  }
+
+  .ascii-title {
+    font-size: clamp(2rem, 5vw, 3.2rem);
+    font-weight: 900;
+    color: #f0f0f0;
+    margin: 0 0 16px;
+    line-height: 1.1;
+    letter-spacing: -1px;
+  }
+
+  .ascii-subtitle {
+    font-size: 1.05rem;
+    color: #888;
+    line-height: 1.6;
+    margin: 0 0 28px;
+  }
+
+  .ascii-features-row {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+  }
+
+  .ascii-chip {
+    font-family: monospace;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    color: #39ff14;
+    border: 1px solid rgba(57,255,20,0.2);
+    padding: 5px 14px;
+    border-radius: 6px;
+    background: rgba(57,255,20,0.04);
+  }
+
+  .ascii-tool-section {
+    border-top: 1px solid rgba(255,255,255,0.06);
+  }
+</style>
