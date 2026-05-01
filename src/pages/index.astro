@@ -16,22 +16,76 @@ const uniqueCategories = [...new Set(allWallpapers.map(w => w.category))];
   <!-- Hero Section -->
   
 
-  <!-- Editorial Content (SEO) -->
-  <section class="editorial-section">
-    <div class="editorial-content">
-      <h2>Professional Digital Topographies for Subliminal Focus</h2>
-      <p>
-        Welcome to CrakingWall, a premier digital gallery dedicated to the curation of high-fidelity, original digital artworks focusing on the "invisible observer" of technology. 
-        We specialize in sophisticated futuristic aesthetics, spanning rain-slicked Cyberpunk metropolises, nostalgic Synthwave horizons, 
-        avant-garde Glitch art, and the raw beauty of Code Brutalism. Each piece is meticulously color-graded with intentional chromatic dissonance 
-        and resolution-optimized to ensure unparalleled visual clarity on <span class="highlight">Ultra-HD 4K displays</span> and professional setups.
-      </p>
-      <p>
-        For the modern developer, designer, and digital native, a workspace is more than just a setup—it is a digital identity. 
-        Our collection offers a diverse array of non-distracting, high-contrast backgrounds engineered to foster deep work and 
-        creative inspiration, exploring specific movements like Retro-Hardware and Cyber-Gothic aesthetics. Every artifact in our gallery is available for high-speed download, ensuring your environment 
-        remains as refined as your craft.
-      </p>
+  <!-- Design Tools CTA -->
+  <section class="tools-section">
+    <div class="tools-header">
+      <span class="tools-badge">LABS</span>
+      <h2 class="tools-title">Design tools for the curious</h2>
+      <p class="tools-subtitle">Experimental creative tools — free, browser-based, no sign-up required.</p>
+    </div>
+
+    <div class="tools-grid">
+      <!-- ASCII Lab Card -->
+      <a href="/ascii-lab/" class="tool-card tool-card--ascii">
+        <div class="tool-card__preview">
+          <pre class="ascii-demo" id="ascii-demo" aria-label="Live ASCII art demo from a real video conversion">##############%%%%%%%%%%###########%%%%@@@@@@@@@
+################################%%%%%%%%@@@@%%%%
+%#################+++#############%%%%%%%%%%%%%#
+####%%%%%%#######++%%%%%%%######################
+####%%%%%%%%%%%%====%%%%%%%%%%#######-#+-:-=====
+---*%%%%%%%%%%-.==%%%%%%%%%%%%%%%====----=------
+--=====:=%%%%%%==:%#==+-=====-=-======----------
+===++++++++***=-===========-====++++++++++++++==
+******************=*******%*%*******************
+***************..=******* *%@@@@****************
+*************+=::::-=+****+=====****************
+***********************###**####################</pre>
+          <div class="tool-card__glow tool-card__glow--green"></div>
+        </div>
+        <div class="tool-card__body">
+          <div class="tool-card__tag tool-card__tag--green">VIDEO &rarr; ASCII</div>
+          <h3 class="tool-card__title">ASCII Lab</h3>
+          <p class="tool-card__desc">Transform any video into animated ASCII art. Customize charsets, FPS and resolution. Export as GIF, MP4 or HTML.</p>
+          <span class="tool-card__cta tool-card__cta--green">
+            Open tool
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          </span>
+        </div>
+      </a>
+
+      <!-- Visual Protocol Card -->
+      <a href="/visual-protocol/" class="tool-card tool-card--vp">
+        <div class="tool-card__preview">
+          <div class="vp-preview-mock">
+            <div class="vp-bar-group">
+              <div class="vp-label">Composition</div>
+              <div class="vp-bar"><div class="vp-bar-fill" style="width:85%"></div></div>
+            </div>
+            <div class="vp-bar-group">
+              <div class="vp-label">Color harmony</div>
+              <div class="vp-bar"><div class="vp-bar-fill" style="width:72%"></div></div>
+            </div>
+            <div class="vp-bar-group">
+              <div class="vp-label">Lighting</div>
+              <div class="vp-bar"><div class="vp-bar-fill" style="width:91%"></div></div>
+            </div>
+            <div class="vp-bar-group">
+              <div class="vp-label">Hierarchy</div>
+              <div class="vp-bar"><div class="vp-bar-fill" style="width:68%"></div></div>
+            </div>
+          </div>
+          <div class="tool-card__glow tool-card__glow--cyan"></div>
+        </div>
+        <div class="tool-card__body">
+          <div class="tool-card__tag tool-card__tag--cyan">IMAGE &rarr; INSIGHT</div>
+          <h3 class="tool-card__title">Visual Protocol</h3>
+          <p class="tool-card__desc">Decode the visual language of any image. Understand composition, color, lighting and hierarchy like a creative director.</p>
+          <span class="tool-card__cta tool-card__cta--cyan">
+            Open tool
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          </span>
+        </div>
+      </a>
     </div>
   </section>
 
@@ -88,6 +142,26 @@ const uniqueCategories = [...new Set(allWallpapers.map(w => w.category))];
 </Layout>
 
 <script>
+  // ASCII demo animation — real frames from 10s 2D animation video
+  document.addEventListener('DOMContentLoaded', () => {
+    const asciiFrames = [
+      "##############%%%%%%%%%%###########%%%%@@@@@@@@@\n################################%%%%%%%%@@@@%%%%\n%#################+++#############%%%%%%%%%%%%%#\n####%%%%%%#######++%%%%%%%######################\n####%%%%%%%%%%%%====%%%%%%%%%%#######-#+-:-=====\n---*%%%%%%%%%%-.==%%%%%%%%%%%%%%%====----=------\n--=====:=%%%%%%==:%#==+-=====-=-======----------\n===++++++++***=-===========-====++++++++++++++==\n******************=*******%*%*******************\n***************..=******* *%@@@@****************\n*************+=::::-=+****+=====****************\n***********************###**####################",
+      "##############%%%%%%%%%%###########%%%%@@@@@@@@@\n################################%%%%%%%%@@@@%%%%\n%#################-+:#############%%%%%%%%%%%%%#\n####%%%%%%#######++%#%%%%%######################\n####%%%%%%%%%%%%==+%%%%%%%%%%%#######-#+-:-=====\n---*%%%%%%%%%%-:=+=%%%%%%%%%%%%%%====---==------\n--=====:=%%%%%%==:%#==+-===+%= +======----------\n===++++++++***=-===========-% +@++++++++++++++==\n******************=*****************************\n***************:.=******************************\n*************+=::::-=+*****+++++****************\n***********************##******#################",
+      "##############%%%%%%%%%%###########%%%%@@@@@@@@@\n################################%%%%%%%%@@@@%%%%\n%###############+++###############%%%%%%%%%%%%%#\n####%%%%%%######+..%%%%%%%######################\n####%%%%%%%%%%#==%%%%%-%%%%%%%#######-#+-:-=====\n--=*%%%%%%%%%-..==%=%%%%%%%%%%%%%====---==------\n--=====:=%%%%%===%%#==+======-==========--------\n===++++++++***=============-====++++++++++++++==\n****************=*=*****************************\n**************=**=****** .@@@@@%****************\n************+========*****+=====****************\n**********#************###**####################",
+      "##############%%%%%%%%%%###########%%%%@@@@@@@@@\n################################%%%%%%%%@@@@%%%%\n%#################################%%%%%%%%%%%%%#\n%###%%%%%%#######%%+++.%%%######################\n####%%%%%%%%%%%%%%=.%=*%%%%%%%#######-#+-:-=====\n--=*%%%%%%%%%%.====.:%%%%%%%%%%%%====----=------\n--=====:=%%%%%====%%==+-=====-=-=-======--------\n===++++++++**===:==========-====++++++++++++++==\n*************.=***#=****************************\n***********=-****=******************************\n***********+=========***************************\n***********************###**####################",
+      "##############%%%%%%%%%%###########%%%%@@@@@@@@@\n################################%%%%%%%%@@@@%%%%\n%#################################%%%%%%%%%%%%%#\n%###%%%%%%#######%%%+++%%%######################\n####%%%%%%%%%%%%%%:=.#+=.%%%%%#######-#+-:-=====\n--=*%%%%%%%%%%%=-==.%+:%%%%%%%%%%====----=------\n--=====:=%%%%%%====#+=+-=====-=-=-======--------\n===++++++++***===-=========-====++++++++++++++==\n**************=****=****************************\n***********==****=******************************\n************+========+**************************\n***********************###**####################",
+      "##############%%%%%%%%%%###########%%%%@@@@@@@@@\n################################%%%%%%%%@@@@%%%%\n%############-+:##################%%%%%%%%%%%%%#\n%###%%%%%%###=+#%%%%%%%%%%######################\n####%%%%%%%===+%%%%%%%%%%%%%%%#######-#+-:-=====\n--=*%%%%%%%==:+%%%%%%%%%%%%%%%%%%====---==------\n--=====:=%%===%%%%%#+=+======-=-=-======--------\n===+++++++.=-==*++=========-====++++++++++++++==\n************=**-********************=*@ @*******\n**********==**+=********************** %@@@@****\n**********+=+++=++**********************+++*****\n***********************###**####################"
+    ];
+    const el = document.getElementById('ascii-demo');
+    if (el) {
+      let i = 0;
+      setInterval(() => {
+        i = (i + 1) % asciiFrames.length;
+        el.textContent = asciiFrames[i];
+      }, 400);
+    }
+  });
+
   // Client-side filtering
   document.addEventListener('DOMContentLoaded', () => {
     const filterBtns = document.querySelectorAll('.filter-btn');
@@ -178,50 +252,255 @@ const uniqueCategories = [...new Set(allWallpapers.map(w => w.category))];
     margin: 0 auto;
   }
 
-  /* Editorial Section */
-  .editorial-section {
-    max-width: 1400px;
-    margin: 20px auto;
+  /* Tools Section */
+  .tools-section {
+    max-width: 1000px;
+    margin: 24px auto 0;
     padding: 0 20px;
-    text-align: center;
   }
 
-  .editorial-content {
-    background: #121218;
-    border: 1px solid #333;
-    padding: 24px 40px;
-    border-radius: 8px;
+  .tools-header {
+    text-align: center;
+    margin-bottom: 28px;
+  }
+
+  .tools-badge {
+    display: inline-block;
+    font-family: monospace;
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 3px;
+    color: #b026ff;
+    border: 1px solid rgba(176,38,255,0.3);
+    padding: 4px 14px;
+    border-radius: 20px;
+    margin-bottom: 12px;
+    background: rgba(176,38,255,0.06);
+  }
+
+  .tools-title {
+    font-size: clamp(1.4rem, 3vw, 2rem);
+    font-weight: 900;
+    color: #f0f0f0;
+    margin: 0 0 8px;
+    letter-spacing: -0.5px;
+  }
+
+  .tools-subtitle {
+    font-size: 0.95rem;
+    color: #666;
+    margin: 0;
+  }
+
+  .tools-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+
+  /* Tool Card */
+  .tool-card {
+    display: flex;
+    flex-direction: column;
+    background: #0d0f14;
+    border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 14px;
+    overflow: hidden;
+    text-decoration: none;
+    color: inherit;
+    transition: all 0.35s cubic-bezier(0.23, 1, 0.32, 1);
     position: relative;
+  }
+
+  .tool-card:hover {
+    transform: translateY(-6px);
+    border-color: rgba(255,255,255,0.15);
+  }
+
+  .tool-card--ascii:hover {
+    box-shadow: 0 12px 40px rgba(57,255,20,0.12), 0 0 0 1px rgba(57,255,20,0.2);
+  }
+
+  .tool-card--vp:hover {
+    box-shadow: 0 12px 40px rgba(0,243,255,0.12), 0 0 0 1px rgba(0,243,255,0.2);
+  }
+
+  /* Card Preview */
+  .tool-card__preview {
+    position: relative;
+    height: 180px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    background: #080a0f;
+  }
+
+  .tool-card__glow {
+    position: absolute;
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    filter: blur(80px);
+    opacity: 0.15;
+    pointer-events: none;
+    transition: opacity 0.4s;
+  }
+
+  .tool-card:hover .tool-card__glow { opacity: 0.3; }
+
+  .tool-card__glow--green {
+    background: #39ff14;
+    top: -40px;
+    right: -40px;
+  }
+
+  .tool-card__glow--cyan {
+    background: #00f3ff;
+    top: -40px;
+    left: -40px;
+  }
+
+  /* ASCII Demo — real video frames */
+  .ascii-demo {
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 7.5px;
+    line-height: 1.15;
+    letter-spacing: 0.5px;
+    color: #39ff14;
+    text-align: center;
+    margin: 0;
+    padding: 0;
+    background: none;
+    border: none;
+    white-space: pre;
+    opacity: 0.65;
+    transition: opacity 0.3s, text-shadow 0.3s;
+    overflow: hidden;
+    text-shadow: 0 0 2px rgba(57,255,20,0.3);
+  }
+
+  .tool-card--ascii:hover .ascii-demo {
+    opacity: 1;
+    text-shadow: 0 0 6px rgba(57,255,20,0.5);
+  }
+
+  /* VP Preview Mock */
+  .vp-preview-mock {
+    width: 80%;
+    max-width: 260px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    opacity: 0.7;
+    transition: opacity 0.3s;
+  }
+
+  .tool-card--vp:hover .vp-preview-mock { opacity: 1; }
+
+  .vp-bar-group {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+  }
+
+  .vp-label {
+    font-family: monospace;
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: #555;
+  }
+
+  .vp-bar {
+    height: 6px;
+    background: rgba(255,255,255,0.06);
+    border-radius: 3px;
     overflow: hidden;
   }
 
-  .editorial-content::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 4px;
+  .vp-bar-fill {
     height: 100%;
-    background: linear-gradient(to bottom, #b026ff, #00fff9);
+    background: linear-gradient(90deg, #00f3ff, #0088ff);
+    border-radius: 3px;
+    transition: width 1s cubic-bezier(0.23, 1, 0.32, 1);
   }
 
-  .editorial-content h2 {
-    font-size: 1.8rem;
+  /* Card Body */
+  .tool-card__body {
+    padding: 20px 22px 22px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    flex: 1;
+  }
+
+  .tool-card__tag {
+    font-family: monospace;
+    font-size: 0.6rem;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    width: fit-content;
+    padding: 3px 10px;
+    border-radius: 4px;
+  }
+
+  .tool-card__tag--green {
+    color: #39ff14;
+    background: rgba(57,255,20,0.08);
+    border: 1px solid rgba(57,255,20,0.15);
+  }
+
+  .tool-card__tag--cyan {
+    color: #00f3ff;
+    background: rgba(0,243,255,0.08);
+    border: 1px solid rgba(0,243,255,0.15);
+  }
+
+  .tool-card__title {
+    font-size: 1.3rem;
+    font-weight: 900;
     color: #f0f0f0;
-    margin-bottom: 1rem;
-    font-weight: 800;
+    margin: 0;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
   }
 
-  .editorial-content p {
-    color: #a0a0a0;
+  .tool-card__desc {
+    font-size: 0.82rem;
+    color: #666;
     line-height: 1.5;
-    margin-bottom: 0.8rem;
-    font-size: 1rem;
+    margin: 0;
+    flex: 1;
   }
 
-  .editorial-content .highlight {
-    color: #00fff9;
-    font-weight: bold;
+  .tool-card__cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-weight: 800;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-top: 8px;
+    transition: gap 0.3s;
+  }
+
+  .tool-card:hover .tool-card__cta { gap: 10px; }
+
+  .tool-card__cta--green { color: #39ff14; }
+  .tool-card__cta--cyan { color: #00f3ff; }
+
+  @media (max-width: 640px) {
+    .tools-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .tool-card__preview {
+      height: 140px;
+    }
   }
 
   /* Filters Section */
