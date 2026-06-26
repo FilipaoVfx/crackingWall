@@ -13,7 +13,12 @@ type DecodeEnv = {
   OPENROUTER_API_KEY: string;
   PUBLIC_SUPABASE_URL: string;
   SUPABASE_SERVICE_ROLE_KEY: string;
+  OPENROUTER_MODEL?: string;
 };
+
+// Vision model used for image analysis. Override via OPENROUTER_MODEL env var
+// if OpenRouter retires the default model.
+const DEFAULT_OPENROUTER_MODEL = 'qwen/qwen3.6-flash';
 
 class DecodeApiError extends Error {
   status: number;
@@ -301,7 +306,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
         'X-Title': 'CrackingWall Analysis',
       },
       body: JSON.stringify({
-        model: 'qwen/qwen2.5-vl-32b-instruct',
+        model: env.OPENROUTER_MODEL || DEFAULT_OPENROUTER_MODEL,
         messages: [
           {
             role: 'user',
