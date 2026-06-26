@@ -115,6 +115,11 @@ export const ImageAnalyzer: React.FC = () => {
       }
 
       setResult(data.result);
+      // Auto-expand the first returned section so the breakdown isn't blank
+      if (data.result && typeof data.result === 'object') {
+        const firstKey = Object.keys(data.result)[0];
+        if (firstKey) setExpandedSection(firstKey);
+      }
       if (data.status === 'cached') {
         setCachedMessage(data.message);
       }
@@ -139,8 +144,14 @@ export const ImageAnalyzer: React.FC = () => {
     }
   };
 
-  const renderJsonSection = (title: string, dataKey: keyof AnalysisResult) => {
-    if (!result || !result[dataKey]) return null;
+  // Prettify a raw JSON key into a section title, e.g. "color_profile" -> "Color Profile"
+  const prettifyKey = (key: string) =>
+    key
+      .replace(/[_-]+/g, ' ')
+      .replace(/\b\w/g, (c) => c.toUpperCase());
+
+  const renderJsonSection = (title: string, dataKey: string) => {
+    if (!result || (result as any)[dataKey] == null) return null;
     const isExpanded = expandedSection === dataKey;
 
     return (
@@ -161,7 +172,7 @@ export const ImageAnalyzer: React.FC = () => {
               className="overflow-hidden"
             >
               <div className="p-4 border-t border-white/5 font-mono text-sm text-gray-300 whitespace-pre-wrap">
-                {JSON.stringify(result[dataKey], null, 2)}
+                {JSON.stringify((result as any)[dataKey], null, 2)}
               </div>
             </motion.div>
           )}
@@ -310,13 +321,15 @@ export const ImageAnalyzer: React.FC = () => {
                   animate={{ opacity: 1 }}
                   className="space-y-4"
                 >
-                  {renderJsonSection('Composition', 'composition')}
-                  {renderJsonSection('Color Profile', 'color_profile')}
-                  {renderJsonSection('Lighting', 'lighting')}
-                  {renderJsonSection('Technical Specs', 'technical_specs')}
-                  {renderJsonSection('Artistic Elements', 'artistic_elements')}
-                  {renderJsonSection('Typography', 'typography')}
-                  {renderJsonSection('Generation Prompts', 'generation_parameters')}
+                  {Object.keys(result).length === 0 ? (
+                    <div className="p-4 font-mono text-sm text-gray-400">
+                      The model returned no breakdown data. Try another image.
+                    </div>
+                  ) : (
+                    Object.keys(result).map((key) =>
+                      renderJsonSection(prettifyKey(key), key)
+                    )
+                  )}
                 </motion.div>
               )}
             </div>
