@@ -32,8 +32,8 @@ export function AsciiControls({ config, onChange, disabled }: Props) {
       style={{
         display: 'flex',
         flexDirection: 'column',
-        gap: 14,
-        padding: 16,
+        gap: 10,
+        padding: 12,
         border: '1px solid #1a1a2e',
         borderRadius: 4,
         background: 'rgba(0,0,0,.3)',
@@ -77,8 +77,8 @@ export function AsciiControls({ config, onChange, disabled }: Props) {
       <div
         style={{
           display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))',
-          gap: 16,
+          gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))',
+          gap: 12,
         }}
       >
       {/* FPS */}

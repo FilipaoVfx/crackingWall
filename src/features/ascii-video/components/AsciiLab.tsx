@@ -19,54 +19,25 @@ export function AsciiLab() {
       style={{
         maxWidth: 1000,
         margin: '0 auto',
-        padding: '40px 20px 80px',
+        padding: '16px 16px 40px',
         fontFamily: 'monospace',
       }}
     >
-      {/* Header */}
-      <div style={{ textAlign: 'center', marginBottom: 40 }}>
-        <h1
-          style={{
-            fontSize: 'clamp(1.8rem, 5vw, 3rem)',
-            fontWeight: 900,
-            background: 'linear-gradient(90deg, #00fff9, #39ff14, #b026ff)',
-            WebkitBackgroundClip: 'text',
-            WebkitTextFillColor: 'transparent',
-            margin: 0,
-            letterSpacing: 2,
-            textTransform: 'uppercase',
-            filter: 'drop-shadow(0 0 12px rgba(0,255,249,0.3))',
-          }}
-        >
-          ASCII LAB
-        </h1>
-        <p
-          style={{
-            color: '#555',
-            fontSize: 13,
-            marginTop: 8,
-            letterSpacing: 1,
-          }}
-        >
-          VIDEO &rarr; ASCII &rarr; EXPORT
-        </p>
-      </div>
-
       {/* Controls — always visible so user can tweak before uploading */}
-      <div style={{ marginBottom: 20 }}>
+      <div style={{ marginBottom: 12 }}>
         <AsciiControls config={config} onChange={setConfig} disabled={isProcessing} />
       </div>
 
       {/* Upload zone — hidden once we have results */}
       {state.status !== 'done' && (
-        <div style={{ marginBottom: 20 }}>
+        <div style={{ marginBottom: 12 }}>
           <AsciiUploader onFile={generate} disabled={isProcessing} />
         </div>
       )}
 
       {/* Processing indicator */}
       {isProcessing && (
-        <div style={{ marginBottom: 20 }}>
+        <div style={{ marginBottom: 12 }}>
           <div
             style={{
               display: 'flex',
