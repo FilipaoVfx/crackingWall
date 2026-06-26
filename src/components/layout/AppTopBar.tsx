@@ -26,7 +26,7 @@ export const AppTopBar: React.FC = () => {
           type="search"
           onChange={handleSearch}
           placeholder="Search tools, assets, guides..."
-          className="w-full rounded-md border-2 border-white/10 bg-black/40 py-2.5 pl-11 pr-4 font-mono text-sm text-white placeholder:text-gray-600 transition-colors focus:border-brutal-neon-cyan focus:outline-none"
+          className="w-full border-2 border-white/10 bg-black/40 py-2.5 pl-11 pr-4 font-mono text-sm text-white placeholder:text-gray-600 transition-colors focus:border-brutal-neon-cyan focus:outline-none"
         />
       </div>
 
@@ -41,7 +41,7 @@ export const AppTopBar: React.FC = () => {
             </span>
             <button
               onClick={() => signOut()}
-              className="flex items-center gap-2 rounded-md border-2 border-black bg-white px-4 py-2.5 font-brutal text-sm font-black uppercase tracking-wide text-black shadow-brutal-sm transition-transform hover:-translate-y-0.5"
+              className="flex items-center gap-2 border-2 border-black bg-white px-4 py-2.5 font-brutal text-sm font-black uppercase tracking-wide text-black shadow-brutal-sm transition-transform hover:-translate-y-0.5"
             >
               <LogOut className="h-4 w-4" />
               <span className="hidden sm:inline">Salir</span>
@@ -50,7 +50,7 @@ export const AppTopBar: React.FC = () => {
         ) : (
           <button
             onClick={() => setIsAuthOpen(true)}
-            className="flex items-center gap-2 rounded-md border-2 border-black bg-brutal-neon-cyan px-5 py-2.5 font-brutal text-sm font-black uppercase tracking-wide text-black shadow-brutal-sm transition-transform hover:-translate-y-0.5"
+            className="flex items-center gap-2 border-2 border-black bg-brutal-neon-cyan px-5 py-2.5 font-brutal text-sm font-black uppercase tracking-wide text-black shadow-brutal-sm transition-transform hover:-translate-y-0.5"
           >
             <LogIn className="h-4 w-4" />
             Login
