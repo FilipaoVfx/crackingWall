@@ -1,0 +1,62 @@
+---
+import Sidebar from '../components/layout/Sidebar.astro';
+import { AppTopBar } from '../components/layout/AppTopBar';
+import '../index.css';
+
+interface Props {
+  title: string;
+  description?: string;
+  image?: string;
+}
+
+const {
+  title,
+  description = 'Creative tools for analyzing visuals, generating ideas and building experiences. Free, browser-based.',
+  image = '/og-image.webp',
+} = Astro.props;
+
+const canonicalURL = new URL(Astro.url.pathname, Astro.site);
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="description" content={description} />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" type="image/x-icon" href="/iconCulture.ico" />
+    <meta name="generator" content={Astro.generator} />
+    <link rel="canonical" href={canonicalURL} />
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content={Astro.url} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:image" content={new URL(image, Astro.url)} />
+    <meta property="twitter:card" content="summary_large_image" />
+
+    <title>{title}</title>
+  </head>
+  <body>
+    <Sidebar />
+
+    <div class="app-content ml-[260px] min-h-screen transition-[margin] duration-200">
+      <AppTopBar client:load />
+      <main class="px-6 py-8 md:px-10">
+        <slot />
+      </main>
+    </div>
+  </body>
+</html>
+
+<style is:global>
+  body {
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+    background: #0a0a0f;
+    color: #f0f0f0;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  }
+</style>
