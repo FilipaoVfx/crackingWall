@@ -1,5 +1,6 @@
 import type { AsciiConfig } from '../core/types';
 import { CHARSETS, type CharsetName } from '../utils/charset';
+import { PRESETS } from '../utils/presets';
 
 interface Props {
   config: AsciiConfig;
@@ -29,9 +30,9 @@ export function AsciiControls({ config, onChange, disabled }: Props) {
   return (
     <div
       style={{
-        display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))',
-        gap: 16,
+        display: 'flex',
+        flexDirection: 'column',
+        gap: 14,
         padding: 16,
         border: '1px solid #1a1a2e',
         borderRadius: 4,
@@ -40,6 +41,46 @@ export function AsciiControls({ config, onChange, disabled }: Props) {
         pointerEvents: disabled ? 'none' : 'auto',
       }}
     >
+      {/* Presets */}
+      <div>
+        <div style={{ ...label, marginBottom: 8 }}>
+          <span>PRESETS</span>
+        </div>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+          {PRESETS.map((p) => {
+            const active = p.patch.charset === config.charset && p.patch.edges === config.edges;
+            return (
+              <button
+                key={p.name}
+                title={p.description}
+                onClick={() => onChange({ ...config, ...p.patch })}
+                style={{
+                  background: active ? '#00fff9' : 'transparent',
+                  color: active ? '#0a0a0f' : '#00fff9',
+                  border: '1px solid #00fff9',
+                  padding: '4px 12px',
+                  fontFamily: 'monospace',
+                  fontSize: 11,
+                  fontWeight: 700,
+                  textTransform: 'uppercase',
+                  cursor: 'pointer',
+                  borderRadius: 2,
+                }}
+              >
+                {p.name}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      <div
+        style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))',
+          gap: 16,
+        }}
+      >
       {/* FPS */}
       <div>
         <div style={label}>
@@ -178,6 +219,34 @@ export function AsciiControls({ config, onChange, disabled }: Props) {
           />
           <span>INVERT</span>
         </label>
+        <label style={{ ...label, cursor: 'pointer', justifyContent: 'flex-start' }}>
+          <input
+            type="checkbox"
+            checked={config.edges}
+            onChange={(e) => onChange({ ...config, edges: e.target.checked })}
+            style={{ accentColor: '#00fff9', cursor: 'pointer' }}
+          />
+          <span>EDGES</span>
+        </label>
+      </div>
+
+      {/* Edge threshold (only relevant when EDGES is on) */}
+      <div style={{ opacity: config.edges ? 1 : 0.4 }}>
+        <div style={label}>
+          <span>EDGE THRESHOLD</span>
+          <span style={{ color: '#39ff14' }}>{config.edgeThreshold.toFixed(2)}</span>
+        </div>
+        <input
+          type="range"
+          min={0.1}
+          max={0.9}
+          step={0.02}
+          value={config.edgeThreshold}
+          disabled={!config.edges}
+          onChange={(e) => onChange({ ...config, edgeThreshold: +e.target.value })}
+          style={slider}
+        />
+      </div>
       </div>
     </div>
   );

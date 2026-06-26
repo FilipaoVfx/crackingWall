@@ -82,6 +82,65 @@ interface ToneOpts {
   invert: boolean;
 }
 
+interface EdgeOpts {
+  enabled: boolean;
+  threshold: number; // normalized 0..1
+}
+
+const EDGE_CHARS = ['|', '/', '-', '\\'];
+
+/** Pick a directional edge glyph from the gradient angle (image y points down). */
+function edgeGlyph(gx: number, gy: number): string {
+  let a = (Math.atan2(gy, gx) * 180) / Math.PI; // -180..180
+  if (a < 0) a += 180; // fold to 0..180 (orientation is symmetric)
+  if (a < 22.5 || a >= 157.5) return EDGE_CHARS[0]; // gradient ~horizontal → vertical edge
+  if (a < 67.5) return EDGE_CHARS[1]; // '/'
+  if (a < 112.5) return EDGE_CHARS[2]; // '-'
+  return EDGE_CHARS[3]; // '\'
+}
+
+/**
+ * Detect edges on a luminance field: light Gaussian blur (noise reduction,
+ * the "DoG-style" smoothing step) followed by a Sobel operator. Returns, per
+ * cell, the normalized gradient magnitude and a directional glyph.
+ */
+function detectEdges(
+  lum: Float32Array,
+  width: number,
+  height: number,
+): { mag: Float32Array; glyph: string[] } {
+  // 3x3 Gaussian blur
+  const bl = new Float32Array(width * height);
+  const at = (x: number, y: number) => lum[Math.min(height - 1, Math.max(0, y)) * width + Math.min(width - 1, Math.max(0, x))];
+  for (let y = 0; y < height; y++) {
+    for (let x = 0; x < width; x++) {
+      bl[y * width + x] =
+        (at(x - 1, y - 1) + 2 * at(x, y - 1) + at(x + 1, y - 1) +
+          2 * at(x - 1, y) + 4 * at(x, y) + 2 * at(x + 1, y) +
+          at(x - 1, y + 1) + 2 * at(x, y + 1) + at(x + 1, y + 1)) / 16;
+    }
+  }
+
+  const mag = new Float32Array(width * height);
+  const glyph: string[] = new Array(width * height);
+  const b = (x: number, y: number) => bl[Math.min(height - 1, Math.max(0, y)) * width + Math.min(width - 1, Math.max(0, x))];
+  for (let y = 0; y < height; y++) {
+    for (let x = 0; x < width; x++) {
+      const gx =
+        -b(x - 1, y - 1) - 2 * b(x - 1, y) - b(x - 1, y + 1) +
+        b(x + 1, y - 1) + 2 * b(x + 1, y) + b(x + 1, y + 1);
+      const gy =
+        -b(x - 1, y - 1) - 2 * b(x, y - 1) - b(x + 1, y - 1) +
+        b(x - 1, y + 1) + 2 * b(x, y + 1) + b(x + 1, y + 1);
+      const p = y * width + x;
+      // max |g| ≈ 4 for luma in 0..1 → normalize by 4
+      mag[p] = Math.min(1, Math.sqrt(gx * gx + gy * gy) / 4);
+      glyph[p] = edgeGlyph(gx, gy);
+    }
+  }
+  return { mag, glyph };
+}
+
 /** Apply brightness/contrast/gamma/invert to a normalized luminance (0..1). */
 function tone(v: number, o: ToneOpts): number {
   v = (v - 0.5) * o.contrast + 0.5 + o.brightness;
@@ -99,16 +158,21 @@ function convertFrame(
   ramp: CalibratedRamp,
   tn: ToneOpts,
   dither: boolean,
+  edge: EdgeOpts,
 ): string {
   const { chars, levels } = ramp;
 
-  // Precompute toned luminance buffer (so error diffusion can write into it)
+  // Raw luminance (for edge detection) + toned buffer (for tonal mapping)
+  const lum = new Float32Array(width * height);
   const buf = new Float32Array(width * height);
   for (let p = 0, i = 0; p < buf.length; p++, i += 4) {
     // Rec.601 luma on sRGB-encoded pixels (standard ASCII luma)
     const g = (rgba[i] * 0.299 + rgba[i + 1] * 0.587 + rgba[i + 2] * 0.114) / 255;
+    lum[p] = g;
     buf[p] = tone(g, tn);
   }
+
+  const edges = edge.enabled ? detectEdges(lum, width, height) : null;
 
   const lines: string[] = [];
   for (let y = 0; y < height; y++) {
@@ -120,7 +184,12 @@ function convertFrame(
       else if (v > 1) v = 1;
 
       const idx = nearestLevel(levels, v);
-      line += chars[idx];
+      // Edge glyph overrides the tonal char where a strong edge is detected
+      if (edges && edges.mag[p] >= edge.threshold) {
+        line += edges.glyph[p];
+      } else {
+        line += chars[idx];
+      }
 
       if (dither) {
         // Floyd–Steinberg error diffusion across the calibrated levels
@@ -139,7 +208,7 @@ function convertFrame(
 }
 
 self.onmessage = (e: MessageEvent) => {
-  const { type, pixels, width, height, charset, brightness, contrast, gamma, dither, invert } = e.data;
+  const { type, pixels, width, height, charset, brightness, contrast, gamma, dither, invert, edges, edgeThreshold } = e.data;
   if (type !== 'convert') return;
 
   try {
@@ -151,13 +220,14 @@ self.onmessage = (e: MessageEvent) => {
       invert: !!invert,
     };
     const useDither = dither !== false;
+    const edge: EdgeOpts = { enabled: !!edges, threshold: edgeThreshold ?? 0.4 };
 
     const total = pixels.length;
     const frames: string[] = [];
 
     for (let i = 0; i < total; i++) {
       const rgba = new Uint8ClampedArray(pixels[i]);
-      frames.push(convertFrame(rgba, width, height, ramp, tn, useDither));
+      frames.push(convertFrame(rgba, width, height, ramp, tn, useDither, edge));
       if ((i + 1) % 5 === 0 || i === total - 1) {
         self.postMessage({ type: 'progress', progress: ((i + 1) / total) * 100 });
       }

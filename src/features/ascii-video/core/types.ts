@@ -12,6 +12,10 @@ export interface AsciiConfig {
   dither: boolean;
   /** Invert mapping (for light backgrounds / negative look). */
   invert: boolean;
+  /** Overlay directional edge glyphs ( | / - \ ) detected via blur+Sobel. */
+  edges: boolean;
+  /** Normalized gradient magnitude above which a cell becomes an edge, 0..1. */
+  edgeThreshold: number;
 }
 
 export type GeneratorStatus = 'idle' | 'validating' | 'extracting' | 'converting' | 'done' | 'error';
@@ -36,6 +40,8 @@ export interface WorkerConvertMessage {
   gamma: number;
   dither: boolean;
   invert: boolean;
+  edges: boolean;
+  edgeThreshold: number;
 }
 
 // Worker → Main thread

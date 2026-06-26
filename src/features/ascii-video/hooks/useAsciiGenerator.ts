@@ -22,6 +22,8 @@ export function useAsciiGenerator() {
     gamma: 1,
     dither: true,
     invert: false,
+    edges: false,
+    edgeThreshold: 0.4,
   });
 
   const workerRef = useRef<Worker | null>(null);
@@ -88,6 +90,8 @@ export function useAsciiGenerator() {
         gamma: config.gamma,
         dither: config.dither,
         invert: config.invert,
+        edges: config.edges,
+        edgeThreshold: config.edgeThreshold,
       },
       extracted.pixels, // transfer ownership
     );
