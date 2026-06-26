@@ -1,6 +1,17 @@
 ---
 export const prerender = true;
 import AppLayout from '../layouts/AppLayout.astro';
+import { WallpaperService } from '../services/wallpaperService';
+
+// Featured wallpapers (secondary content) — prefer flagged ones, else newest
+const allWallpapers = await WallpaperService.getAllWallpapers();
+const featuredWallpapers = [
+  ...allWallpapers.filter((w) => w.is_featured),
+  ...allWallpapers.filter((w) => !w.is_featured),
+].slice(0, 4);
+
+const wallpaperHref = (w: { category: string; title: string; id: string }) =>
+  `/${w.category.toLowerCase()}/${w.title.toLowerCase().replace(/[^a-z0-9]+/g, '-')}-${w.id}/`;
 
 const tools = [
   {
@@ -84,10 +95,38 @@ const accentClasses: Record<string, { border: string; text: string; tag: string 
       <h2 class="font-brutal text-xl font-black uppercase tracking-wide text-white">Featured Wallpapers</h2>
       <a href="/" class="font-mono text-xs uppercase tracking-wide text-brutal-neon-purple hover:underline">View all →</a>
     </div>
-    <div class="rounded-lg border-2 border-dashed border-white/10 p-10 text-center">
-      <p class="font-mono text-sm text-gray-500">
-        Wallpaper gallery moves here as a secondary section — wired up in the next increment.
-      </p>
-    </div>
+    {featuredWallpapers.length === 0 ? (
+      <div class="rounded-lg border-2 border-dashed border-white/10 p-10 text-center">
+        <p class="font-mono text-sm text-gray-500">No wallpapers available right now.</p>
+      </div>
+    ) : (
+      <div class="grid grid-cols-2 gap-5 lg:grid-cols-4">
+        {featuredWallpapers.map((w, i) => (
+          <a
+            href={wallpaperHref(w)}
+            class="group overflow-hidden rounded-lg border-2 border-white/10 bg-brutal-dark-bg transition-all hover:-translate-y-1 hover:border-brutal-neon-purple hover:shadow-neon-purple"
+          >
+            <div class="relative aspect-video overflow-hidden">
+              <img
+                src={w.url}
+                alt={w.alt_text || w.title}
+                width="400"
+                height="225"
+                loading={i < 2 ? 'eager' : 'lazy'}
+                decoding={i < 2 ? 'sync' : 'async'}
+                class="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+              />
+              <div class="absolute inset-0 flex items-center justify-center bg-black/60 opacity-0 transition-opacity group-hover:opacity-100">
+                <span class="font-brutal text-sm font-black uppercase tracking-widest text-brutal-neon-cyan">View</span>
+              </div>
+            </div>
+            <div class="flex items-center justify-between gap-2 px-3 py-2.5">
+              <h3 class="truncate font-brutal text-xs font-bold uppercase tracking-wide text-white">{w.title}</h3>
+              <span class="shrink-0 font-mono text-[10px] text-gray-500">❤️ {w.likes}</span>
+            </div>
+          </a>
+        ))}
+      </div>
+    )}
   </section>
 </AppLayout>

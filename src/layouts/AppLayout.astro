@@ -24,9 +24,17 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
     <meta charset="UTF-8" />
     <meta name="description" content={description} />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1028294908787451"
+     crossorigin="anonymous"></script>
     <link rel="icon" type="image/x-icon" href="/iconCulture.ico" />
     <meta name="generator" content={Astro.generator} />
     <link rel="canonical" href={canonicalURL} />
+
+    <!-- HilltopAds Native Banner Script -->
+    <script async="async" data-cfasync="false" src="https://pl28866886.effectivegatecpm.com/ef6e3b461a71809c904dce507871700c/invoke.js"></script>
+
+    <!-- Social Bar Ad Script -->
+    <script src="https://pl28929413.effectivegatecpm.com/d1/dd/00/d1dd00200c1df93aee192392fab2094a.js"></script>
 
     <!-- Open Graph -->
     <meta property="og:type" content="website" />
@@ -45,6 +53,11 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
       <AppTopBar client:load />
       <main class="px-6 py-8 md:px-10">
         <slot />
+
+        <!-- Native Ad Banner -->
+        <div class="mx-auto my-8 flex max-w-5xl justify-center">
+          <div id="container-ef6e3b461a71809c904dce507871700c"></div>
+        </div>
       </main>
     </div>
   </body>
