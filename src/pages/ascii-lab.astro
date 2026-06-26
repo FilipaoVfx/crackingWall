@@ -1,22 +1,14 @@
 ---
 export const prerender = true;
-import Layout from '../layouts/Layout.astro';
+import AppLayout from '../layouts/AppLayout.astro';
 import { AsciiLab } from '../features/ascii-video';
-import SEO from '../components/SEO.astro';
 
 const title = "ASCII Lab — Convert Video to ASCII Art | CrackingWall";
 const description = "Transform any video into animated ASCII art in your browser. Customize character sets, FPS and resolution. Export as GIF, MP4 or HTML. Free experimental tool.";
 const canonicalUrl = "https://crakingculturewallpaperr.xyz/ascii-lab/";
 ---
 
-<Layout title={title} description={description}>
-  <SEO
-    slot="seo"
-    title={title}
-    description={description}
-    canonicalUrl={canonicalUrl}
-  />
-
+<AppLayout title={title} description={description}>
   <script type="application/ld+json" set:html={JSON.stringify({
     "@context": "https://schema.org",
     "@type": "WebApplication",
@@ -50,7 +42,7 @@ const canonicalUrl = "https://crakingculturewallpaperr.xyz/ascii-lab/";
   <section class="ascii-tool-section">
     <AsciiLab client:only="react" />
   </section>
-</Layout>
+</AppLayout>
 
 <style>
   /* Compact hero — keeps the tool above the fold */

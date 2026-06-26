@@ -59,6 +59,24 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
           <div id="container-ef6e3b461a71809c904dce507871700c"></div>
         </div>
       </main>
+
+      <footer class="border-t-2 border-white/10 px-6 py-10 text-center md:px-10">
+        <div class="mb-6 flex flex-wrap justify-center gap-x-6 gap-y-2 font-brutal text-xs font-black uppercase tracking-wider">
+          <a href="/" class="text-gray-400 transition-colors hover:text-brutal-neon-cyan">Home</a>
+          <a href="/ascii-lab/" class="text-gray-400 transition-colors hover:text-brutal-neon-green">ASCII Lab</a>
+          <a href="/visual-protocol/" class="text-gray-400 transition-colors hover:text-brutal-neon-pink">Visual Protocol</a>
+          <a href="/wallpapers/" class="text-gray-400 transition-colors hover:text-brutal-neon-purple">Wallpapers</a>
+          <a href="/blog/" class="text-gray-400 transition-colors hover:text-brutal-neon-cyan">Blog</a>
+          <a href="/about/" class="text-gray-400 transition-colors hover:text-brutal-neon-cyan">About</a>
+          <a href="/contact/" class="text-gray-400 transition-colors hover:text-brutal-neon-yellow">Contact</a>
+          <a href="/license" class="text-gray-400 transition-colors hover:text-brutal-neon-green">License</a>
+          <a href="/privacy-policy" class="text-gray-400 transition-colors hover:text-brutal-neon-green">Privacy</a>
+        </div>
+        <div class="mx-auto mb-4 h-1 w-20 bg-brutal-neon-cyan"></div>
+        <p class="font-mono text-xs text-gray-500">
+          &copy; {new Date().getFullYear()} <span class="text-white">CrakingWall</span>. Protocol initialized.
+        </p>
+      </footer>
     </div>
   </body>
 </html>

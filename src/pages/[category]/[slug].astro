@@ -1,9 +1,8 @@
 ---
 export const prerender = true;
-import Layout from '../../layouts/Layout.astro';
+import AppLayout from '../../layouts/AppLayout.astro';
 import { WallpaperService } from '../../services/wallpaperService';
 import { Download, Heart, ArrowLeft, Terminal, Cpu, Layers, Monitor } from 'lucide-react';
-import SEO from '../../components/SEO.astro';
 
 export async function getStaticPaths() {
   const wallpapers = await WallpaperService.getAllWallpapers();
@@ -99,15 +98,7 @@ const breadcrumbSchema = {
 
 ---
 
-<Layout title={title} description={description}>
-  <SEO 
-    slot="seo"
-    title={title}
-    description={description}
-    imageUrl={wallpaper.url}
-    canonicalUrl={canonicalUrl}
-  />
-  
+<AppLayout title={title} description={description} image={wallpaper.url}>
   <script type="application/ld+json" set:html={JSON.stringify(imageObjectSchema)} />
   <script type="application/ld+json" set:html={JSON.stringify(breadcrumbSchema)} />
 
@@ -257,7 +248,7 @@ const breadcrumbSchema = {
   <div class="fixed bottom-4 left-4 font-mono text-[8px] text-brutal-black/20 pointer-events-none uppercase">
     0x4A 0x24 0xEE // BUILD_V1.2 // SECURE_SOCKET_LAYER_ACTIVE
   </div>
-</Layout>
+</AppLayout>
 
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Exo+2:wght@900&family=JetBrains+Mono:wght@400;700;800&display=swap');

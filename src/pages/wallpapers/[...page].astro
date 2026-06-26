@@ -1,6 +1,6 @@
 ---
 export const prerender = true;
-import Layout from '../../layouts/Layout.astro';
+import AppLayout from '../../layouts/AppLayout.astro';
 import { WallpaperService } from '../../services/wallpaperService';
 import { WallpapersGridContainer } from '../../components/WallpapersGridContainer';
 
@@ -15,7 +15,7 @@ const { page } = Astro.props;
 // page.data contains the slice
 ---
 
-<Layout title="Browse Wallpapers | CrackingWall" description="Explore our entire collection of curated digital wallpapers.">
+<AppLayout title="Browse Wallpapers | CrackingWall" description="Explore our entire collection of curated digital wallpapers.">
   <div class="mb-8 text-center">
     <h1 class="text-4xl font-brutal font-black uppercase mb-4">
       All Wallpapers
@@ -44,4 +44,4 @@ const { page } = Astro.props;
       </a>
     ) : null}
   </div>
-</Layout>
+</AppLayout>

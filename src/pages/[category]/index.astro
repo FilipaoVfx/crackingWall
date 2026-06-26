@@ -1,9 +1,8 @@
 ---
 export const prerender = true;
-import Layout from '../../layouts/Layout.astro';
+import AppLayout from '../../layouts/AppLayout.astro';
 import { WallpaperService } from '../../services/wallpaperService';
 import { WallpapersGridContainer } from '../../components/WallpapersGridContainer';
-import SEO from '../../components/SEO.astro';
 
 export async function getStaticPaths() {
   try {
@@ -48,14 +47,7 @@ const descriptionText = descriptions[category.toLowerCase()] || defaultDescripti
 const title = `${category} Wallpapers | CrackingWall`;
 ---
 
-<Layout title={title} description={descriptionText}>
-  <SEO 
-    slot="seo"
-    title={title}
-    description={descriptionText}
-    canonicalUrl={Astro.url.href}
-  />
-  
+<AppLayout title={title} description={descriptionText}>
   <div class="mb-8 text-center editorial-header">
     <h1 class="text-4xl font-brutal font-black uppercase mb-4">
       {category} Collection
@@ -72,7 +64,7 @@ const title = `${category} Wallpapers | CrackingWall`;
     client:load 
     initialWallpapers={wallpapers} 
   />
-</Layout>
+</AppLayout>
 
 <style>
     .editorial-header {
