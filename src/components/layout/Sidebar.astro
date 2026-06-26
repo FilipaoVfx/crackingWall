@@ -11,13 +11,13 @@ const isActive = (href: string) => current === norm(href);
 type NavItem = { label: string; href: string; accent: string; icon: string };
 
 const tools: NavItem[] = [
-  { label: 'Dashboard', href: '/dashboard', accent: 'cyan', icon: 'grid' },
+  { label: 'Home', href: '/', accent: 'cyan', icon: 'grid' },
   { label: 'ASCII Lab', href: '/ascii-lab/', accent: 'green', icon: 'terminal' },
   { label: 'Visual Protocol', href: '/visual-protocol/', accent: 'pink', icon: 'scan' },
 ];
 
 const library: NavItem[] = [
-  { label: 'Wallpapers', href: '/', accent: 'purple', icon: 'image' },
+  { label: 'Wallpapers', href: '/wallpapers/', accent: 'purple', icon: 'image' },
 ];
 
 // Accent -> active background color (neon tokens)
@@ -53,7 +53,7 @@ function iconSvg(name: string): string {
 >
   <!-- Brand -->
   <div class="flex items-center gap-3 border-b-2 border-white/10 px-5 py-5">
-    <a href="/dashboard" class="flex items-center gap-3 group">
+    <a href="/" class="flex items-center gap-3 group">
       <span
         class="grid h-9 w-9 shrink-0 place-items-center border-2 border-black bg-brutal-neon-cyan font-brutal text-lg font-black text-black shadow-brutal-sm"
         >C</span
