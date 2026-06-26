@@ -17,6 +17,11 @@ export function useAsciiGenerator() {
     fps: 10,
     width: 120,
     charset: CHARSETS[DEFAULT_CHARSET],
+    brightness: 0,
+    contrast: 1,
+    gamma: 1,
+    dither: true,
+    invert: false,
   });
 
   const workerRef = useRef<Worker | null>(null);
@@ -78,6 +83,11 @@ export function useAsciiGenerator() {
         width: extracted.width,
         height: extracted.height,
         charset: config.charset,
+        brightness: config.brightness,
+        contrast: config.contrast,
+        gamma: config.gamma,
+        dither: config.dither,
+        invert: config.invert,
       },
       extracted.pixels, // transfer ownership
     );

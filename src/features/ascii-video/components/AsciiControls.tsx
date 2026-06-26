@@ -106,6 +106,79 @@ export function AsciiControls({ config, onChange, disabled }: Props) {
           ))}
         </select>
       </div>
+
+      {/* Brightness */}
+      <div>
+        <div style={label}>
+          <span>BRIGHTNESS</span>
+          <span style={{ color: '#39ff14' }}>{config.brightness.toFixed(2)}</span>
+        </div>
+        <input
+          type="range"
+          min={-0.5}
+          max={0.5}
+          step={0.05}
+          value={config.brightness}
+          onChange={(e) => onChange({ ...config, brightness: +e.target.value })}
+          style={slider}
+        />
+      </div>
+
+      {/* Contrast */}
+      <div>
+        <div style={label}>
+          <span>CONTRAST</span>
+          <span style={{ color: '#39ff14' }}>{config.contrast.toFixed(2)}</span>
+        </div>
+        <input
+          type="range"
+          min={0.5}
+          max={2}
+          step={0.05}
+          value={config.contrast}
+          onChange={(e) => onChange({ ...config, contrast: +e.target.value })}
+          style={slider}
+        />
+      </div>
+
+      {/* Gamma */}
+      <div>
+        <div style={label}>
+          <span>GAMMA</span>
+          <span style={{ color: '#39ff14' }}>{config.gamma.toFixed(2)}</span>
+        </div>
+        <input
+          type="range"
+          min={0.5}
+          max={2.5}
+          step={0.05}
+          value={config.gamma}
+          onChange={(e) => onChange({ ...config, gamma: +e.target.value })}
+          style={slider}
+        />
+      </div>
+
+      {/* Toggles */}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 10, justifyContent: 'center' }}>
+        <label style={{ ...label, cursor: 'pointer', justifyContent: 'flex-start' }}>
+          <input
+            type="checkbox"
+            checked={config.dither}
+            onChange={(e) => onChange({ ...config, dither: e.target.checked })}
+            style={{ accentColor: '#00fff9', cursor: 'pointer' }}
+          />
+          <span>DITHER</span>
+        </label>
+        <label style={{ ...label, cursor: 'pointer', justifyContent: 'flex-start' }}>
+          <input
+            type="checkbox"
+            checked={config.invert}
+            onChange={(e) => onChange({ ...config, invert: e.target.checked })}
+            style={{ accentColor: '#00fff9', cursor: 'pointer' }}
+          />
+          <span>INVERT</span>
+        </label>
+      </div>
     </div>
   );
 }

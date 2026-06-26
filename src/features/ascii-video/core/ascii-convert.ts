@@ -33,6 +33,10 @@ export async function extractFrames(
     canvas.width = asciiWidth;
     canvas.height = asciiHeight;
     const ctx = canvas.getContext('2d', { willReadFrequently: true })!;
+    // High-quality downscale: each ASCII cell becomes a proper average of its
+    // source region instead of a sparse sample — far more faithful + less aliasing.
+    ctx.imageSmoothingEnabled = true;
+    ctx.imageSmoothingQuality = 'high';
 
     const duration = video.duration;
     const interval = 1 / config.fps;
