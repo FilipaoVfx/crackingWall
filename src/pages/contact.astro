@@ -1,10 +1,10 @@
 ---
 export const prerender = true;
-import Layout from '../layouts/Layout.astro';
+import AppLayout from '../layouts/AppLayout.astro';
 import ContactForm from '../components/ContactForm';
 ---
 
-<Layout 
+<AppLayout 
   title="Contact Protocol - CrackingWall" 
   description="Connect with the builders of the ultimate AI wallpaper platform. Secure communications channel."
 >
@@ -74,7 +74,7 @@ import ContactForm from '../components/ContactForm';
       </div>
     </div>
   </main>
-</Layout>
+</AppLayout>
 
 <style>
   @keyframes pulse {

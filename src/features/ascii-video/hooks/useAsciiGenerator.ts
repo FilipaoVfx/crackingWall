@@ -2,7 +2,7 @@ import { useState, useRef, useCallback } from 'react';
 import type { AsciiConfig, GeneratorState, WorkerOutMessage } from '../core/types';
 import { validateVideo } from '../core/video-preprocess';
 import { extractFrames } from '../core/ascii-convert';
-import { CHARSETS, DEFAULT_CHARSET } from '../utils/charset';
+import { CHARSETS } from '../utils/charset';
 
 const INITIAL_STATE: GeneratorState = {
   status: 'idle',
@@ -15,8 +15,15 @@ export function useAsciiGenerator() {
   const [state, setState] = useState<GeneratorState>(INITIAL_STATE);
   const [config, setConfig] = useState<AsciiConfig>({
     fps: 10,
-    width: 120,
-    charset: CHARSETS[DEFAULT_CHARSET],
+    width: 190,
+    charset: CHARSETS.detailed,
+    brightness: -0.05,
+    contrast: 1.45,
+    gamma: 1.2,
+    dither: true,
+    invert: true,
+    edges: false,
+    edgeThreshold: 0.4,
   });
 
   const workerRef = useRef<Worker | null>(null);
@@ -78,6 +85,13 @@ export function useAsciiGenerator() {
         width: extracted.width,
         height: extracted.height,
         charset: config.charset,
+        brightness: config.brightness,
+        contrast: config.contrast,
+        gamma: config.gamma,
+        dither: config.dither,
+        invert: config.invert,
+        edges: config.edges,
+        edgeThreshold: config.edgeThreshold,
       },
       extracted.pixels, // transfer ownership
     );

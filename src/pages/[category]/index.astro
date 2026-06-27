@@ -1,9 +1,8 @@
 ---
 export const prerender = true;
-import Layout from '../../layouts/Layout.astro';
+import AppLayout from '../../layouts/AppLayout.astro';
 import { WallpaperService } from '../../services/wallpaperService';
 import { WallpapersGridContainer } from '../../components/WallpapersGridContainer';
-import SEO from '../../components/SEO.astro';
 
 export async function getStaticPaths() {
   try {
@@ -48,22 +47,15 @@ const descriptionText = descriptions[category.toLowerCase()] || defaultDescripti
 const title = `${category} Wallpapers | CrackingWall`;
 ---
 
-<Layout title={title} description={descriptionText}>
-  <SEO 
-    slot="seo"
-    title={title}
-    description={descriptionText}
-    canonicalUrl={Astro.url.href}
-  />
-  
+<AppLayout title={title} description={descriptionText}>
   <div class="mb-8 text-center editorial-header">
-    <h1 class="text-4xl font-brutal font-black uppercase mb-4">
+    <h1 class="mb-4 font-brutal text-3xl font-black uppercase tracking-tight text-white md:text-4xl">
       {category} Collection
     </h1>
-    <div class="max-w-3xl mx-auto px-4">
-        <p class="text-lg text-brutal-black/80 font-medium mb-4">{descriptionText}</p>
-        <p class="text-sm text-gray-500">
-            Discover {wallpapers.length} high-quality {category} backgrounds.
+    <div class="mx-auto max-w-3xl px-4">
+        <p class="mb-3 font-mono text-sm leading-relaxed text-gray-400">{descriptionText}</p>
+        <p class="font-mono text-xs text-gray-600">
+            {wallpapers.length} high-quality {category} backgrounds.
         </p>
     </div>
   </div>
@@ -72,7 +64,7 @@ const title = `${category} Wallpapers | CrackingWall`;
     client:load 
     initialWallpapers={wallpapers} 
   />
-</Layout>
+</AppLayout>
 
 <style>
     .editorial-header {

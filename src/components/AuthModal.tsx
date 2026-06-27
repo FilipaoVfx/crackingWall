@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, User, Mail, Lock, AlertCircle } from 'lucide-react';
-import { BrutalButton } from './BrutalButton';
+import { X, User, Mail, Lock, AlertCircle, LogIn } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
 
 interface AuthModalProps {
@@ -15,8 +15,20 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  
+  const emailRef = useRef<HTMLInputElement>(null);
+
   const { signIn, signUp } = useAuth();
+
+  // Focus the email field and allow Escape to close
+  useEffect(() => {
+    if (!isOpen) return;
+    emailRef.current?.focus();
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose();
+    };
+    document.addEventListener('keydown', onKey);
+    return () => document.removeEventListener('keydown', onKey);
+  }, [isOpen, onClose]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -24,7 +36,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
     setError(null);
 
     try {
-      const { error } = isLogin 
+      const { error } = isLogin
         ? await signIn(email, password)
         : await signUp(email, password);
 
@@ -35,127 +47,136 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
         setPassword('');
         onClose();
       }
-    } catch (err) {
+    } catch {
       setError('Ocurrió un error inesperado');
     } finally {
       setLoading(false);
     }
   };
 
-  return (
+  const inputClass =
+    'w-full border-2 border-white/25 bg-black/70 py-3 pl-11 pr-4 font-mono text-sm text-white placeholder:text-gray-500 transition-colors focus:border-brutal-neon-cyan focus:ring-1 focus:ring-brutal-neon-cyan focus:outline-none disabled:opacity-50';
+
+  if (typeof document === 'undefined') return null;
+
+  return createPortal(
     <AnimatePresence>
       {isOpen && (
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          className="fixed inset-0 bg-brutal-black bg-opacity-80 z-50 flex items-center justify-center p-4"
+          className="fixed inset-0 z-[100] flex items-center justify-center overflow-y-auto bg-black/85 p-4 backdrop-blur-sm"
           onClick={onClose}
         >
           <motion.div
-            initial={{ scale: 0.8, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            exit={{ scale: 0.8, opacity: 0 }}
-            className="bg-brutal-white border-6 border-brutal-black shadow-brutal-lg w-full max-w-md"
+            role="dialog"
+            aria-modal="true"
+            aria-label={isLogin ? 'Iniciar sesión' : 'Registrarse'}
+            initial={{ scale: 0.9, opacity: 0, y: 10 }}
+            animate={{ scale: 1, opacity: 1, y: 0 }}
+            exit={{ scale: 0.9, opacity: 0, y: 10 }}
+            className="my-auto w-full max-w-md border-2 border-brutal-neon-cyan/50 bg-brutal-dark-bg shadow-neon-cyan"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Header */}
-            <div className="flex items-center justify-between p-6 border-b-4 border-brutal-black bg-brutal-pink">
-              <h2 className="text-2xl font-brutal font-black text-brutal-black uppercase">
-                {isLogin ? 'INICIAR SESIÓN' : 'REGISTRARSE'}
-              </h2>
+            <div className="flex items-center justify-between border-b-2 border-white/10 px-6 py-5">
+              <div>
+                <p className="mb-1 font-mono text-[10px] uppercase tracking-[0.25em] text-brutal-neon-purple">CrackingWall</p>
+                <h2 className="font-brutal text-xl font-black uppercase tracking-tight text-white">
+                  {isLogin ? 'Iniciar sesión' : 'Crear cuenta'}
+                </h2>
+              </div>
               <button
                 onClick={onClose}
-                className="p-2 bg-brutal-black text-brutal-white hover:bg-brutal-yellow hover:text-brutal-black transition-colors border-3 border-brutal-black"
+                aria-label="Cerrar"
+                className="grid h-9 w-9 place-items-center border-2 border-white/15 text-gray-400 transition-colors hover:border-brutal-neon-cyan hover:text-brutal-neon-cyan"
               >
-                <X className="w-5 h-5" />
+                <X className="h-4 w-4" />
               </button>
             </div>
 
-            {/* Error Message */}
+            {/* Error */}
             {error && (
-              <div className="p-4 bg-brutal-red border-b-4 border-brutal-black">
-                <div className="flex items-center space-x-2">
-                  <AlertCircle className="w-5 h-5 text-brutal-white" />
-                  <p className="font-brutal font-bold text-brutal-white uppercase text-sm">
-                    {error}
-                  </p>
-                </div>
+              <div className="flex items-center gap-2 border-b-2 border-brutal-neon-pink/40 bg-brutal-neon-pink/10 px-6 py-3">
+                <AlertCircle className="h-4 w-4 shrink-0 text-brutal-neon-pink" />
+                <p className="font-mono text-xs text-brutal-neon-pink">{error}</p>
               </div>
             )}
 
             {/* Form */}
-            <form onSubmit={handleSubmit} className="p-6 space-y-4">
+            <form onSubmit={handleSubmit} className="space-y-4 px-6 py-6">
               <div>
-                <label className="block text-sm font-brutal font-black text-brutal-black uppercase mb-2">
-                  EMAIL
+                <label htmlFor="auth-email" className="mb-1.5 block font-mono text-[11px] font-bold uppercase tracking-wide text-gray-300">
+                  Email
                 </label>
                 <div className="relative">
+                  <Mail className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-500" />
                   <input
+                    id="auth-email"
+                    ref={emailRef}
                     type="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     required
                     disabled={loading}
-                    className="w-full px-4 py-3 pl-12 font-brutal font-bold bg-brutal-yellow border-4 border-brutal-black shadow-brutal-sm focus:outline-none focus:shadow-brutal disabled:opacity-50"
+                    className={inputClass}
                     placeholder="tu@email.com"
                   />
-                  <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-brutal-black" />
                 </div>
               </div>
 
               <div>
-                <label className="block text-sm font-brutal font-black text-brutal-black uppercase mb-2">
-                  CONTRASEÑA
+                <label htmlFor="auth-password" className="mb-1.5 block font-mono text-[11px] font-bold uppercase tracking-wide text-gray-300">
+                  Contraseña
                 </label>
                 <div className="relative">
+                  <Lock className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-500" />
                   <input
+                    id="auth-password"
                     type="password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     required
                     disabled={loading}
-                    className="w-full px-4 py-3 pl-12 font-brutal font-bold bg-brutal-yellow border-4 border-brutal-black shadow-brutal-sm focus:outline-none focus:shadow-brutal disabled:opacity-50"
-                    placeholder="••••••••"
                     minLength={6}
+                    className={inputClass}
+                    placeholder="••••••••"
                   />
-                  <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-brutal-black" />
                 </div>
               </div>
 
-              <div className="pt-4 space-y-3">
-                <BrutalButton
-                  variant="primary"
-                  size="lg"
-                  className="w-full"
-                  disabled={loading}
-                >
-                  <div className="flex items-center justify-center space-x-2">
-                    <User className="w-5 h-5" />
-                    <span>{loading ? 'PROCESANDO...' : (isLogin ? 'ENTRAR' : 'CREAR CUENTA')}</span>
-                  </div>
-                </BrutalButton>
+              <button
+                type="submit"
+                disabled={loading}
+                className="flex w-full items-center justify-center gap-2 border-2 border-black bg-brutal-neon-cyan py-3 font-brutal text-sm font-black uppercase tracking-wide text-black shadow-brutal-sm transition-transform hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:translate-y-0"
+              >
+                {loading ? (
+                  <span>Procesando…</span>
+                ) : (
+                  <>
+                    {isLogin ? <LogIn className="h-4 w-4" /> : <User className="h-4 w-4" />}
+                    <span>{isLogin ? 'Entrar' : 'Crear cuenta'}</span>
+                  </>
+                )}
+              </button>
 
-                <button
-                  type="button"
-                  onClick={() => setIsLogin(!isLogin)}
-                  disabled={loading}
-                  className="w-full text-center font-brutal font-bold text-brutal-black hover:text-brutal-pink transition-colors uppercase disabled:opacity-50"
-                >
-                  {isLogin ? '¿NO TIENES CUENTA? REGÍSTRATE' : '¿YA TIENES CUENTA? INICIA SESIÓN'}
-                </button>
-              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  setIsLogin(!isLogin);
+                  setError(null);
+                }}
+                disabled={loading}
+                className="w-full text-center font-mono text-xs text-gray-300 transition-colors hover:text-brutal-neon-cyan disabled:opacity-50"
+              >
+                {isLogin ? '¿No tienes cuenta? Regístrate' : '¿Ya tienes cuenta? Inicia sesión'}
+              </button>
             </form>
-
-            {/* Notice */}
-            <div className="p-6 border-t-4 border-brutal-black bg-brutal-cyan">
-              <p className="text-sm font-brutal font-bold text-brutal-black text-center">
-                ⚡ FUNCIONALIDAD COMPLETA CON SUPABASE ⚡
-              </p>
-            </div>
           </motion.div>
         </motion.div>
       )}
-    </AnimatePresence>
+    </AnimatePresence>,
+    document.body,
   );
 };

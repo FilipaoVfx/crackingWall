@@ -1,0 +1,93 @@
+---
+import Sidebar from '../components/layout/Sidebar.astro';
+import { AppTopBar } from '../components/layout/AppTopBar';
+import '../index.css';
+
+interface Props {
+  title: string;
+  description?: string;
+  image?: string;
+}
+
+const {
+  title,
+  description = 'Creative tools for analyzing visuals, generating ideas and building experiences. Free, browser-based.',
+  image = '/og-image.webp',
+} = Astro.props;
+
+const canonicalURL = new URL(Astro.url.pathname, Astro.site);
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="description" content={description} />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1028294908787451"
+     crossorigin="anonymous"></script>
+    <link rel="icon" type="image/x-icon" href="/iconCulture.ico" />
+    <meta name="generator" content={Astro.generator} />
+    <link rel="canonical" href={canonicalURL} />
+
+    <!-- HilltopAds Native Banner Script -->
+    <script async="async" data-cfasync="false" src="https://pl28866886.effectivegatecpm.com/ef6e3b461a71809c904dce507871700c/invoke.js"></script>
+
+    <!-- Social Bar Ad Script -->
+    <script src="https://pl28929413.effectivegatecpm.com/d1/dd/00/d1dd00200c1df93aee192392fab2094a.js"></script>
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content={Astro.url} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:image" content={new URL(image, Astro.url)} />
+    <meta property="twitter:card" content="summary_large_image" />
+
+    <title>{title}</title>
+  </head>
+  <body>
+    <Sidebar />
+
+    <div class="app-content ml-[260px] min-h-screen transition-[margin] duration-200">
+      <AppTopBar client:load />
+      <main class="px-6 py-8 md:px-10">
+        <slot />
+
+        <!-- Native Ad Banner -->
+        <div class="mx-auto my-8 flex max-w-5xl justify-center">
+          <div id="container-ef6e3b461a71809c904dce507871700c"></div>
+        </div>
+      </main>
+
+      <footer class="border-t-2 border-white/10 px-6 py-10 text-center md:px-10">
+        <div class="mb-6 flex flex-wrap justify-center gap-x-6 gap-y-2 font-brutal text-xs font-black uppercase tracking-wider">
+          <a href="/" class="text-gray-400 transition-colors hover:text-brutal-neon-cyan">Home</a>
+          <a href="/ascii-lab/" class="text-gray-400 transition-colors hover:text-brutal-neon-green">ASCII Lab</a>
+          <a href="/visual-protocol/" class="text-gray-400 transition-colors hover:text-brutal-neon-pink">Visual Protocol</a>
+          <a href="/wallpapers/" class="text-gray-400 transition-colors hover:text-brutal-neon-purple">Wallpapers</a>
+          <a href="/blog/" class="text-gray-400 transition-colors hover:text-brutal-neon-cyan">Blog</a>
+          <a href="/about/" class="text-gray-400 transition-colors hover:text-brutal-neon-cyan">About</a>
+          <a href="/contact/" class="text-gray-400 transition-colors hover:text-brutal-neon-yellow">Contact</a>
+          <a href="/license" class="text-gray-400 transition-colors hover:text-brutal-neon-green">License</a>
+          <a href="/privacy-policy" class="text-gray-400 transition-colors hover:text-brutal-neon-green">Privacy</a>
+        </div>
+        <div class="mx-auto mb-4 h-1 w-20 bg-brutal-neon-cyan"></div>
+        <p class="font-mono text-xs text-gray-500">
+          &copy; {new Date().getFullYear()} <span class="text-white">CrakingWall</span>. Protocol initialized.
+        </p>
+      </footer>
+    </div>
+  </body>
+</html>
+
+<style is:global>
+  body {
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+    background: #0a0a0f;
+    color: #f0f0f0;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  }
+</style>

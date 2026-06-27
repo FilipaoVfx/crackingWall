@@ -16,102 +16,107 @@ export const WallpaperCard: React.FC<WallpaperCardProps> = ({
   onDownload,
   onView
 }) => {
+  const overlayBtn =
+    'grid h-10 w-10 place-items-center border-2 border-white/20 bg-black/60 text-white shadow-brutal-sm transition-colors cursor-pointer';
+
   return (
     <motion.div
       layout
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      whileHover={{ y: -4, x: -4 }}
-      className="bg-brutal-white border-4 border-brutal-black shadow-brutal group relative"
+      whileHover={{ y: -4 }}
+      className="group relative overflow-hidden border-2 border-black bg-brutal-dark-bg shadow-brutal-sm transition-shadow hover:shadow-neon-purple"
     >
-      <div className="relative overflow-hidden">
+      <div className="relative overflow-hidden border-b-2 border-black">
         <img
           src={wallpaper.url}
           alt={wallpaper.alt_text || wallpaper.title}
-          className="w-full h-60 md:h-48 object-cover"
+          className="h-60 w-full object-cover transition-transform duration-300 group-hover:scale-105 md:h-48"
           loading="lazy"
           decoding="async"
           width={wallpaper.width || 400}
           height={wallpaper.height || 225}
         />
 
-        {/* Overlay con botones */}
-        <div className="absolute inset-0 bg-brutal-black bg-opacity-70 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center">
-          <div className="flex space-x-2">
-            <motion.button
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.9 }}
-              onClick={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                onView(wallpaper);
-              }}
-              onMouseDown={(e) => e.stopPropagation()}
-              aria-label={`Ver imagen completa de ${wallpaper.title}`}
-              title={`Ver ${wallpaper.title} en tamaño completo`}
-              className="p-3 bg-brutal-white border-3 border-brutal-black shadow-brutal-sm hover:bg-brutal-yellow transition-colors cursor-pointer"
-            >
-              <Eye className="w-5 h-5 text-brutal-black" />
-            </motion.button>
+        {/* Hover action buttons */}
+        <div className="absolute inset-0 flex items-center justify-center gap-2 bg-black/70 opacity-0 transition-opacity duration-200 group-hover:opacity-100">
+          <motion.button
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.9 }}
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              onView(wallpaper);
+            }}
+            onMouseDown={(e) => e.stopPropagation()}
+            aria-label={`Ver imagen completa de ${wallpaper.title}`}
+            title={`Ver ${wallpaper.title} en tamaño completo`}
+            className={`${overlayBtn} hover:border-brutal-neon-cyan hover:text-brutal-neon-cyan`}
+          >
+            <Eye className="h-5 w-5" />
+          </motion.button>
 
-            <motion.button
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.9 }}
-              onClick={(e) => {
-                e.stopPropagation();
-                onLike(wallpaper.id);
-              }}
-              aria-label={wallpaper.isLiked ? `Quitar me gusta de ${wallpaper.title}` : `Dar me gusta a ${wallpaper.title}`}
-              title={wallpaper.isLiked ? 'Quitar me gusta' : 'Dar me gusta'}
-              className={`p-3 border-3 border-brutal-black shadow-brutal-sm transition-colors ${wallpaper.isLiked
-                ? 'bg-brutal-pink text-brutal-black'
-                : 'bg-brutal-white text-brutal-black hover:bg-brutal-pink'
-                }`}
-            >
-              <Heart className={`w-5 h-5 ${wallpaper.isLiked ? 'fill-current' : ''}`} />
-            </motion.button>
+          <motion.button
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.9 }}
+            onClick={(e) => {
+              e.stopPropagation();
+              onLike(wallpaper.id);
+            }}
+            aria-label={wallpaper.isLiked ? `Quitar me gusta de ${wallpaper.title}` : `Dar me gusta a ${wallpaper.title}`}
+            title={wallpaper.isLiked ? 'Quitar me gusta' : 'Dar me gusta'}
+            className={
+              wallpaper.isLiked
+                ? 'grid h-10 w-10 place-items-center border-2 border-black bg-brutal-neon-pink text-black shadow-brutal-sm'
+                : `${overlayBtn} hover:border-brutal-neon-pink hover:text-brutal-neon-pink`
+            }
+          >
+            <Heart className={`h-5 w-5 ${wallpaper.isLiked ? 'fill-current' : ''}`} />
+          </motion.button>
 
-            <motion.button
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.9 }}
-              onClick={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                onDownload(wallpaper.id);
-              }}
-              onMouseDown={(e) => e.stopPropagation()}
-              aria-label={`Descargar imagen: ${wallpaper.title} (${wallpaper.width}×${wallpaper.height})`}
-              title={`Descargar ${wallpaper.title}`}
-              className="p-3 bg-brutal-white border-3 border-brutal-black shadow-brutal-sm hover:bg-brutal-yellow transition-colors cursor-pointer"
-            >
-              <Download className="w-5 h-5 text-brutal-black" />
-            </motion.button>
-          </div>
+          <motion.button
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.9 }}
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              onDownload(wallpaper.id);
+            }}
+            onMouseDown={(e) => e.stopPropagation()}
+            aria-label={`Descargar imagen: ${wallpaper.title} (${wallpaper.width}×${wallpaper.height})`}
+            title={`Descargar ${wallpaper.title}`}
+            className={`${overlayBtn} hover:border-brutal-neon-green hover:text-brutal-neon-green`}
+          >
+            <Download className="h-5 w-5" />
+          </motion.button>
         </div>
       </div>
 
-      {/* Info del wallpaper */}
+      {/* Info */}
       <div className="p-4">
-        <h3 className="font-brutal font-black text-lg text-brutal-black uppercase truncate">
+        <h3 className="truncate font-brutal text-base font-black uppercase tracking-wide text-white">
           {wallpaper.title}
         </h3>
 
-        <div className="flex items-center justify-between mt-2">
-          <a href={`/${wallpaper.category.toLowerCase()}/`} className="px-2 py-1 bg-brutal-black text-brutal-white text-xs font-brutal font-bold uppercase hover:bg-brutal-accent transition-colors">
+        <div className="mt-2 flex items-center justify-between">
+          <a
+            href={`/${wallpaper.category.toLowerCase()}/`}
+            className="border border-brutal-neon-cyan/30 bg-brutal-neon-cyan/10 px-2 py-0.5 font-mono text-[10px] font-bold uppercase tracking-wide text-brutal-neon-cyan transition-colors hover:bg-brutal-neon-cyan/20"
+          >
             {wallpaper.category}
           </a>
-          <span className="text-sm font-brutal font-bold text-brutal-black">
+          <span className="font-mono text-[11px] text-gray-500">
             {wallpaper.width}×{wallpaper.height}
           </span>
         </div>
 
-        <div className="flex items-center justify-between mt-3 text-sm font-brutal font-bold text-brutal-black">
-          <div className="flex items-center space-x-1">
-            <Heart className="w-4 h-4" />
+        <div className="mt-3 flex items-center justify-between font-mono text-[11px] text-gray-500">
+          <div className="flex items-center gap-1.5">
+            <Heart className="h-3.5 w-3.5 text-brutal-neon-pink" />
             <span>{wallpaper.likes.toLocaleString()}</span>
           </div>
-          <div className="flex items-center space-x-1">
-            <Download className="w-4 h-4" />
+          <div className="flex items-center gap-1.5">
+            <Download className="h-3.5 w-3.5 text-brutal-neon-green" />
             <span>{wallpaper.downloads.toLocaleString()}</span>
           </div>
         </div>
