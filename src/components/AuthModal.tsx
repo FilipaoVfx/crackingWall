@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, User, Mail, Lock, AlertCircle, LogIn } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
@@ -54,16 +55,18 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
   };
 
   const inputClass =
-    'w-full border-2 border-white/15 bg-black/40 py-3 pl-11 pr-4 font-mono text-sm text-white placeholder:text-gray-600 transition-colors focus:border-brutal-neon-cyan focus:outline-none disabled:opacity-50';
+    'w-full border-2 border-white/25 bg-black/70 py-3 pl-11 pr-4 font-mono text-sm text-white placeholder:text-gray-500 transition-colors focus:border-brutal-neon-cyan focus:ring-1 focus:ring-brutal-neon-cyan focus:outline-none disabled:opacity-50';
 
-  return (
+  if (typeof document === 'undefined') return null;
+
+  return createPortal(
     <AnimatePresence>
       {isOpen && (
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4 backdrop-blur-sm"
+          className="fixed inset-0 z-[100] flex items-center justify-center overflow-y-auto bg-black/85 p-4 backdrop-blur-sm"
           onClick={onClose}
         >
           <motion.div
@@ -73,7 +76,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
             initial={{ scale: 0.9, opacity: 0, y: 10 }}
             animate={{ scale: 1, opacity: 1, y: 0 }}
             exit={{ scale: 0.9, opacity: 0, y: 10 }}
-            className="w-full max-w-md border-2 border-black bg-brutal-dark-bg shadow-brutal"
+            className="my-auto w-full max-w-md border-2 border-brutal-neon-cyan/50 bg-brutal-dark-bg shadow-neon-cyan"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Header */}
@@ -104,7 +107,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
             {/* Form */}
             <form onSubmit={handleSubmit} className="space-y-4 px-6 py-6">
               <div>
-                <label htmlFor="auth-email" className="mb-1.5 block font-mono text-[11px] font-bold uppercase tracking-wide text-gray-400">
+                <label htmlFor="auth-email" className="mb-1.5 block font-mono text-[11px] font-bold uppercase tracking-wide text-gray-300">
                   Email
                 </label>
                 <div className="relative">
@@ -124,7 +127,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
               </div>
 
               <div>
-                <label htmlFor="auth-password" className="mb-1.5 block font-mono text-[11px] font-bold uppercase tracking-wide text-gray-400">
+                <label htmlFor="auth-password" className="mb-1.5 block font-mono text-[11px] font-bold uppercase tracking-wide text-gray-300">
                   Contraseña
                 </label>
                 <div className="relative">
@@ -165,7 +168,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
                   setError(null);
                 }}
                 disabled={loading}
-                className="w-full text-center font-mono text-xs text-gray-400 transition-colors hover:text-brutal-neon-cyan disabled:opacity-50"
+                className="w-full text-center font-mono text-xs text-gray-300 transition-colors hover:text-brutal-neon-cyan disabled:opacity-50"
               >
                 {isLogin ? '¿No tienes cuenta? Regístrate' : '¿Ya tienes cuenta? Inicia sesión'}
               </button>
@@ -173,6 +176,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
           </motion.div>
         </motion.div>
       )}
-    </AnimatePresence>
+    </AnimatePresence>,
+    document.body,
   );
 };
