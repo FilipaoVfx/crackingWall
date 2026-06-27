@@ -1,5 +1,6 @@
-import { Component, Suspense, lazy, useState, type ReactNode } from 'react';
-import { PRESETS, type PresetName } from '@filipaovfx/svg3d';
+import { Component, Suspense, lazy, useRef, useState, type ReactNode } from 'react';
+import { PRESETS, exportCanvasPng, readSvgFile, type PresetName } from '@filipaovfx/svg3d';
+import { Download, Upload, X } from 'lucide-react';
 
 // Code-split the engine (three/fiber/drei) so the controls paint instantly
 // and the heavy 3D bundle only loads for this tool.
@@ -28,38 +29,104 @@ class WebGLBoundary extends Component<{ children: ReactNode }, { failed: boolean
 export default function Svg3DLab() {
   const [text, setText] = useState('CW');
   const [preset, setPreset] = useState<PresetName>('neon');
+  const [svg, setSvg] = useState<string | null>(null);
+  const [svgName, setSvgName] = useState('');
+  const [error, setError] = useState('');
+  const [canExport, setCanExport] = useState(false);
+
+  const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const fileRef = useRef<HTMLInputElement | null>(null);
+
+  const onUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setError('');
+    try {
+      const content = await readSvgFile(file);
+      setSvg(content);
+      setSvgName(file.name);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Could not read SVG.');
+    } finally {
+      e.target.value = ''; // allow re-uploading the same file
+    }
+  };
+
+  const clearSvg = () => {
+    setSvg(null);
+    setSvgName('');
+  };
+
+  const onExportPng = () => {
+    if (canvasRef.current) exportCanvasPng(canvasRef.current, 'crackingwall-3d.png');
+  };
+
+  // Remount the engine only when the source mode (text vs svg) or preset changes
+  const sourceKey = `${preset}-${svg ? 'svg' : 'text'}`;
+  const sourceProps = svg ? { svg } : { text };
 
   return (
     <div>
       {/* Controls */}
-      <div className="mb-4 flex flex-wrap items-center gap-4">
+      <div className="mb-4 flex flex-wrap items-center gap-3">
         <label className="flex items-center gap-2 font-mono text-xs text-gray-400">
           <span>TEXT</span>
           <input
             value={text}
             maxLength={6}
+            disabled={!!svg}
             onChange={(e) => setText(e.target.value)}
-            className="w-28 border-2 border-white/15 bg-black/40 px-3 py-2 font-mono text-sm text-white focus:border-brutal-neon-cyan focus:outline-none"
+            className="w-28 border-2 border-white/15 bg-black/40 px-3 py-2 font-mono text-sm text-white focus:border-brutal-neon-cyan focus:outline-none disabled:opacity-40"
           />
         </label>
 
-        <div className="flex flex-wrap gap-2">
-          {PRESET_NAMES.map((name) => (
-            <button
-              key={name}
-              onClick={() => setPreset(name)}
-              className={
-                'border-2 px-3 py-1.5 font-brutal text-[11px] font-black uppercase tracking-wide transition-all ' +
-                (preset === name
-                  ? 'border-black bg-brutal-neon-cyan text-black shadow-brutal-sm'
-                  : 'border-white/15 bg-transparent text-gray-300 hover:border-brutal-neon-cyan hover:text-brutal-neon-cyan')
-              }
-            >
-              {name}
+        {/* Upload SVG */}
+        <input ref={fileRef} type="file" accept=".svg,image/svg+xml" onChange={onUpload} className="hidden" />
+        {svg ? (
+          <span className="flex items-center gap-2 border-2 border-brutal-neon-green/40 bg-brutal-neon-green/10 px-3 py-1.5 font-mono text-[11px] text-brutal-neon-green">
+            <span className="max-w-[140px] truncate">{svgName}</span>
+            <button onClick={clearSvg} aria-label="Quitar SVG" className="hover:text-white">
+              <X className="h-3.5 w-3.5" />
             </button>
-          ))}
-        </div>
+          </span>
+        ) : (
+          <button
+            onClick={() => fileRef.current?.click()}
+            className="flex items-center gap-2 border-2 border-white/15 px-3 py-1.5 font-brutal text-[11px] font-black uppercase tracking-wide text-gray-300 transition-colors hover:border-brutal-neon-cyan hover:text-brutal-neon-cyan"
+          >
+            <Upload className="h-3.5 w-3.5" /> Upload SVG
+          </button>
+        )}
+
+        {/* Export PNG */}
+        <button
+          onClick={onExportPng}
+          disabled={!canExport}
+          className="ml-auto flex items-center gap-2 border-2 border-black bg-brutal-neon-cyan px-3 py-1.5 font-brutal text-[11px] font-black uppercase tracking-wide text-black shadow-brutal-sm transition-transform hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:translate-y-0"
+        >
+          <Download className="h-3.5 w-3.5" /> PNG
+        </button>
       </div>
+
+      {/* Presets */}
+      <div className="mb-4 flex flex-wrap gap-2">
+        {PRESET_NAMES.map((name) => (
+          <button
+            key={name}
+            onClick={() => setPreset(name)}
+            className={
+              'border-2 px-3 py-1.5 font-brutal text-[11px] font-black uppercase tracking-wide transition-all ' +
+              (preset === name
+                ? 'border-black bg-brutal-neon-cyan text-black shadow-brutal-sm'
+                : 'border-white/15 bg-transparent text-gray-300 hover:border-brutal-neon-cyan hover:text-brutal-neon-cyan')
+            }
+          >
+            {name}
+          </button>
+        ))}
+      </div>
+
+      {error && <p className="mb-3 font-mono text-[11px] text-brutal-neon-pink">{error}</p>}
 
       {/* Stage */}
       <div className="h-[460px] overflow-hidden border-2 border-black bg-brutal-dark-bg shadow-brutal">
@@ -71,13 +138,21 @@ export default function Svg3DLab() {
               </div>
             }
           >
-            <Svg3D key={preset} text={text} preset={preset} />
+            <Svg3D
+              key={sourceKey}
+              {...sourceProps}
+              preset={preset}
+              registerCanvas={(c: HTMLCanvasElement) => {
+                canvasRef.current = c;
+                setCanExport(true);
+              }}
+            />
           </Suspense>
         </WebGLBoundary>
       </div>
 
       <p className="mt-3 font-mono text-[11px] text-gray-500">
-        Drag to orbit · active preset: <span className="text-brutal-neon-green">{preset}</span>
+        Drag to orbit · active preset: <span className="text-brutal-neon-green">{preset}</span> · upload an SVG or type up to 6 chars
       </p>
     </div>
   );
