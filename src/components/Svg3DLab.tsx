@@ -1,6 +1,6 @@
 import { Component, Suspense, lazy, useRef, useState, type ReactNode } from 'react';
-import { PRESETS, exportCanvasPng, readSvgFile, type PresetName } from '@filipaovfx/svg3d';
-import { Download, Upload, X } from 'lucide-react';
+import { PRESETS, exportCanvasPng, exportSceneGlb, readSvgFile, type PresetName } from '@filipaovfx/svg3d';
+import { Box, Download, Upload, X } from 'lucide-react';
 
 // Code-split the engine (three/fiber/drei) so the controls paint instantly
 // and the heavy 3D bundle only loads for this tool.
@@ -35,6 +35,7 @@ export default function Svg3DLab() {
   const [canExport, setCanExport] = useState(false);
 
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const sceneRef = useRef<unknown>(null);
   const fileRef = useRef<HTMLInputElement | null>(null);
 
   const onUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -59,6 +60,15 @@ export default function Svg3DLab() {
 
   const onExportPng = () => {
     if (canvasRef.current) exportCanvasPng(canvasRef.current, 'crackingwall-3d.png');
+  };
+
+  const onExportGlb = async () => {
+    setError('');
+    try {
+      await exportSceneGlb(sceneRef.current, 'crackingwall-3d.glb');
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'GLB export failed.');
+    }
   };
 
   // Remount the engine only when the source mode (text vs svg) or preset changes
@@ -98,14 +108,23 @@ export default function Svg3DLab() {
           </button>
         )}
 
-        {/* Export PNG */}
-        <button
-          onClick={onExportPng}
-          disabled={!canExport}
-          className="ml-auto flex items-center gap-2 border-2 border-black bg-brutal-neon-cyan px-3 py-1.5 font-brutal text-[11px] font-black uppercase tracking-wide text-black shadow-brutal-sm transition-transform hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:translate-y-0"
-        >
-          <Download className="h-3.5 w-3.5" /> PNG
-        </button>
+        {/* Exports */}
+        <div className="ml-auto flex gap-2">
+          <button
+            onClick={onExportPng}
+            disabled={!canExport}
+            className="flex items-center gap-2 border-2 border-black bg-brutal-neon-cyan px-3 py-1.5 font-brutal text-[11px] font-black uppercase tracking-wide text-black shadow-brutal-sm transition-transform hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:translate-y-0"
+          >
+            <Download className="h-3.5 w-3.5" /> PNG
+          </button>
+          <button
+            onClick={onExportGlb}
+            disabled={!canExport}
+            className="flex items-center gap-2 border-2 border-black bg-brutal-neon-yellow px-3 py-1.5 font-brutal text-[11px] font-black uppercase tracking-wide text-black shadow-brutal-sm transition-transform hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:translate-y-0"
+          >
+            <Box className="h-3.5 w-3.5" /> GLB
+          </button>
+        </div>
       </div>
 
       {/* Presets */}
@@ -145,6 +164,9 @@ export default function Svg3DLab() {
               registerCanvas={(c: HTMLCanvasElement) => {
                 canvasRef.current = c;
                 setCanExport(true);
+              }}
+              registerScene={(s: unknown) => {
+                sceneRef.current = s;
               }}
             />
           </Suspense>
