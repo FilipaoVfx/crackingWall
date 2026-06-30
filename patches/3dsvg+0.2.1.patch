@@ -1,0 +1,36 @@
+diff --git a/node_modules/3dsvg/dist/index.js b/node_modules/3dsvg/dist/index.js
+index 35c5ef1..c443f9f 100644
+--- a/node_modules/3dsvg/dist/index.js
++++ b/node_modules/3dsvg/dist/index.js
+@@ -695,6 +695,7 @@ function SVG3DScene({
+   onLoadingChange,
+   resetKey,
+   registerCanvas,
++  registerScene,
+   children
+ }) {
+   const meshGroupRef = useRef2(null);
+@@ -722,6 +723,7 @@ function SVG3DScene({
+         }
+         const canvas = gl.domElement;
+         registerCanvas?.(canvas);
++        registerScene?.(scene);
+         canvas.addEventListener("webglcontextlost", (e) => {
+           e.preventDefault();
+           const wrapper = canvas.parentElement;
+@@ -1054,6 +1056,7 @@ function SVG3D(props) {
+     onAnimationComplete,
+     onLoadingChange,
+     registerCanvas,
++    registerScene,
+     children
+   } = props;
+   const cursorOrbit = interactive ? cursorOrbitProp : false;
+@@ -1123,6 +1126,7 @@ function SVG3D(props) {
+       onAnimationComplete,
+       onLoadingChange,
+       registerCanvas,
++      registerScene,
+       children
+     }
+   ) }) });

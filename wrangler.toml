@@ -1,6 +1,9 @@
 name = "crackingwall"
 compatibility_date = "2024-09-23"
-compatibility_flags = ["nodejs_compat"]
+# expose_global_message_channel: React 19 SSR (react-dom/server) references
+# MessageChannel, which Workers only expose by default from compat date
+# 2025-08-15+. This flag enables it without changing other runtime defaults.
+compatibility_flags = ["nodejs_compat", "expose_global_message_channel"]
 main = "./dist/_worker.js"
 
 [assets]
