@@ -1,0 +1,106 @@
+---
+export const prerender = true;
+import AppLayout from '../../layouts/AppLayout.astro';
+
+const siteURL = Astro.site?.toString().replace(/\/$/, '') ?? 'https://crakingculturewallpaperr.xyz';
+const title = 'Visual Protocol: Turning an Image into Creative Direction';
+const description =
+  'How to use CrackingWall\'s Visual Protocol to decode any image into a structured brief — palette, mood, composition, and style — and feed it into your next project.';
+const published = '2026-06-12';
+const url = `${siteURL}/blog/visual-protocol-creative-direction/`;
+
+const schema = {
+  '@context': 'https://schema.org',
+  '@type': 'BlogPosting',
+  headline: title,
+  description,
+  datePublished: published,
+  dateModified: published,
+  inLanguage: 'en',
+  author: { '@type': 'Person', name: 'FilipaoVfx', url: 'https://github.com/FilipaoVfx' },
+  publisher: {
+    '@type': 'Organization',
+    name: 'CrackingWall',
+    logo: { '@type': 'ImageObject', url: `${siteURL}/og-image.webp` },
+  },
+  mainEntityOfPage: { '@type': 'WebPage', '@id': url },
+};
+---
+
+<AppLayout title={`${title} — CrackingWall`} description={description}>
+  <script type="application/ld+json" set:html={JSON.stringify(schema)} />
+  <article
+    class="max-w-4xl mx-auto px-4 py-12 prose prose-invert prose-lg prose-headings:font-brutal prose-headings:uppercase prose-a:text-brutal-neon-cyan text-gray-300"
+  >
+    <a href="/blog/" class="not-prose inline-block font-mono text-sm text-gray-500 hover:text-white mb-8">
+      &lt;- Back to Transmissions
+    </a>
+
+    <h1 class="text-4xl md:text-6xl font-black mb-4 !text-brutal-neon-pink">
+      Visual Protocol: Turning an Image into Creative Direction
+    </h1>
+    <div class="not-prose font-mono text-sm text-gray-400 mb-12 border-b border-gray-800 pb-4">
+      By <a href="/about/" class="text-brutal-neon-cyan">FilipaoVfx</a> · Published June 12, 2026 · ~5 min read
+    </div>
+
+    <p class="lead text-xl border-l-4 border-brutal-neon-pink pl-4">
+      Everyone can tell when an image "works," but few can say <em>why</em> quickly. The
+      <a href="/visual-protocol/">Visual Protocol</a> exists to close that gap: give it an image and it
+      decodes the visual into a structured brief you can actually act on.
+    </p>
+
+    <h2>The Problem It Solves</h2>
+    <p>
+      You find a reference that nails the mood you're after — a frame from a film, a poster, a
+      screenshot. Now you have to translate that feeling into decisions: which colors, what contrast,
+      what kind of composition, which era of design it belongs to. Doing that by eye is slow and
+      inconsistent. Visual Protocol turns the reference into words and parameters.
+    </p>
+
+    <h2>What It Reads From an Image</h2>
+    <p>
+      Instead of a vague "cyberpunk-ish", you get a breakdown you can hand to a tool, a teammate, or your
+      future self:
+    </p>
+    <ul>
+      <li><strong>Palette:</strong> the dominant and accent colors driving the look.</li>
+      <li><strong>Mood &amp; atmosphere:</strong> the emotional read — calm, tense, nostalgic, clinical.</li>
+      <li><strong>Composition:</strong> how the frame is organized — focal point, balance, negative space.</li>
+      <li><strong>Style cues:</strong> the movements and references it leans on (retro-hardware, vaporwave, brutalist, and so on).</li>
+    </ul>
+
+    <h2>How to Use It</h2>
+    <ol>
+      <li>Open the <a href="/visual-protocol/">Visual Protocol</a> and provide an image.</li>
+      <li>Let it analyze — it returns the structured read described above.</li>
+      <li>Treat the output as a <strong>starting brief</strong>, not a verdict. Keep what resonates, drop what doesn't.</li>
+      <li>Carry the palette and style cues into your actual work.</li>
+    </ol>
+
+    <h2>Where It Fits: Analyze → Generate → Build</h2>
+    <p>
+      Visual Protocol is the first step in the CrackingWall workflow. Once you have a decoded brief, the
+      rest of the toolkit picks it up:
+    </p>
+    <ul>
+      <li>Take the palette and mood into the <a href="/3d-lab/">3D Lab</a> to give a logo or title matching depth and material.</li>
+      <li>Use the contrast read to get faithful output from the <a href="/ascii-lab/">ASCII Lab</a> (see our <a href="/blog/faithful-ascii-art-guide/">ASCII fidelity guide</a>).</li>
+      <li>Match the direction against our <a href="/wallpapers/">wallpaper</a> gallery to set the tone of a whole workspace.</li>
+    </ul>
+
+    <h2>Tips for Better Decodes</h2>
+    <ul>
+      <li><strong>Feed it a clean reference.</strong> One clear subject reads better than a busy collage.</li>
+      <li><strong>Compare two references.</strong> Decoding both and contrasting the results sharpens what you actually want.</li>
+      <li><strong>Keep the brief.</strong> Save the output as the seed of a moodboard so decisions stay consistent across a project.</li>
+    </ul>
+
+    <h2>Why Structure Beats Vibes</h2>
+    <p>
+      "Make it feel more cyberpunk" is unactionable. "Push toward a cyan/magenta palette, high contrast,
+      strong central focal point, retro-hardware cues" is a plan. Visual Protocol exists to move you from
+      the first sentence to the second. Try it on your favorite reference in the
+      <a href="/visual-protocol/">Visual Protocol</a> and see how much sharper your next decision gets.
+    </p>
+  </article>
+</AppLayout>
