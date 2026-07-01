@@ -1,0 +1,75 @@
+{
+  "site": "https://pixelatmos.com",
+  "generated": "2026-07-01",
+  "pipeline": "eGEOagents",
+  "guardrail": "AdSense-safe: urgency and ranking_emphasis intentionally under-weighted to avoid made-for-ads hype",
+  "site_baseline_score": 74,
+  "pages": [
+    {
+      "url": "/blog/svg-to-3d-browser-guide/",
+      "template": "tool-guide",
+      "scores": { "ranking_emphasis": 5, "user_intent": 10, "competitive_diff": 7, "social_proof": 3, "narrative": 9, "authority": 9, "usps": 7, "urgency": 1, "scannable": 9, "factual": 9 },
+      "total_score": 84,
+      "strengths": ["First-hand expertise", "Clear step-by-step", "HowTo schema"],
+      "gaps": [{ "feature": "social_proof", "recommendation": "Add usage numbers or examples of outputs" }]
+    },
+    {
+      "url": "/about/",
+      "template": "about",
+      "scores": { "ranking_emphasis": 4, "user_intent": 8, "competitive_diff": 8, "social_proof": 4, "narrative": 8, "authority": 9, "usps": 8, "urgency": 1, "scannable": 8, "factual": 9 },
+      "total_score": 78,
+      "strengths": ["Named creator + avatar (E-E-A-T)", "Transparent AI process", "Original tools as moat"],
+      "gaps": [{ "feature": "social_proof", "recommendation": "Add real usage/community numbers when available" }]
+    },
+    {
+      "url": "/3d-lab/",
+      "template": "tool",
+      "scores": { "ranking_emphasis": 4, "user_intent": 9, "competitive_diff": 6, "social_proof": 2, "narrative": 6, "authority": 8, "usps": 7, "urgency": 1, "scannable": 9, "factual": 9 },
+      "total_score": 74,
+      "strengths": ["Instant value", "Client-side privacy angle", "WebApplication schema (added)"],
+      "gaps": [{ "feature": "social_proof", "recommendation": "Add FAQ + usage counts" }, { "feature": "competitive_diff", "recommendation": "Foreground no-signup / files-stay-local" }]
+    },
+    {
+      "url": "/ascii-lab/",
+      "template": "tool",
+      "scores": { "ranking_emphasis": 5, "user_intent": 9, "competitive_diff": 6, "social_proof": 2, "narrative": 6, "authority": 8, "usps": 7, "urgency": 2, "scannable": 9, "factual": 8 },
+      "total_score": 74,
+      "strengths": ["Clear value prop", "WebApplication schema", "Feature chips"],
+      "gaps": [{ "feature": "social_proof", "recommendation": "Add FAQ + examples" }]
+    },
+    {
+      "url": "/visual-protocol/",
+      "template": "tool",
+      "scores": { "ranking_emphasis": 4, "user_intent": 9, "competitive_diff": 6, "social_proof": 2, "narrative": 6, "authority": 8, "usps": 7, "urgency": 1, "scannable": 9, "factual": 8 },
+      "total_score": 73,
+      "strengths": ["Clear intent", "WebApplication schema"],
+      "gaps": [{ "feature": "social_proof", "recommendation": "Add FAQ + sample decodes" }]
+    },
+    {
+      "url": "/",
+      "template": "home",
+      "scores": { "ranking_emphasis": 4, "user_intent": 8, "competitive_diff": 6, "social_proof": 3, "narrative": 7, "authority": 8, "usps": 7, "urgency": 1, "scannable": 9, "factual": 8 },
+      "total_score": 72,
+      "strengths": ["Tools-first positioning", "Good structure", "Org + WebSite schema"],
+      "gaps": [{ "feature": "social_proof", "recommendation": "Surface real download/like totals" }]
+    },
+    {
+      "url": "/wallpapers/ (+ detail)",
+      "template": "gallery",
+      "scores": { "ranking_emphasis": 3, "user_intent": 8, "competitive_diff": 5, "social_proof": 3, "narrative": 5, "authority": 7, "usps": 5, "urgency": 1, "scannable": 8, "factual": 8 },
+      "total_score": 66,
+      "strengths": ["ImageObject + Breadcrumb schema", "Original self-hosted art", "Per-item descriptions"],
+      "gaps": [
+        { "feature": "social_proof", "recommendation": "Display real downloads/likes (already in DB) + add interactionStatistic to schema" },
+        { "feature": "narrative", "recommendation": "1-2 sentences of visible context per wallpaper" }
+      ]
+    }
+  ],
+  "top_priority_actions": [
+    "Surface real download/like counts (honest social proof) on cards, detail pages, and in schema",
+    "Add FAQ sections with FAQPage schema to tool pages",
+    "Foreground honest differentiators (100% browser, no signup, files stay local, free)",
+    "Thicken wallpaper detail copy",
+    "Optional ItemList/Course schema for the blog guides"
+  ]
+}

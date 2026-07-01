@@ -29,6 +29,20 @@ const schema = {
 
 <AppLayout title={`${title} — CrackingWall`} description={description}>
   <script type="application/ld+json" set:html={JSON.stringify(schema)} />
+  <script type="application/ld+json" set:html={JSON.stringify({
+    '@context': 'https://schema.org',
+    '@type': 'HowTo',
+    name: 'How to make faithful ASCII art from images and video',
+    description,
+    tool: [{ '@type': 'HowToTool', name: 'CrackingWall ASCII Lab' }],
+    step: [
+      { '@type': 'HowToStep', position: 1, name: 'Pick a strong source', text: 'Choose an image or clip with clear contrast and a strong subject.' },
+      { '@type': 'HowToStep', position: 2, name: 'Start with a medium ramp', text: 'Open the ASCII Lab and begin with a medium-length character ramp.' },
+      { '@type': 'HowToStep', position: 3, name: 'Tune density and resolution', text: 'Adjust until the subject is readable when you squint.' },
+      { '@type': 'HowToStep', position: 4, name: 'Swap character sets', text: 'Try blocks for solidity or symbols for a classic terminal feel.' },
+      { '@type': 'HowToStep', position: 5, name: 'Export', text: 'Export the result and drop it into your terminal, README, or a wallpaper backdrop.' },
+    ],
+  })} />
   <article
     class="max-w-4xl mx-auto px-4 py-12 prose prose-invert prose-lg prose-headings:font-brutal prose-headings:uppercase prose-a:text-brutal-neon-cyan text-gray-300"
   >

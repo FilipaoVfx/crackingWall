@@ -5,9 +5,23 @@ import Svg3DLab from '../components/Svg3DLab';
 
 const title = '3D Lab — Turn text & SVG into 3D | CrackingWall';
 const description = 'Turn any text or SVG into an interactive 3D object right in your browser. Pick a material preset, drag to orbit. Free, client-side.';
+const canonicalUrl = new URL(Astro.url.pathname, Astro.site).href;
 ---
 
 <AppLayout title={title} description={description}>
+  <script type="application/ld+json" set:html={JSON.stringify({
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "3D Lab",
+    "description": description,
+    "url": canonicalUrl,
+    "applicationCategory": "DesignApplication",
+    "operatingSystem": "Web",
+    "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+    "featureList": ["Text to 3D", "SVG to 3D", "Per-layer sculpting", "PNG export", "GLB export"],
+    "creator": { "@type": "Organization", "name": "CrackingWall", "url": "https://pixelatmos.com" }
+  })} />
+
   <!-- Compact hero -->
   <section class="mb-6 border-2 border-black bg-brutal-dark-bg px-6 py-5 shadow-brutal md:px-8">
     <p class="mb-1.5 font-mono text-[10px] uppercase tracking-[0.3em] text-brutal-neon-purple">Labs / 3D Lab</p>
