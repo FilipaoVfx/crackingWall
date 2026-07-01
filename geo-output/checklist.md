@@ -14,10 +14,12 @@
 - [x] Custom 404 (noindex) + Cloudflare ASSETS binding fix
 - [x] GSC verification hook (`PUBLIC_GOOGLE_SITE_VERIFICATION`)
 
+## ✅ Done (social proof + FAQ pass)
+- [x] **Social proof:** wallpaper cards + detail pages already show real `downloads`/`likes`, and the detail schema already carries `interactionStatistic` (DownloadAction + LikeAction). Added a real aggregate stats strip to the home (3 tools · 9 wallpapers · 3,085 downloads · 313 likes — computed from data, no inflation).
+- [x] **FAQ:** honest FAQ + `FAQPage` JSON-LD on all 3 tool pages (reusable `FaqSection.astro`, 5 Q&A each). Differentiators woven into the answers (free, no signup, files-stay-local for ASCII/3D; honest server-analysis note for Visual Protocol).
+
 ## ⏳ Recommended next (high ROI, honest — no hype)
-- [ ] **Social proof:** display real `downloads`/`likes` (already in Supabase) on wallpaper cards + detail pages; add `interactionStatistic` to wallpaper schema
-- [ ] **FAQ:** add a short honest FAQ + `FAQPage` schema on tool pages (or `/faq`)
-- [ ] **Differentiators:** one honest line per tool — "100% in your browser · no signup · files stay local · free"
+- [ ] **Differentiators:** optional one-liner near the top of each tool hero (currently in the FAQ answers)
 - [ ] **Wallpaper copy:** 1–2 sentences of visible context per piece
 - [ ] Validate all schema in Google Rich Results Test after deploy
 - [ ] (Optional) `ItemList`/`Course` schema for the blog guides collection

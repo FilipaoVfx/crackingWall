@@ -2,6 +2,15 @@
 export const prerender = true;
 import AppLayout from '../layouts/AppLayout.astro';
 import Svg3DLab from '../components/Svg3DLab';
+import FaqSection from '../components/FaqSection.astro';
+
+const faqs = [
+  { q: 'Is the 3D Lab free?', a: 'Yes — it is completely free and needs no account or signup.' },
+  { q: 'Do my files leave my device?', a: 'No. The 3D Lab runs entirely in your browser (client-side). Your text or SVG is processed locally with WebGL and is never uploaded to a server.' },
+  { q: 'What can I turn into 3D?', a: 'Short text (up to about six characters) or any SVG file. For SVGs, each element is detected so you can sculpt its relief, material, color and visibility.' },
+  { q: 'What formats can I export?', a: 'A high-fidelity PNG image, or a GLB — a standard binary glTF 3D model with each layer as a named node, openable in any 3D viewer.' },
+  { q: 'Do I need a powerful computer?', a: 'It runs on any WebGL-capable browser. Very complex SVGs are heavier, so the tool applies a geometry budget and caps quality automatically to stay smooth.' },
+];
 
 const title = '3D Lab — Turn text & SVG into 3D | CrackingWall';
 const description = 'Turn any text or SVG into an interactive 3D object right in your browser. Pick a material preset, drag to orbit. Free, client-side.';
@@ -32,4 +41,6 @@ const canonicalUrl = new URL(Astro.url.pathname, Astro.site).href;
   </section>
 
   <Svg3DLab client:only="react" />
+
+  <FaqSection items={faqs} />
 </AppLayout>

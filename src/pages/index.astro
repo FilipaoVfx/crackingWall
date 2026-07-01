@@ -13,6 +13,17 @@ const featuredWallpapers = [
 const categories = [...new Set(allWallpapers.map((w) => w.category))].slice(0, 8);
 
 const wallpaperHref = wallpaperPath;
+
+// Real social proof — aggregate totals from the gallery data (no inflated numbers).
+const totalDownloads = allWallpapers.reduce((s, w) => s + (w.downloads || 0), 0);
+const totalLikes = allWallpapers.reduce((s, w) => s + (w.likes || 0), 0);
+const wallpaperCount = allWallpapers.length;
+const stats = [
+  { value: '3', label: 'Free tools' },
+  { value: wallpaperCount.toLocaleString(), label: 'Original wallpapers' },
+  { value: totalDownloads.toLocaleString(), label: 'Downloads' },
+  { value: totalLikes.toLocaleString(), label: 'Likes' },
+];
 ---
 
 <AppLayout
@@ -42,6 +53,16 @@ const wallpaperHref = wallpaperPath;
         </a>
       </div>
     </div>
+  </section>
+
+  <!-- Social proof — real aggregate totals -->
+  <section class="mb-10 grid grid-cols-2 gap-3 md:grid-cols-4">
+    {stats.map((s) => (
+      <div class="border-2 border-black bg-brutal-dark-bg px-4 py-3 text-center shadow-brutal-sm">
+        <div class="font-brutal text-2xl font-black tracking-tight text-brutal-neon-cyan md:text-3xl">{s.value}</div>
+        <div class="mt-0.5 font-mono text-[10px] uppercase tracking-wider text-gray-500">{s.label}</div>
+      </div>
+    ))}
   </section>
 
   <!-- Tools (primary) — exactly 2, each with a descriptive visual preview -->
