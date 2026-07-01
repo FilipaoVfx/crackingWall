@@ -1,33 +1,111 @@
 ---
 export const prerender = true;
 import AppLayout from '../../layouts/AppLayout.astro';
+
+// NOTE: Tailwind's scanner only picks up complete, literal class strings, so the
+// full class names are written out here (not composed from a color token).
+const toolGuides = [
+  {
+    href: '/blog/svg-to-3d-browser-guide/',
+    title: 'How to Turn Any SVG into a 3D Model in Your Browser',
+    blurb: 'The "sculpted volume" approach to SVG→3D, the layer explorer, and clean PNG/GLB export — all client-side.',
+    tag: '3D Lab',
+    hoverBorder: 'hover:border-brutal-neon-yellow',
+    hoverText: 'group-hover:text-brutal-neon-yellow',
+    accentText: 'text-brutal-neon-yellow',
+  },
+  {
+    href: '/blog/faithful-ascii-art-guide/',
+    title: 'Making Faithful ASCII Art from Images and Video',
+    blurb: 'Luminance ramps, character density, and the settings that make ASCII output read like the original.',
+    tag: 'ASCII Lab',
+    hoverBorder: 'hover:border-brutal-neon-green',
+    hoverText: 'group-hover:text-brutal-neon-green',
+    accentText: 'text-brutal-neon-green',
+  },
+  {
+    href: '/blog/visual-protocol-creative-direction/',
+    title: 'Visual Protocol: Turning an Image into Creative Direction',
+    blurb: 'Decode any image into a structured brief — palette, mood, composition, style — and act on it.',
+    tag: 'Visual Protocol',
+    hoverBorder: 'hover:border-brutal-neon-pink',
+    hoverText: 'group-hover:text-brutal-neon-pink',
+    accentText: 'text-brutal-neon-pink',
+  },
+];
+
+const culturePosts = [
+  {
+    href: '/blog/best-cyberpunk-wallpapers-developers/',
+    title: 'Best Cyberpunk Wallpapers for Developers',
+    blurb: 'Enhance your productivity and workspace aesthetics with these top digital art choices.',
+    hoverBorder: 'hover:border-brutal-neon-cyan',
+    hoverText: 'group-hover:text-brutal-neon-cyan',
+    accentText: 'text-brutal-neon-cyan',
+  },
+  {
+    href: '/blog/terminal-setup-aesthetic-guide/',
+    title: 'The Ultimate Terminal Setup Aesthetic Guide',
+    blurb: 'A complete guide to making your terminal look futuristic and visually coherent.',
+    hoverBorder: 'hover:border-brutal-neon-pink',
+    hoverText: 'group-hover:text-brutal-neon-pink',
+    accentText: 'text-brutal-neon-pink',
+  },
+  {
+    href: '/blog/digital-underground-art/',
+    title: 'Defining Digital Underground Art in Modern Context',
+    blurb: 'Exploring the roots of glitch, tech culture, and digital landscapes as a formal aesthetic.',
+    hoverBorder: 'hover:border-brutal-neon-yellow',
+    hoverText: 'group-hover:text-brutal-neon-yellow',
+    accentText: 'text-brutal-neon-yellow',
+  },
+];
 ---
 
-<AppLayout title="Blog - CrakingWall | Tech Culture & Setup Guides" description="Articles about developer setups, cyberpunk aesthetics, and digital culture.">
+<AppLayout
+  title="Blog — CrackingWall | Tool Guides & Tech Culture"
+  description="Hands-on guides for CrackingWall's creative tools (3D Lab, ASCII Lab, Visual Protocol) plus writing on developer setups and digital culture."
+>
   <div class="max-w-4xl mx-auto px-4 py-12">
-    <h1 class="text-5xl font-brutal font-black uppercase mb-12 text-center drop-shadow-[2px_2px_0_#b026ff]">Transmissions</h1>
-    
+    <h1 class="text-5xl font-brutal font-black uppercase mb-4 text-center drop-shadow-[2px_2px_0_#b026ff]">
+      Transmissions
+    </h1>
+    <p class="text-center text-gray-400 font-mono text-sm max-w-2xl mx-auto mb-12">
+      Practical guides to our creative tools, plus notes on tech-culture aesthetics — written first-hand
+      by the person who builds them.
+    </p>
+
+    <h2 class="text-2xl font-brutal font-black uppercase text-brutal-neon-green mb-6">Tool Guides</h2>
+    <div class="grid gap-8 mb-16">
+      {toolGuides.map((p) => (
+        <a
+          href={p.href}
+          class:list={['block bg-brutal-dark-deeper border-2 border-brutal-dark-border p-6 transition-colors group', p.hoverBorder]}
+        >
+          <span class:list={['font-mono text-[10px] uppercase tracking-widest', p.accentText]}>{p.tag}</span>
+          <h3 class:list={['text-2xl font-brutal font-bold text-white mt-1 mb-2', p.hoverText]}>
+            {p.title}
+          </h3>
+          <p class="text-gray-400 font-mono text-sm mb-4">{p.blurb}</p>
+          <span class:list={['font-mono text-xs uppercase tracking-widest', p.accentText]}>Read More -&gt;</span>
+        </a>
+      ))}
+    </div>
+
+    <h2 class="text-2xl font-brutal font-black uppercase text-brutal-neon-cyan mb-6">Tech Culture</h2>
     <div class="grid gap-8">
-      {/* Article 1 */}
-      <a href="/blog/best-cyberpunk-wallpapers-developers/" class="block bg-brutal-dark-deeper border-2 border-brutal-dark-border p-6 hover:border-brutal-neon-cyan transition-colors group">
-        <h2 class="text-2xl font-brutal font-bold text-white group-hover:text-brutal-neon-cyan mb-2">Best Cyberpunk Wallpapers for Developers</h2>
-        <p class="text-gray-400 font-mono text-sm mb-4">Enhance your productivity and workspace aesthetics with these top digital art choices.</p>
-        <span class="text-brutal-neon-cyan font-mono text-xs uppercase tracking-widest">Read More -></span>
-      </a>
-
-      {/* Article 2 */}
-      <a href="/blog/terminal-setup-aesthetic-guide/" class="block bg-brutal-dark-deeper border-2 border-brutal-dark-border p-6 hover:border-brutal-neon-pink transition-colors group">
-        <h2 class="text-2xl font-brutal font-bold text-white group-hover:text-brutal-neon-pink mb-2">The Ultimate Terminal Setup Aesthetic Guide</h2>
-        <p class="text-gray-400 font-mono text-sm mb-4">A complete guide to making your terminal look incredibly futuristic and visually coherent.</p>
-        <span class="text-brutal-neon-pink font-mono text-xs uppercase tracking-widest">Read More -></span>
-      </a>
-
-      {/* Article 3 */}
-      <a href="/blog/digital-underground-art/" class="block bg-brutal-dark-deeper border-2 border-brutal-dark-border p-6 hover:border-brutal-neon-yellow transition-colors group">
-        <h2 class="text-2xl font-brutal font-bold text-white group-hover:text-brutal-neon-yellow mb-2">Defining Digital Underground Art in Modern Context</h2>
-        <p class="text-gray-400 font-mono text-sm mb-4">Exploring the roots of glitch, tech culture, and digital landscapes as a formal aesthetic.</p>
-        <span class="text-brutal-neon-yellow font-mono text-xs uppercase tracking-widest">Read More -></span>
-      </a>
+      {culturePosts.map((p) => (
+        <a
+          href={p.href}
+          class:list={['block bg-brutal-dark-deeper border-2 border-brutal-dark-border p-6 transition-colors group', p.hoverBorder]}
+        >
+          <h3 class:list={['text-2xl font-brutal font-bold text-white mb-2', p.hoverText]}>
+            {p.title}
+          </h3>
+          <p class="text-gray-400 font-mono text-sm mb-4">{p.blurb}</p>
+          <span class:list={['font-mono text-xs uppercase tracking-widest', p.accentText]}>Read More -&gt;</span>
+        </a>
+      ))}
     </div>
   </div>
 </AppLayout>

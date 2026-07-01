@@ -63,11 +63,12 @@ El `<head>` cargaba **HilltopAds** (native banner + *social bar* / pop-under de 
 ## 5. Roadmap (prioridad descendente)
 
 ### P1 — Antes de solicitar AdSense
+- [x] **Contenido con valor único (tanda 1):** 3 guías originales de primera mano de las tools — [3D Lab](/blog/svg-to-3d-browser-guide/), [ASCII Lab](/blog/faithful-ascii-art-guide/), [Visual Protocol](/blog/visual-protocol-creative-direction/). Con `BlogPosting` schema, autor, fechas reales, inter-linking tools↔blog. *(Añadir más con el tiempo; el blog venía fino — 3 posts genéricos — para el estándar del notebook.)*
+- [ ] 🟠 **Origen de las imágenes de wallpapers (autenticidad):** `src/content/wallpapers.json` apunta a **Unsplash** (stock hotlinkeado), lo que contradice el relato de "artworks originales" y parece agregador (señal MFA). Decisión del dueño: sustituir por arte propio/AI-curado y **auto-alojado**, o reencuadrar honestamente la galería. Alto impacto en EEAT.
 - [ ] **Personalizar EEAT real:** nombre real/alias público + foto/avatar + links sociales verificables del creador (hoy usa el handle GitHub como base). Cuanto más real, mejor.
-- [ ] **Contenido con valor único:** ampliar el blog con guías reales de las herramientas ("cómo llevar un SVG a 3D", "elegir charset para ASCII fiel"), casos y capturas propias. El blog actual (3 posts) es fino para el estándar del notebook.
-- [ ] **Descripciones originales por wallpaper** (no autogeneradas): contexto, técnica, inspiración → propósito editorial.
+- [ ] **Descripciones originales por wallpaper** (no autogeneradas): contexto, técnica, inspiración → propósito editorial. *(Depende de resolver el origen de imágenes.)*
 - [ ] **Revisar densidad/calidad de la galería:** quitar lo que no aporte; que cada imagen tenga propósito.
-- [ ] Verificar que **no quedan otras redes** de anuncios/pop-ups en ninguna página.
+- [x] Verificar que **no quedan otras redes** de anuncios/pop-ups — HilltopAds eliminado por completo (ver §3).
 
 ### P2 — SEO técnico
 - [ ] `BreadcrumbList` en más rutas; verificar `sitemap` incluye tools + blog + legales.

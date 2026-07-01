@@ -1,0 +1,145 @@
+---
+export const prerender = true;
+import AppLayout from '../../layouts/AppLayout.astro';
+
+const siteURL = Astro.site?.toString().replace(/\/$/, '') ?? 'https://crakingculturewallpaperr.xyz';
+const title = 'How to Turn Any SVG into a 3D Model in Your Browser';
+const description =
+  'A hands-on guide to CrackingWall\'s 3D Lab: the "sculpted volume" approach to SVG→3D, how the layer explorer works, and how to export clean PNG/GLB — all client-side.';
+const published = '2026-06-28';
+const url = `${siteURL}/blog/svg-to-3d-browser-guide/`;
+
+const schema = {
+  '@context': 'https://schema.org',
+  '@type': 'BlogPosting',
+  headline: title,
+  description,
+  datePublished: published,
+  dateModified: published,
+  inLanguage: 'en',
+  author: { '@type': 'Person', name: 'FilipaoVfx', url: 'https://github.com/FilipaoVfx' },
+  publisher: {
+    '@type': 'Organization',
+    name: 'CrackingWall',
+    logo: { '@type': 'ImageObject', url: `${siteURL}/og-image.webp` },
+  },
+  mainEntityOfPage: { '@type': 'WebPage', '@id': url },
+};
+---
+
+<AppLayout title={`${title} — CrackingWall`} description={description}>
+  <script type="application/ld+json" set:html={JSON.stringify(schema)} />
+  <article
+    class="max-w-4xl mx-auto px-4 py-12 prose prose-invert prose-lg prose-headings:font-brutal prose-headings:uppercase prose-a:text-brutal-neon-cyan text-gray-300"
+  >
+    <a href="/blog/" class="not-prose inline-block font-mono text-sm text-gray-500 hover:text-white mb-8">
+      &lt;- Back to Transmissions
+    </a>
+
+    <h1 class="text-4xl md:text-6xl font-black mb-4 !text-brutal-neon-yellow">
+      How to Turn Any SVG into a 3D Model in Your Browser
+    </h1>
+    <div class="not-prose font-mono text-sm text-gray-400 mb-12 border-b border-gray-800 pb-4">
+      By <a href="/about/" class="text-brutal-neon-cyan">FilipaoVfx</a> · Published June 28, 2026 · ~7 min read
+    </div>
+
+    <p class="lead text-xl border-l-4 border-brutal-neon-yellow pl-4">
+      Most SVG-to-3D converters see hundreds of loose paths and extrude them all the same way — you get
+      a flat slab with no soul. The <a href="/3d-lab/">3D Lab</a> takes a different stance: an SVG isn't
+      a list of paths, it's a creative asset with parts, colors, and depth of its own. Here's how to use
+      it, and the thinking behind it.
+    </p>
+
+    <h2>What "Sculpted Volume" Means</h2>
+    <p>
+      The core idea is simple: don't just extrude — <strong>interpret, then sculpt</strong>. The tool
+      reads your SVG, detects each element (eyes, pupils, vents, letters…), captures its color, and
+      proposes a material and a relief for it. From there, you shape each piece by hand. The pipeline
+      looks like this:
+    </p>
+    <pre class="not-prose bg-black border-2 border-brutal-dark-border p-4 font-mono text-sm text-brutal-neon-green overflow-x-auto"><code>SVG → Interpretation → Per-part relief → High-fidelity 3D</code></pre>
+
+    <h2>Step 1 — Bring in Your Asset</h2>
+    <p>
+      Open the <a href="/3d-lab/">3D Lab</a>. You have two modes:
+    </p>
+    <ul>
+      <li><strong>Text mode:</strong> type up to six characters and pick a brand preset (neon, glitch, chrome, gold, glass). Great for logos and titles.</li>
+      <li><strong>SVG mode:</strong> upload an <code>.svg</code> file. This is where the sculpting really shines.</li>
+    </ul>
+    <p>
+      Everything runs <strong>in your browser</strong>. Nothing is uploaded to a server — the file is
+      parsed and rendered locally with WebGL, so your asset never leaves your machine.
+    </p>
+
+    <h2>Step 2 — Let It Interpret the SVG</h2>
+    <p>
+      When you drop in an SVG, the intelligence layer segments it automatically:
+    </p>
+    <ul>
+      <li>If the author named groups with <code>&lt;g id&gt;</code>, it respects those groupings.</li>
+      <li>If there are no ids (most icons), it <strong>segments by individual shape</strong> so no detail is lost.</li>
+      <li>It resolves color from flat fills, named colors, and even <strong>gradients</strong> (by averaging their stops).</li>
+      <li>It ignores non-visible regions (<code>&lt;defs&gt;</code>, <code>&lt;mask&gt;</code>, <code>&lt;clipPath&gt;</code>).</li>
+    </ul>
+
+    <h2>Step 3 — Understand the Depth (Painter's Z-Order)</h2>
+    <p>
+      This is the trick that makes results look sculpted instead of flat. In SVG, the drawing order is
+      meaningful: things drawn later sit on top. The 3D Lab maps that order to <strong>height</strong> —
+      the base stays at the back, and the details drawn on top rise toward you. On a face, that means the
+      silhouette sits at the back while eyes, nose, and mouth stand out in relief. You get real volume for
+      free, before you touch a single control.
+    </p>
+
+    <h2>Step 4 — Sculpt in the Layer Explorer</h2>
+    <p>
+      Open the Layer Explorer and you'll see each detected part listed with its real color. Select any
+      piece and adjust it live:
+    </p>
+    <ul>
+      <li><strong>Relief (depth):</strong> how far the part extrudes — the heart of "sculpted volume".</li>
+      <li><strong>Material:</strong> glass, metal, plastic, emissive, chrome, gold.</li>
+      <li><strong>Color:</strong> override the captured color when you want to art-direct.</li>
+      <li><strong>Visibility:</strong> hide parts to focus, or to simplify heavy icons.</li>
+    </ul>
+    <p>
+      Changes are debounced and applied on the fly, so you can iterate quickly without rebuilding the
+      whole model each time.
+    </p>
+
+    <h2>Step 5 — Export (PNG or GLB)</h2>
+    <p>
+      When it looks right, export:
+    </p>
+    <ul>
+      <li><strong>PNG</strong> — a direct, high-fidelity capture of the canvas.</li>
+      <li><strong>GLB</strong> — a standard binary glTF you can open in any 3D viewer, with each layer as a named node.</li>
+    </ul>
+
+    <h2>Tips for the Best Results</h2>
+    <ul>
+      <li><strong>Feed it clean SVGs.</strong> Fewer stray paths and sensible grouping give better segmentation.</li>
+      <li><strong>Fills beat strokes.</strong> The engine extrudes filled areas; shapes made only of thin strokes (like fine rings) don't generate geometry yet.</li>
+      <li><strong>Mind complexity on low-end devices.</strong> There's a geometry budget (~300k vertices) with automatic warnings; hide or simplify parts if you hit it.</li>
+      <li><strong>Filters don't translate.</strong> SVG blur / inner-shadow filters are 2D effects and won't become 3D.</li>
+    </ul>
+
+    <h2>Under the Hood (for the Curious)</h2>
+    <p>
+      The 3D Lab is built on an open-source package, <em>@filipaovfx/svg3d</em>, which wraps the
+      <a href="https://github.com/renatoworks/3dsvg" rel="noopener noreferrer" target="_blank">3dsvg</a>
+      extrusion engine (MIT © Renato Costa) and adds the intelligence, per-layer sculpting, scene presets,
+      and export utilities. The heavy 3D engine is lazy-loaded and the SVG analysis is cached by hash, so
+      the tool stays responsive. If you want the deeper product story, see our
+      <a href="/about/">About page</a>.
+    </p>
+
+    <h2>Try It</h2>
+    <p>
+      The fastest way to understand it is to sculpt something. Grab an icon you like and open the
+      <a href="/3d-lab/">3D Lab</a> — text mode takes about ten seconds, and an SVG upload turns a flat
+      logo into something with real depth.
+    </p>
+  </article>
+</AppLayout>

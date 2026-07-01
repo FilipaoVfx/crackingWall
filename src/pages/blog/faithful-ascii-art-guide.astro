@@ -1,0 +1,136 @@
+---
+export const prerender = true;
+import AppLayout from '../../layouts/AppLayout.astro';
+
+const siteURL = Astro.site?.toString().replace(/\/$/, '') ?? 'https://crakingculturewallpaperr.xyz';
+const title = 'Making Faithful ASCII Art from Images and Video';
+const description =
+  'How image-to-ASCII conversion actually works — luminance ramps, character density, and the settings that make ASCII Lab output look like the original instead of noise.';
+const published = '2026-06-20';
+const url = `${siteURL}/blog/faithful-ascii-art-guide/`;
+
+const schema = {
+  '@context': 'https://schema.org',
+  '@type': 'BlogPosting',
+  headline: title,
+  description,
+  datePublished: published,
+  dateModified: published,
+  inLanguage: 'en',
+  author: { '@type': 'Person', name: 'FilipaoVfx', url: 'https://github.com/FilipaoVfx' },
+  publisher: {
+    '@type': 'Organization',
+    name: 'CrackingWall',
+    logo: { '@type': 'ImageObject', url: `${siteURL}/og-image.webp` },
+  },
+  mainEntityOfPage: { '@type': 'WebPage', '@id': url },
+};
+---
+
+<AppLayout title={`${title} — CrackingWall`} description={description}>
+  <script type="application/ld+json" set:html={JSON.stringify(schema)} />
+  <article
+    class="max-w-4xl mx-auto px-4 py-12 prose prose-invert prose-lg prose-headings:font-brutal prose-headings:uppercase prose-a:text-brutal-neon-cyan text-gray-300"
+  >
+    <a href="/blog/" class="not-prose inline-block font-mono text-sm text-gray-500 hover:text-white mb-8">
+      &lt;- Back to Transmissions
+    </a>
+
+    <h1 class="text-4xl md:text-6xl font-black mb-4 !text-brutal-neon-green">
+      Making Faithful ASCII Art from Images and Video
+    </h1>
+    <div class="not-prose font-mono text-sm text-gray-400 mb-12 border-b border-gray-800 pb-4">
+      By <a href="/about/" class="text-brutal-neon-cyan">FilipaoVfx</a> · Published June 20, 2026 · ~6 min read
+    </div>
+
+    <p class="lead text-xl border-l-4 border-brutal-neon-green pl-4">
+      Good ASCII art isn't random symbols — it's a faithful map from brightness to characters. Once you
+      understand that one idea, you can make output from the <a href="/ascii-lab/">ASCII Lab</a> that
+      genuinely reads as the original image instead of a mess of glyphs.
+    </p>
+
+    <h2>The One Concept That Matters: Luminance → Density</h2>
+    <p>
+      Every ASCII converter does the same fundamental thing. It divides the image into a grid of cells,
+      measures the <strong>brightness (luminance)</strong> of each cell, and swaps that cell for a
+      character whose visual "ink" matches that brightness. A dark cell becomes a dense character like
+      <code>@</code> or <code>#</code>; a bright cell becomes something sparse like <code>.</code> or a
+      space.
+    </p>
+    <pre class="not-prose bg-black border-2 border-brutal-dark-border p-4 font-mono text-sm text-brutal-neon-green overflow-x-auto"><code>dark  @ % # * + = - : . (space)  bright</code></pre>
+    <p>
+      That ordered string is called the <strong>character ramp</strong>. Everything about fidelity comes
+      down to picking the right ramp and sampling the image well.
+    </p>
+
+    <h2>Luminance Isn't the Average of RGB</h2>
+    <p>
+      A common mistake is averaging red, green, and blue equally. Human eyes are far more sensitive to
+      green than to blue, so perceptual brightness is weighted:
+    </p>
+    <pre class="not-prose bg-black border-2 border-brutal-dark-border p-4 font-mono text-sm text-brutal-neon-cyan overflow-x-auto"><code>luma = 0.2126·R + 0.7152·G + 0.0722·B</code></pre>
+    <p>
+      Using perceptual weights (instead of a flat average) is one of the biggest fidelity wins — skin
+      tones, skies, and neon stop collapsing into the wrong shade of gray.
+    </p>
+
+    <h2>Choosing a Character Ramp</h2>
+    <p>
+      Different ramps suit different images:
+    </p>
+    <ul>
+      <li><strong>Long, fine ramps</strong> (10+ characters) capture smooth gradients — good for portraits and soft lighting.</li>
+      <li><strong>Short, high-contrast ramps</strong> (e.g. <code>@#. </code>) suit graphic, high-contrast subjects — logos, silhouettes, and the classic terminal look.</li>
+      <li><strong>Block characters</strong> (<code>█ ▓ ▒ ░</code>) give the most "solid" image because their ink coverage is near-uniform and predictable.</li>
+    </ul>
+    <p>
+      In the <a href="/ascii-lab/">ASCII Lab</a>, try a few charsets on the same source. The "right" one is
+      whichever makes the subject recognizable at a glance when you squint.
+    </p>
+
+    <h2>Resolution and the Character-Aspect Trap</h2>
+    <p>
+      Monospace characters are taller than they are wide (roughly 1:2). If you sample the image on a
+      square grid, the output looks vertically stretched. Faithful output <strong>compensates for cell
+      aspect ratio</strong> — sampling fewer rows than columns so proportions stay correct. If your ASCII
+      looks squished, this is almost always why.
+    </p>
+
+    <h2>Contrast Before Conversion</h2>
+    <p>
+      Because you're quantizing a whole tonal range down to a handful of characters, low-contrast images
+      turn to mush. A little pre-processing goes a long way:
+    </p>
+    <ul>
+      <li>Nudge contrast up so darks and lights separate clearly.</li>
+      <li>Consider inverting for dark-background terminals (bright subject on black reads better).</li>
+      <li>Crop tight — every wasted cell is a wasted character.</li>
+    </ul>
+
+    <h2>Doing It on Video</h2>
+    <p>
+      Video is just the same conversion applied per frame. The two things that keep motion legible:
+    </p>
+    <ul>
+      <li><strong>Consistency:</strong> keep the ramp and grid fixed across frames so characters don't flicker between similar brightness levels.</li>
+      <li><strong>Enough cells:</strong> motion hides detail, so a slightly denser grid helps the eye track shapes.</li>
+    </ul>
+
+    <h2>A Quick Workflow</h2>
+    <ol>
+      <li>Pick a source with clear contrast and a strong subject.</li>
+      <li>Open the <a href="/ascii-lab/">ASCII Lab</a> and start with a medium-length ramp.</li>
+      <li>Adjust density/resolution until the subject is readable when you squint.</li>
+      <li>Swap charsets to taste — blocks for solidity, symbols for a classic terminal feel.</li>
+      <li>Export and drop it into your terminal, README, or a <a href="/wallpapers/">wallpaper</a>-style backdrop.</li>
+    </ol>
+
+    <h2>Why It's Worth Learning</h2>
+    <p>
+      ASCII art is constraint as a creative tool — a whole image expressed in text. Understanding the
+      luminance-to-density mapping turns it from a gimmick into something you can actually control. Open
+      the <a href="/ascii-lab/">ASCII Lab</a>, try one image with three different ramps, and the idea
+      clicks immediately.
+    </p>
+  </article>
+</AppLayout>
