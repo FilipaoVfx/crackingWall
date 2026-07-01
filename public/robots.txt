@@ -6,8 +6,8 @@ Allow: /
 Disallow: /api/
 
 # Sitemaps
-Sitemap: https://crakingculturewallpaperr.xyz/sitemap-index.xml
-Sitemap: https://crakingculturewallpaperr.xyz/image-sitemap.xml
+Sitemap: https://pixelatmos.com/sitemap-index.xml
+Sitemap: https://pixelatmos.com/image-sitemap.xml
 
 # Block known abusive scrapers only
 User-agent: Bytespider

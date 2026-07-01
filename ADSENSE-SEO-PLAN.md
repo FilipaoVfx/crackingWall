@@ -75,7 +75,7 @@ El `<head>` cargaba **HilltopAds** (native banner + *social bar* / pop-under de 
 - [ ] Metadatos por página (títulos/descripciones únicos y descriptivos) — auditar duplicados.
 - [ ] Imágenes: `alt` descriptivo, `width/height`, `loading="lazy"`, formatos optimizados (webp/avif).
 - [ ] Core Web Vitals: peso de islas React, lazy-load del motor 3D (ya), LCP del home.
-- [ ] Coherencia de dominio: `robots.txt`/`site` usan `crakingculturewallpaperr.xyz` — confirmar dominio final antes de solicitar (un cambio de dominio reinicia la evaluación).
+- [ ] Coherencia de dominio: `robots.txt`/`site` usan `pixelatmos.com` — confirmar dominio final antes de solicitar (un cambio de dominio reinicia la evaluación).
 
 ### P3 — Profesionalización / confianza
 - [ ] Página o sección de **contacto real** verificable (email visible, no solo formulario).

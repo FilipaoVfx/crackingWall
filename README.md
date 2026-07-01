@@ -33,7 +33,7 @@ src/
 - 🔄 Real-time updates with Supabase
 
 ### 🚀 Deployment
-- **Domain**: crakingculturewallpaperr.xyz
+- **Domain**: pixelatmos.com
 - **Hosting**: Vercel/Netlify
 - **Storage**: Supabase Storage
 - **CI/CD**: GitHub Actions

@@ -7,7 +7,7 @@ Aquí tienes el **PRD completo consolidado** en formato `.md`, listo para entreg
 # CrakingCultureWallpaper — SEO + AI Discoverability Upgrade
 
 **Project:** CrakingCultureWallpaper  
-**Domain:** https://crakingculturewallpaperr.xyz/  
+**Domain:** https://pixelatmos.com/  
 **Stack:** Astro (Static), TailwindCSS, Sitemap Integration  
 **Owner:** Tech Lead  
 **Version:** v2.0  
@@ -146,8 +146,8 @@ Add JSON-LD to each wallpaper page:
   "@context": "https://schema.org",
   "@type": "ImageObject",
   "name": "Neon Hacker Terminal Glitch 4K",
-  "contentUrl": "https://crakingculturewallpaperr.xyz/assets/neon-hacker-4k.webp",
-  "license": "https://crakingculturewallpaperr.xyz/license",
+  "contentUrl": "https://pixelatmos.com/assets/neon-hacker-4k.webp",
+  "license": "https://pixelatmos.com/license",
   "creator": {
     "@type": "Organization",
     "name": "Craking Culture Wallpaper"
