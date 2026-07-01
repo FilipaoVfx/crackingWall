@@ -14,6 +14,7 @@ const aboutSchema = {
     '@type': 'Person',
     name: 'FilipaoVfx',
     url: 'https://github.com/FilipaoVfx',
+    image: `${siteURL}/filipaovfx-avatar.png`,
     jobTitle: 'Independent developer & digital artist',
     description:
       'Independent developer and digital artist behind CrackingWall — builder of its browser-based creative tools and curator of its tech-culture wallpaper gallery.',
@@ -41,6 +42,23 @@ const aboutSchema = {
         </p>
 
         <h2 class="first-heading">Who's Behind CrackingWall</h2>
+        <div class="creator-card">
+          <img
+            class="creator-avatar"
+            src="/filipaovfx-avatar.png"
+            width="96"
+            height="96"
+            alt="FilipaoVfx, creator of CrackingWall"
+            loading="lazy"
+          />
+          <div class="creator-meta">
+            <span class="creator-name">FilipaoVfx</span>
+            <span class="creator-role">Independent developer &amp; digital artist</span>
+            <a class="creator-link" href="https://github.com/FilipaoVfx" rel="noopener noreferrer" target="_blank">
+              github.com/FilipaoVfx
+            </a>
+          </div>
+        </div>
         <p>
           CrackingWall is a solo project by <strong>FilipaoVfx</strong> — an independent
           developer and digital artist. The same person writes the code for the creative
@@ -166,6 +184,56 @@ const aboutSchema = {
     font-size: 1.25rem;
     color: #d0d0d0;
     line-height: 1.7;
+  }
+
+  .creator-card {
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+    margin: 0 0 1.75rem;
+    padding: 1.25rem;
+    background: #0d0d13;
+    border: 1px solid #2a2a35;
+    border-left: 4px solid #00fff9;
+    border-radius: 6px;
+  }
+
+  .creator-avatar {
+    width: 96px;
+    height: 96px;
+    border-radius: 50%;
+    border: 2px solid #00fff9;
+    box-shadow: 0 0 16px rgba(0, 255, 249, 0.25);
+    flex-shrink: 0;
+  }
+
+  .creator-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  .creator-name {
+    font-size: 1.4rem;
+    font-weight: 900;
+    color: #f0f0f0;
+  }
+
+  .creator-role {
+    font-size: 0.95rem;
+    color: #a0a0a0;
+  }
+
+  .creator-link {
+    font-family: monospace;
+    font-size: 0.85rem;
+    color: #00fff9;
+    text-decoration: none;
+    margin-top: 0.25rem;
+  }
+
+  .creator-link:hover {
+    color: #b026ff;
   }
 
   h2 {
