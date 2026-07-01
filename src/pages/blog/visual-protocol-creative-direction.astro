@@ -29,6 +29,19 @@ const schema = {
 
 <AppLayout title={`${title} — CrackingWall`} description={description}>
   <script type="application/ld+json" set:html={JSON.stringify(schema)} />
+  <script type="application/ld+json" set:html={JSON.stringify({
+    '@context': 'https://schema.org',
+    '@type': 'HowTo',
+    name: 'How to turn an image into creative direction with Visual Protocol',
+    description,
+    tool: [{ '@type': 'HowToTool', name: 'CrackingWall Visual Protocol' }],
+    step: [
+      { '@type': 'HowToStep', position: 1, name: 'Provide an image', text: 'Open the Visual Protocol and give it a clear reference image.' },
+      { '@type': 'HowToStep', position: 2, name: 'Let it analyze', text: 'It returns a structured read: palette, mood, composition and style cues.' },
+      { '@type': 'HowToStep', position: 3, name: 'Treat it as a brief', text: 'Keep what resonates and drop what does not — it is a starting brief, not a verdict.' },
+      { '@type': 'HowToStep', position: 4, name: 'Carry it into your work', text: 'Take the palette and style cues into your actual project or the other tools.' },
+    ],
+  })} />
   <article
     class="max-w-4xl mx-auto px-4 py-12 prose prose-invert prose-lg prose-headings:font-brutal prose-headings:uppercase prose-a:text-brutal-neon-cyan text-gray-300"
   >
