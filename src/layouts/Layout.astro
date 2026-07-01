@@ -28,14 +28,7 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
     <link rel="icon" type="image/x-icon" href="/iconCulture.ico" />
     <meta name="generator" content={Astro.generator} />
     <link rel="canonical" href={canonicalURL} />
-    
-    <!-- HilltopAds Native Banner Script -->
-    <script async="async" data-cfasync="false" src="https://pl28866886.effectivegatecpm.com/ef6e3b461a71809c904dce507871700c/invoke.js"></script>
 
-    <!-- Social Bar Ad Script -->
-    <script src="https://pl28929413.effectivegatecpm.com/d1/dd/00/d1dd00200c1df93aee192392fab2094a.js"></script>
-
-    
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website" />
     <meta property="og:url" content={Astro.url} />
@@ -58,11 +51,6 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 
     <main>
       <slot />
-      
-      <!-- Native Ad Banner -->
-      <div class="max-w-7xl mx-auto px-4 my-8 flex justify-center">
-        <div id="container-ef6e3b461a71809c904dce507871700c"></div>
-      </div>
     </main>
 
     

@@ -1,0 +1,170 @@
+---
+export const prerender = true;
+import AppLayout from '../layouts/AppLayout.astro';
+const updated = 'June 30, 2026';
+---
+
+<AppLayout
+  title="Terms of Service - CrackingWall"
+  description="The terms that govern your use of CrackingWall's creative tools and wallpaper gallery."
+>
+  <div class="legal-container">
+    <div class="content-wrapper">
+      <h1 class="glitch-title">Terms of Service</h1>
+
+      <div class="text-content">
+        <p class="updated">Last updated: {updated}</p>
+
+        <h2 class="first-heading">1. Agreement</h2>
+        <p>
+          These Terms of Service ("Terms") govern your access to and use of CrackingWall
+          (the "Site"), including its browser-based creative tools (ASCII Lab, Visual
+          Protocol, 3D Lab) and its curated wallpaper gallery. By accessing or using the
+          Site you agree to these Terms. If you do not agree, please do not use the Site.
+        </p>
+
+        <h2>2. The Service</h2>
+        <p>
+          CrackingWall provides free, browser-based creative tools and a gallery of
+          original tech-culture wallpapers. The creative tools run entirely in your
+          browser (client-side): the assets you paste, type, or upload are processed
+          locally on your device and are not uploaded to or stored on our servers unless
+          a specific feature explicitly states otherwise.
+        </p>
+
+        <h2>3. Acceptable Use</h2>
+        <p>You agree not to:</p>
+        <ul>
+          <li>use the Site for any unlawful purpose or in violation of any applicable law;</li>
+          <li>attempt to disrupt, overload, reverse-engineer, or gain unauthorized access to the Site or its infrastructure;</li>
+          <li>upload content you do not have the right to use, or content that infringes the rights of others;</li>
+          <li>use automated systems to scrape or redistribute Site content at scale.</li>
+        </ul>
+
+        <h2>4. Intellectual Property &amp; Licensing</h2>
+        <p>
+          The wallpapers, branding, interface, and original code of CrackingWall are the
+          property of CrackingWall and its creator, except where third-party components
+          are used under their own licenses. Wallpaper usage rights are described on our
+          <a href="/license">License</a> page. The 3D Lab tool is built on the open-source
+          <a href="https://github.com/renatoworks/3dsvg" rel="noopener noreferrer" target="_blank">3dsvg</a>
+          engine (MIT © Renato Costa); see the <a href="/license">License</a> page for details.
+        </p>
+
+        <h2>5. Your Content</h2>
+        <p>
+          You retain all rights to any file (e.g. an SVG) you provide to the creative
+          tools. Because processing happens in your browser, you are solely responsible
+          for the content you supply and for ensuring you have the rights to use it. Any
+          output you generate with the tools is yours to use, subject to any third-party
+          rights in the source material you supplied.
+        </p>
+
+        <h2>6. Advertising</h2>
+        <p>
+          The Site may display advertising provided by third parties, including Google
+          AdSense. Advertisers and ad networks may use cookies and similar technologies to
+          serve ads based on your prior visits. Our handling of advertising cookies is
+          described in our <a href="/privacy-policy">Privacy Policy</a>.
+        </p>
+
+        <h2>7. Disclaimers</h2>
+        <p>
+          The Site and its tools are provided "as is" and "as available", without
+          warranties of any kind, whether express or implied, including fitness for a
+          particular purpose. We do not warrant that the Site will be uninterrupted,
+          error-free, or secure.
+        </p>
+
+        <h2>8. Limitation of Liability</h2>
+        <p>
+          To the maximum extent permitted by law, CrackingWall and its creator shall not
+          be liable for any indirect, incidental, or consequential damages arising from
+          your use of, or inability to use, the Site or its tools.
+        </p>
+
+        <h2>9. Changes to These Terms</h2>
+        <p>
+          We may update these Terms from time to time. Material changes will be reflected
+          by updating the "Last updated" date above. Continued use of the Site after
+          changes take effect constitutes acceptance of the revised Terms.
+        </p>
+
+        <h2>10. Contact</h2>
+        <p>
+          Questions about these Terms? Reach out through our
+          <a href="/contact/">Contact</a> page.
+        </p>
+      </div>
+    </div>
+  </div>
+</AppLayout>
+
+<style>
+  .legal-container {
+    min-height: 80vh;
+    display: flex;
+    justify-content: center;
+    padding: 60px 20px;
+    background: #0a0a0f;
+    color: #f0f0f0;
+  }
+  .content-wrapper {
+    max-width: 800px;
+    width: 100%;
+  }
+  .glitch-title {
+    font-size: clamp(2.5rem, 5vw, 4rem);
+    font-weight: 900;
+    margin-bottom: 2rem;
+    color: #f0f0f0;
+    text-shadow: 2px 2px 0px #b026ff, -2px -2px 0px #00fff9;
+  }
+  .text-content {
+    background: #121218;
+    border: 1px solid #333;
+    padding: 40px;
+    border-radius: 8px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  }
+  h2 {
+    color: #00fff9;
+    font-size: 1.6rem;
+    margin-top: 2rem;
+    margin-bottom: 1rem;
+    font-weight: 800;
+  }
+  .first-heading {
+    margin-top: 0;
+  }
+  p {
+    line-height: 1.8;
+    color: #a0a0a0;
+    margin-bottom: 1.5rem;
+    font-size: 1.1rem;
+  }
+  .updated {
+    color: #666;
+    font-size: 0.95rem;
+    font-family: monospace;
+  }
+  a {
+    color: #00fff9;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+  a:hover {
+    color: #b026ff;
+  }
+  ul {
+    list-style-type: disc;
+    padding-left: 20px;
+    margin-bottom: 1.5rem;
+    color: #a0a0a0;
+  }
+  li {
+    margin-bottom: 0.5rem;
+    font-size: 1.1rem;
+    line-height: 1.6;
+  }
+</style>

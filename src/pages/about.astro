@@ -1,93 +1,130 @@
 ---
 export const prerender = true;
 import AppLayout from '../layouts/AppLayout.astro';
+
+const siteURL = Astro.site?.toString().replace(/\/$/, '') ?? 'https://crakingculturewallpaperr.xyz';
+
+// About-page structured data: identify the creator (E-E-A-T) + the page itself.
+const aboutSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'AboutPage',
+  name: 'About CrackingWall',
+  url: `${siteURL}/about/`,
+  mainEntity: {
+    '@type': 'Person',
+    name: 'FilipaoVfx',
+    url: 'https://github.com/FilipaoVfx',
+    jobTitle: 'Independent developer & digital artist',
+    description:
+      'Independent developer and digital artist behind CrackingWall — builder of its browser-based creative tools and curator of its tech-culture wallpaper gallery.',
+    sameAs: ['https://github.com/FilipaoVfx'],
+  },
+};
 ---
 
-<AppLayout title="About CrakingWall - Tech Culture Wallpapers" description="Learn more about CrakingWall, a niche platform for high-resolution cyberpunk and tech culture wallpapers.">
+<AppLayout
+  title="About CrackingWall — Who We Are & How We Work"
+  description="CrackingWall is an independent creative-tools studio and curated tech-culture gallery. Meet the creator, our editorial standards, and how we use AI transparently."
+>
+  <script type="application/ld+json" set:html={JSON.stringify(aboutSchema)} />
   <div class="about-container">
     <div class="content-wrapper">
-      <h1 class="glitch-title">About CrakingWall</h1>
-      
+      <h1 class="glitch-title">About CrackingWall</h1>
+
       <div class="text-content">
-        <h2 class="first-heading">What Is CrakingWall?</h2>
-        <p>
-          CrakingWall is a niche digital wallpaper platform focused on high-resolution cyberpunk, futuristic, glitch-inspired, and tech culture backgrounds.
-        </p>
-        <p>
-          The website provides curated premium wallpapers designed specifically for desktop environments, including 1080p, 1440p, 4K, and ultrawide monitors.
-        </p>
-        <p>
-          Unlike general wallpaper aggregators, CrakingWall concentrates on a cohesive tech aesthetic rooted in developer culture, science fiction atmospheres, and modern digital minimalism.
+        <p class="lead">
+          CrackingWall is an independent studio at the intersection of <strong>software and
+          visual culture</strong>. We build free, browser-based creative tools and curate a
+          focused gallery of tech-culture wallpapers — cyberpunk, futuristic, glitch, and
+          developer-culture aesthetics. Everything here is made with intent, not scraped or
+          mass-produced.
         </p>
 
-        <h2>What Makes CrakingWall Different?</h2>
+        <h2 class="first-heading">Who's Behind CrackingWall</h2>
         <p>
-          CrakingWall is not a wallpaper scraping site.
+          CrackingWall is a solo project by <strong>FilipaoVfx</strong> — an independent
+          developer and digital artist. The same person writes the code for the creative
+          tools, designs the visual identity, and curates every wallpaper in the gallery.
+          It is an author-led project, not an anonymous content farm.
         </p>
-        <p>All wallpapers are:</p>
+        <p>
+          You can see the engineering work in the open: the tools are built on original
+          code, and the 3D Lab engine is published as an open-source package. Reach the
+          creator directly on
+          <a href="https://github.com/FilipaoVfx" rel="noopener noreferrer" target="_blank">GitHub</a>
+          or through the <a href="/contact/">contact page</a>.
+        </p>
+
+        <h2>What We Actually Build</h2>
+        <p>
+          The heart of CrackingWall is a small suite of <strong>original, browser-based
+          creative tools</strong> — real software, written by us, that runs entirely on
+          your device:
+        </p>
         <ul>
-          <li><strong>Original digital artworks</strong></li>
-          <li>Curated for visual coherence</li>
-          <li>Optimized for desktop usability</li>
-          <li>Designed around a consistent futuristic identity</li>
+          <li><strong><a href="/ascii-lab/">ASCII Lab</a></strong> — convert images and video into ASCII art with tunable character sets and rendering logic.</li>
+          <li><strong><a href="/visual-protocol/">Visual Protocol</a></strong> — analyze and decode visuals into structured creative direction.</li>
+          <li><strong><a href="/3d-lab/">3D Lab</a></strong> — turn text or an SVG into an interactive 3D object you can sculpt and export (PNG/GLB), powered by our open-source <em>@filipaovfx/svg3d</em> package.</li>
+        </ul>
+        <p>
+          These tools are the original, hands-on value of the site — not a wrapper around
+          someone else's product. The wallpaper gallery complements them with a cohesive
+          visual world for the same audience.
+        </p>
+
+        <h2>Our Editorial Standards</h2>
+        <p>
+          We publish on a curation-first principle: fewer things, done well. Every
+          wallpaper is selected and refined against a written aesthetic manifesto tracking
+          movements like Code Brutalism, Retro-Hardware, and Technical Vaporwave. Concretely,
+          that means we:
+        </p>
+        <ul>
+          <li>curate for visual coherence rather than volume;</li>
+          <li>refine composition, contrast, and color for real desktop usability (1080p, 1440p, 4K, ultrawide);</li>
+          <li>reject anything that doesn't add to the collection's identity;</li>
+          <li>write our own descriptions and context instead of auto-generating filler.</li>
         </ul>
 
-        <p>The platform prioritizes:</p>
-        <ul>
-          <li>Clean composition with intentional chromatic dissonance (e.g., neon green on absolute black)</li>
-          <li>Strong contrast for readability and focus</li>
-          <li>Immersive digital atmospheres with layers of technical information</li>
-          <li>Art that suggests action — the narrative of the invisible observer working within the machine</li>
-        </ul>
-
-        <h2>Target Audience</h2>
-        <p>CrakingWall is built for:</p>
-        <ul>
-          <li>Developers</li>
-          <li>Designers</li>
-          <li>Gamers</li>
-          <li>Tech enthusiasts</li>
-          <li>Digital creators</li>
-          <li>Anyone who considers their desktop environment part of their identity.</li>
-        </ul>
-
-        <h2>Technical Optimization</h2>
-        <p>All wallpapers are optimized for:</p>
-        <ul>
-          <li>High-resolution desktop displays</li>
-          <li>Modern GPUs and large monitors</li>
-          <li>Dark-mode setups</li>
-          <li>Minimal visual noise</li>
-        </ul>
-        <p>Each image is exported in optimized formats to balance quality and performance.</p>
-
-        <h2>Digital Art Transparency & The Manifesto</h2>
+        <h2>How We Use AI — Transparently</h2>
         <p>
-          All images on CrakingWall are highly curated digital artworks, guided by our internal aesthetic manifesto.
+          We're open about our process: AI is one tool in our pipeline, not the product.
+          Some wallpapers begin as AI-assisted drafts, which are then <strong>curated,
+          composited, corrected, and refined by hand</strong> to fit our aesthetic
+          standards. The value we offer is the human editorial judgment and the original
+          software around the images — the selection, the refinement, and the interactive
+          tools you can use yourself.
         </p>
         <p>
-          They are assembled and refined stringently to tell the story of the "invisible observer" — the symbiotic relationship between human developers and the machines they build.
+          We don't publish raw, unreviewed AI output as if it were a finished product, and
+          we don't pretend a machine did nothing. What ships is what we consider good
+          enough to stand behind.
         </p>
+
+        <h2>Who It's For</h2>
         <p>
-          The platform operates as a curated gallery focusing on human editorial value, tracking movements such as Code Brutalism, Retro-Hardware, and Technical Vaporwave to provide the most cohesive technological culture desktop experience.
+          CrackingWall is built for developers, designers, gamers, and digital creators —
+          anyone who treats their desktop and their tools as part of their identity.
         </p>
 
         <div class="disclaimer-box">
-            <h3>⚠️ Content Clarification</h3>
-            <p>
-              CrakingWall features fictional digital artwork inspired by cyberpunk aesthetics, speculative technology, and digital environments.
-            </p>
-            <p class="mt-4">
-              All terminology related to systems, glitches, or digital disruption is purely artistic and metaphorical, celebrating the culture of software development and network engineering.
-            </p>
+          <h3>⚠️ Content Clarification</h3>
+          <p>
+            CrackingWall features fictional digital artwork inspired by cyberpunk
+            aesthetics, speculative technology, and digital environments.
+          </p>
+          <p class="mt-4">
+            All terminology related to systems, glitches, or digital disruption is purely
+            artistic and metaphorical — a celebration of software development and network
+            engineering culture.
+          </p>
         </div>
 
-        <h2>Mission Statement</h2>
+        <h2>Mission</h2>
         <p>
-          CrakingWall exists to provide high-quality, culture-driven tech wallpapers that transform digital workspaces into intentional environments.
-        </p>
-        <p>
-          The focus is depth, cohesion, and identity — not mass aggregation.
+          To turn digital workspaces into intentional environments — through original
+          creative tools and a curated visual world built on depth, cohesion, and identity,
+          not mass aggregation.
         </p>
       </div>
     </div>
@@ -122,13 +159,19 @@ import AppLayout from '../layouts/AppLayout.astro';
     border: 1px solid #333;
     padding: 40px;
     border-radius: 8px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  }
+
+  .lead {
+    font-size: 1.25rem;
+    color: #d0d0d0;
+    line-height: 1.7;
   }
 
   h2 {
     color: #00fff9;
     font-size: 1.8rem;
-    margin-top: 2rem;
+    margin-top: 2.5rem;
     margin-bottom: 1rem;
     font-weight: 800;
   }
@@ -142,6 +185,16 @@ import AppLayout from '../layouts/AppLayout.astro';
 
   strong {
     color: #f0f0f0;
+  }
+
+  a {
+    color: #00fff9;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  a:hover {
+    color: #b026ff;
   }
 
   ul {

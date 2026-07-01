@@ -16,6 +16,39 @@ const {
 } = Astro.props;
 
 const canonicalURL = new URL(Astro.url.pathname, Astro.site);
+const siteURL = Astro.site?.toString().replace(/\/$/, '') ?? 'https://crakingculturewallpaperr.xyz';
+
+// Site-wide structured data (Organization + WebSite) for SEO / E-E-A-T signals.
+const structuredData = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'Organization',
+      '@id': `${siteURL}/#organization`,
+      name: 'CrackingWall',
+      alternateName: 'CrakingWall',
+      url: `${siteURL}/`,
+      logo: {
+        '@type': 'ImageObject',
+        url: `${siteURL}/og-image.webp`,
+      },
+      description:
+        'CrackingWall is an independent creative-tools studio and curated gallery for tech-culture visuals — browser-based tools (ASCII Lab, Visual Protocol, 3D Lab) plus original cyberpunk and developer-culture wallpapers.',
+      foundingDate: '2024',
+      sameAs: ['https://github.com/FilipaoVfx'],
+    },
+    {
+      '@type': 'WebSite',
+      '@id': `${siteURL}/#website`,
+      url: `${siteURL}/`,
+      name: 'CrackingWall',
+      description:
+        'Free, browser-based creative tools and a curated gallery of tech-culture wallpapers.',
+      inLanguage: 'en',
+      publisher: { '@id': `${siteURL}/#organization` },
+    },
+  ],
+};
 ---
 
 <!doctype html>
@@ -30,11 +63,8 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
     <meta name="generator" content={Astro.generator} />
     <link rel="canonical" href={canonicalURL} />
 
-    <!-- HilltopAds Native Banner Script -->
-    <script async="async" data-cfasync="false" src="https://pl28866886.effectivegatecpm.com/ef6e3b461a71809c904dce507871700c/invoke.js"></script>
-
-    <!-- Social Bar Ad Script -->
-    <script src="https://pl28929413.effectivegatecpm.com/d1/dd/00/d1dd00200c1df93aee192392fab2094a.js"></script>
+    <!-- Site-wide structured data (Organization + WebSite) -->
+    <script type="application/ld+json" set:html={JSON.stringify(structuredData)} />
 
     <!-- Open Graph -->
     <meta property="og:type" content="website" />
@@ -53,11 +83,6 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
       <AppTopBar client:load />
       <main class="px-6 py-8 md:px-10">
         <slot />
-
-        <!-- Native Ad Banner -->
-        <div class="mx-auto my-8 flex max-w-5xl justify-center">
-          <div id="container-ef6e3b461a71809c904dce507871700c"></div>
-        </div>
       </main>
 
       <footer class="border-t-2 border-white/10 px-6 py-10 text-center md:px-10">
@@ -72,6 +97,7 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
           <a href="/contact/" class="text-gray-400 transition-colors hover:text-brutal-neon-yellow">Contact</a>
           <a href="/license" class="text-gray-400 transition-colors hover:text-brutal-neon-green">License</a>
           <a href="/privacy-policy" class="text-gray-400 transition-colors hover:text-brutal-neon-green">Privacy</a>
+          <a href="/terms" class="text-gray-400 transition-colors hover:text-brutal-neon-green">Terms</a>
         </div>
         <div class="mx-auto mb-4 h-1 w-20 bg-brutal-neon-cyan"></div>
         <p class="font-mono text-xs text-gray-500">
