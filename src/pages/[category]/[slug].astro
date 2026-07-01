@@ -48,9 +48,9 @@ const imageObjectSchema = {
   height: { '@type': 'QuantitativeValue', value: wallpaper.height || 2160 },
   encodingFormat: `image/${wallpaper.format || 'jpeg'}`,
   keywords: wallpaper.tags?.join(', ') || wallpaper.category,
-  license: 'https://crakingculturewallpaperr.xyz/license',
-  acquireLicensePage: 'https://crakingculturewallpaperr.xyz/license',
-  creator: { '@type': 'Organization', name: 'CrackingWall', url: 'https://crakingculturewallpaperr.xyz' },
+  license: 'https://pixelatmos.com/license',
+  acquireLicensePage: 'https://pixelatmos.com/license',
+  creator: { '@type': 'Organization', name: 'CrackingWall', url: 'https://pixelatmos.com' },
   interactionStatistic: [
     { '@type': 'InteractionCounter', interactionType: 'https://schema.org/DownloadAction', userInteractionCount: wallpaper.downloads || 0 },
     { '@type': 'InteractionCounter', interactionType: 'https://schema.org/LikeAction', userInteractionCount: wallpaper.likes || 0 },
@@ -61,8 +61,8 @@ const breadcrumbSchema = {
   '@context': 'https://schema.org',
   '@type': 'BreadcrumbList',
   itemListElement: [
-    { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://crakingculturewallpaperr.xyz/' },
-    { '@type': 'ListItem', position: 2, name: wallpaper.category, item: `https://crakingculturewallpaperr.xyz/${wallpaper.category.toLowerCase()}/` },
+    { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://pixelatmos.com/' },
+    { '@type': 'ListItem', position: 2, name: wallpaper.category, item: `https://pixelatmos.com/${wallpaper.category.toLowerCase()}/` },
     { '@type': 'ListItem', position: 3, name: wallpaper.title },
   ],
 };

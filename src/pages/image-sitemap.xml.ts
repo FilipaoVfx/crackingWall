@@ -3,7 +3,7 @@ export const prerender = true;
 import type { APIRoute } from 'astro';
 import { WallpaperService } from '../services/wallpaperService';
 
-const SITE = 'https://crakingculturewallpaperr.xyz';
+const SITE = 'https://pixelatmos.com';
 
 export const GET: APIRoute = async () => {
   const wallpapers = await WallpaperService.getAllWallpapers();

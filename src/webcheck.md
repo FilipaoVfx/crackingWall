@@ -184,7 +184,7 @@ Contenido:
 Contact: mailto:your@email.com
 Expires: 2027-01-01T00:00:00.000Z
 Preferred-Languages: en, es
-Canonical: https://crakingculturewallpaperr.xyz/.well-known/security.txt
+Canonical: https://pixelatmos.com/.well-known/security.txt
 ```
 
 ---
@@ -222,7 +222,7 @@ Si no existe → problema.
 import sitemap from '@astrojs/sitemap';
 
 export default defineConfig({
-  site: 'https://crakingculturewallpaperr.xyz',
+  site: 'https://pixelatmos.com',
   integrations: [sitemap()]
 });
 ```
