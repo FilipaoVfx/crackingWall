@@ -64,10 +64,10 @@ El `<head>` cargaba **HilltopAds** (native banner + *social bar* / pop-under de 
 
 ### P1 — Antes de solicitar AdSense
 - [x] **Contenido con valor único (tanda 1):** 3 guías originales de primera mano de las tools — [3D Lab](/blog/svg-to-3d-browser-guide/), [ASCII Lab](/blog/faithful-ascii-art-guide/), [Visual Protocol](/blog/visual-protocol-creative-direction/). Con `BlogPosting` schema, autor, fechas reales, inter-linking tools↔blog. *(Añadir más con el tiempo; el blog venía fino — 3 posts genéricos — para el estándar del notebook.)*
-- [ ] 🟠 **Origen de las imágenes de wallpapers (autenticidad):** `src/content/wallpapers.json` apunta a **Unsplash** (stock hotlinkeado), lo que contradice el relato de "artworks originales" y parece agregador (señal MFA). Decisión del dueño: sustituir por arte propio/AI-curado y **auto-alojado**, o reencuadrar honestamente la galería. Alto impacto en EEAT.
-- [ ] **Personalizar EEAT real:** nombre real/alias público + foto/avatar + links sociales verificables del creador (hoy usa el handle GitHub como base). Cuanto más real, mejor.
-- [ ] **Descripciones originales por wallpaper** (no autogeneradas): contexto, técnica, inspiración → propósito editorial. *(Depende de resolver el origen de imágenes.)*
-- [ ] **Revisar densidad/calidad de la galería:** quitar lo que no aporte; que cada imagen tenga propósito.
+- [x] 🟢 **Origen de las imágenes de wallpapers (autenticidad):** Unsplash **eliminado por completo**. La galería son ahora **8 wallpapers originales autoalojados**, generados por código propio (arte generativo vectorial → WebP 4K vía `scripts/generate-wallpapers.mjs`). 0 stock en todo el sitio (incl. heroes de blog). Coherente con la identidad "estudio de creative tools" → EEAT fuerte.
+- [x] **EEAT del autor (avatar):** avatar del creador autoalojado + `Person` schema con `image` (ver PR #14). *(Falta opcional: nombre real/redes verificables si el dueño lo desea.)*
+- [x] **Descripciones originales por wallpaper:** cada pieza nueva trae título + descripción propia (no autogenerada) explicando técnica/origen.
+- [ ] **Revisar densidad/calidad de la galería:** con el tiempo, ampliar el set original (8 es un mínimo digno; más variedad ayuda) y refinar las piezas más flojas (`lattice-city`, `deep-void`).
 - [x] Verificar que **no quedan otras redes** de anuncios/pop-ups — HilltopAds eliminado por completo (ver §3).
 
 ### P2 — SEO técnico
@@ -87,11 +87,11 @@ El `<head>` cargaba **HilltopAds** (native banner + *social bar* / pop-under de 
 
 ## 6. Checklist de "listo para solicitar"
 
-- [ ] Sin redes de anuncios intrusivas activas.
-- [ ] Legales completas: About (EEAT), Contact, Privacy (con AdSense), Terms, License.
-- [ ] Autor real e identificable.
-- [ ] ≥ ~15–20 piezas de contenido con valor único (posts/guías + wallpapers con descripción propia).
-- [ ] Navegación clara, sin enlaces rotos, diseño consistente.
+- [x] Sin redes de anuncios intrusivas activas.
+- [x] Legales completas: About (EEAT), Contact, Privacy (con AdSense), Terms, License.
+- [~] Autor identificable (handle + avatar); falta nombre real/redes si se desea.
+- [~] Contenido con valor único: 6 posts (3 guías de tools de primera mano) + 8 wallpapers originales con descripción propia = 14 piezas. Objetivo ~15–20: casi.
+- [ ] Navegación clara, sin enlaces rotos, diseño consistente. *(Pendiente: URLs de categoría con espacio, p. ej. `/tech culture/` → slugificar a `/tech-culture/`.)*
 - [ ] Dominio final decidido y estable.
 - [ ] Structured data válido (probar en Rich Results Test).
 - [ ] Sitemap enviado en Search Console; sin errores de indexación graves.
