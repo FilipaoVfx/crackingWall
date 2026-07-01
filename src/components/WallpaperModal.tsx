@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { X, Download, Heart, ExternalLink } from 'lucide-react';
 import { Wallpaper } from '../types';
 import { BrutalButton } from './BrutalButton';
+import { wallpaperPath } from '../utils/wallpaper';
 
 interface WallpaperModalProps {
   wallpaper: Wallpaper | null;
@@ -114,7 +115,7 @@ export const WallpaperModal: React.FC<WallpaperModalProps> = ({
                     </BrutalButton>
 
                     <a
-                      href={`/${wallpaper.category.toLowerCase()}/${wallpaper.title.toLowerCase().replace(/[^a-z0-9]+/g, '-')}-${wallpaper.id}/`}
+                      href={wallpaperPath(wallpaper)}
                       className="w-full inline-block"
                     >
                       <BrutalButton variant="secondary" className="w-full">
