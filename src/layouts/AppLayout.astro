@@ -18,6 +18,10 @@ const {
 const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 const siteURL = Astro.site?.toString().replace(/\/$/, '') ?? 'https://crakingculturewallpaperr.xyz';
 
+// Google Search Console verification. Set PUBLIC_GOOGLE_SITE_VERIFICATION in the
+// Cloudflare env to render the meta tag (leave unset to omit it).
+const googleSiteVerification = import.meta.env.PUBLIC_GOOGLE_SITE_VERIFICATION;
+
 // Site-wide structured data (Organization + WebSite) for SEO / E-E-A-T signals.
 const structuredData = {
   '@context': 'https://schema.org',
@@ -56,6 +60,7 @@ const structuredData = {
   <head>
     <meta charset="UTF-8" />
     <meta name="description" content={description} />
+    {googleSiteVerification && <meta name="google-site-verification" content={googleSiteVerification} />}
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1028294908787451"
      crossorigin="anonymous"></script>

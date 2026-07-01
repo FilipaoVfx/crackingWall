@@ -1,14 +1,34 @@
 ---
 export const prerender = true;
 import AppLayout from '../../layouts/AppLayout.astro';
+
+const siteURL = Astro.site?.toString().replace(/\/$/, '') ?? 'https://crakingculturewallpaperr.xyz';
+const title = 'Best Cyberpunk Wallpapers for Developers';
+const description =
+  'A curated pick of high-resolution cyberpunk wallpapers for developers — why the aesthetic aids focus, what to look for in a coding backdrop, and how to pair one with your setup.';
+const published = '2026-05-15';
+const url = `${siteURL}/blog/best-cyberpunk-wallpapers-developers/`;
+const schema = {
+  '@context': 'https://schema.org',
+  '@type': 'BlogPosting',
+  headline: title,
+  description,
+  datePublished: published,
+  dateModified: published,
+  inLanguage: 'en',
+  author: { '@type': 'Person', name: 'FilipaoVfx', url: 'https://github.com/FilipaoVfx' },
+  publisher: { '@type': 'Organization', name: 'CrackingWall', logo: { '@type': 'ImageObject', url: `${siteURL}/og-image.webp` } },
+  mainEntityOfPage: { '@type': 'WebPage', '@id': url },
+};
 ---
 
-<AppLayout title="Best Cyberpunk Wallpapers for Developers - CrakingWall" description="Curated high-resolution cyberpunk digital art for software developers.">
+<AppLayout title={`${title} — CrackingWall`} description={description}>
+  <script type="application/ld+json" set:html={JSON.stringify(schema)} />
   <article class="max-w-4xl mx-auto px-4 py-12 prose prose-invert prose-lg prose-headings:font-brutal prose-headings:uppercase prose-a:text-brutal-neon-cyan">
     <a href="/blog/" class="not-prose inline-block font-mono text-sm text-gray-500 hover:text-white mb-8"><- Back to Transmissions</a>
-    
+
     <h1 class="text-4xl md:text-6xl font-black mb-4 !text-brutal-neon-cyan">Best Cyberpunk Wallpapers for Developers</h1>
-    <div class="font-mono text-sm text-gray-400 mb-12 border-b border-gray-800 pb-4">Published: {new Date().toLocaleDateString()}</div>
+    <div class="not-prose font-mono text-sm text-gray-400 mb-12 border-b border-gray-800 pb-4">By <a href="/about/" class="text-brutal-neon-cyan">FilipaoVfx</a> · Published May 15, 2026</div>
     
     <p class="lead text-xl text-gray-300 border-l-4 border-brutal-neon-pink pl-4">
       As developers, our workspace is our second home. We spend countless hours staring at our screens, making the aesthetics of our digital environment crucial for focus and inspiration.
