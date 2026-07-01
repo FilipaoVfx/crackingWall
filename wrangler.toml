@@ -24,3 +24,19 @@ watch_dir = "src"
 #   - SUPABASE_SERVICE_ROLE_KEY
 # Only non-secret vars below:
 PUBLIC_SUPABASE_URL = "https://cauitdpbsedajkuodsaf.supabase.co"
+
+# Workers Observability — keeps the dashboard toggle in sync so deploys don't
+# reset it. Top-level `enabled = true` is the master switch (persists logs).
+# head_sampling_rate = 1 → log 100% of requests.
+[observability]
+enabled = true
+head_sampling_rate = 1
+
+[observability.logs]
+enabled = true
+invocation_logs = true
+head_sampling_rate = 1
+
+[observability.traces]
+enabled = false
+head_sampling_rate = 1
