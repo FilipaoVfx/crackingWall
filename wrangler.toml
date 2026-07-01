@@ -8,6 +8,10 @@ main = "./dist/_worker.js"
 
 [assets]
 directory = "./dist"
+# The Astro Cloudflare adapter's worker serves static fallbacks (e.g. 404.html)
+# via env.ASSETS. Without this binding env.ASSETS is undefined, so worker-handled
+# not-found routes throw → generic 500 instead of the 404 page.
+binding = "ASSETS"
 
 [build]
 command = "npm ci && npm run build"
