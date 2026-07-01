@@ -1,14 +1,34 @@
 ---
 export const prerender = true;
 import AppLayout from '../../layouts/AppLayout.astro';
+
+const siteURL = Astro.site?.toString().replace(/\/$/, '') ?? 'https://crakingculturewallpaperr.xyz';
+const title = 'The Ultimate Terminal Setup Aesthetic Guide';
+const description =
+  'A practical guide to a beautiful terminal: choosing an emulator, transparency and blur, developer fonts, and color schemes that stay readable — with tips for pairing it with a wallpaper.';
+const published = '2026-06-05';
+const url = `${siteURL}/blog/terminal-setup-aesthetic-guide/`;
+const schema = {
+  '@context': 'https://schema.org',
+  '@type': 'BlogPosting',
+  headline: title,
+  description,
+  datePublished: published,
+  dateModified: published,
+  inLanguage: 'en',
+  author: { '@type': 'Person', name: 'FilipaoVfx', url: 'https://github.com/FilipaoVfx' },
+  publisher: { '@type': 'Organization', name: 'CrackingWall', logo: { '@type': 'ImageObject', url: `${siteURL}/og-image.webp` } },
+  mainEntityOfPage: { '@type': 'WebPage', '@id': url },
+};
 ---
 
-<AppLayout title="The Ultimate Terminal Setup Aesthetic Guide - CrakingWall" description="A comprehensive guide to styling your terminal and aligning it with cyberpunk and synthwave themes.">
+<AppLayout title={`${title} — CrackingWall`} description={description}>
+  <script type="application/ld+json" set:html={JSON.stringify(schema)} />
   <article class="max-w-4xl mx-auto px-4 py-12 prose prose-invert prose-lg prose-headings:font-brutal prose-headings:uppercase prose-a:text-brutal-neon-cyan text-gray-300">
     <a href="/blog/" class="not-prose inline-block font-mono text-sm text-gray-500 hover:text-white mb-8"><- Back to Transmissions</a>
-    
+
     <h1 class="text-4xl md:text-6xl font-black mb-4 !text-brutal-neon-pink">The Ultimate Terminal Setup Aesthetic Guide</h1>
-    <div class="font-mono text-sm text-gray-400 mb-12 border-b border-gray-800 pb-4">Published: {new Date().toLocaleDateString()}</div>
+    <div class="not-prose font-mono text-sm text-gray-400 mb-12 border-b border-gray-800 pb-4">By <a href="/about/" class="text-brutal-neon-cyan">FilipaoVfx</a> · Published June 5, 2026</div>
     
     <p class="lead text-xl border-l-4 border-brutal-neon-cyan pl-4">
       Your terminal is your most powerful tool. It's the gateway to the machine. But just because it's text-based doesn't mean it has to look like a default installation from 1995.
