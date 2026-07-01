@@ -66,17 +66,6 @@ const structuredData = {
     <!-- Site-wide structured data (Organization + WebSite) -->
     <script type="application/ld+json" set:html={JSON.stringify(structuredData)} />
 
-    <!--
-      NOTE (AdSense readiness): The HilltopAds "Native Banner" and "Social Bar"
-      (pop-under / interstitial) scripts were disabled. Google AdSense policy
-      rejects sites running intrusive pop-under / social-bar networks, and their
-      presence is a strong "Made-for-AdSense" signal. Re-enable ONLY after AdSense
-      approval, and only if the placements are non-intrusive & policy-compliant.
-
-      <script async="async" data-cfasync="false" src="https://pl28866886.effectivegatecpm.com/ef6e3b461a71809c904dce507871700c/invoke.js"></script>
-      <script src="https://pl28929413.effectivegatecpm.com/d1/dd/00/d1dd00200c1df93aee192392fab2094a.js"></script>
-    -->
-
     <!-- Open Graph -->
     <meta property="og:type" content="website" />
     <meta property="og:url" content={Astro.url} />
@@ -94,8 +83,6 @@ const structuredData = {
       <AppTopBar client:load />
       <main class="px-6 py-8 md:px-10">
         <slot />
-
-        <!-- Native Ad Banner (HilltopAds) disabled for AdSense readiness — see head note. -->
       </main>
 
       <footer class="border-t-2 border-white/10 px-6 py-10 text-center md:px-10">

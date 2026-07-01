@@ -34,21 +34,19 @@ CrackingWall combina **IA (wallpapers/tools) + herramientas creativas originales
 | Privacy Policy | ⚠️ Débil | No divulgaba **AdSense / cookies de terceros** (requisito duro) |
 | EEAT / autor | ❌ | About sin persona/autor identificable |
 | Structured data site-wide | ❌ | Solo en 3 páginas; sin Organization/WebSite global |
-| **Redes de anuncios en conflicto** | 🔴 **Crítico** | HilltopAds *native banner* + *social bar* (pop-under) en el `<head>` |
+| **Redes de anuncios en conflicto** | ✅ Eliminado | HilltopAds *native banner* + *social bar* (pop-under) retirados por completo |
 
 ---
 
-## 3. 🔴 Bloqueador crítico: redes de anuncios agresivas
+## 3. ✅ Resuelto: redes de anuncios agresivas eliminadas
 
 El `<head>` cargaba **HilltopAds** (native banner + *social bar* / pop-under de `effectivegatecpm.com`). Para AdSense esto es de los peores anti-patrones:
 
 - Google **rechaza** sitios con anuncios **intrusivos** (pop-under, social bar, interstitials no conformes).
 - Es una **señal fuerte de MFA** — exactamente el perfil que el notebook dice que Google penaliza.
-- Puede provocar **rechazo directo** aunque todo lo demás esté bien.
+- Podía provocar **rechazo directo** aunque todo lo demás estuviera bien.
 
-**Acción tomada (en esta rama):** ambos scripts + el contenedor del banner quedaron **comentados** en `AppLayout.astro`, con nota para reactivarlos **solo tras la aprobación** y solo si son no intrusivos.
-
-> ⚠️ **Decisión del dueño:** esto afecta ingresos actuales. Es 100% reversible (está en rama, sin merge). Recomendación fuerte: mantener desactivado durante toda la revisión de AdSense. Si prefieres conservar HilltopAds, hay que asumir un riesgo alto de rechazo.
+**Acción tomada (por decisión del dueño):** el proveedor se **eliminó por completo** del repo — scripts, contenedor del banner en `AppLayout.astro` y en el `Layout.astro` legacy, y los dominios `effectivegatecpm.com` del CSP en `middleware.ts`. AdSense queda como única red de anuncios.
 
 ---
 
