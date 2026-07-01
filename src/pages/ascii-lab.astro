@@ -2,6 +2,15 @@
 export const prerender = true;
 import AppLayout from '../layouts/AppLayout.astro';
 import { AsciiLab } from '../features/ascii-video';
+import FaqSection from '../components/FaqSection.astro';
+
+const faqs = [
+  { q: 'Is ASCII Lab free?', a: 'Yes — it is free and browser-based, with no account or signup required.' },
+  { q: 'Do my videos or images upload anywhere?', a: 'No. Conversion runs entirely in your browser; your media is processed locally and never uploaded to a server.' },
+  { q: 'What can I convert?', a: 'Images and video. You control the character set, FPS and resolution, with a real-time preview.' },
+  { q: 'What formats can I export?', a: 'Animated GIF, MP4 video, or self-contained HTML.' },
+  { q: 'How do I get a result faithful to the original?', a: 'Use a high-contrast source and pick a character ramp that matches its tones. Our guide "Making Faithful ASCII Art" walks through the settings.' },
+];
 
 const title = "ASCII Lab — Convert Video to ASCII Art | CrackingWall";
 const description = "Transform any video into animated ASCII art in your browser. Customize character sets, FPS and resolution. Export as GIF, MP4 or HTML. Free experimental tool.";
@@ -42,6 +51,8 @@ const canonicalUrl = "https://pixelatmos.com/ascii-lab/";
   <section class="ascii-tool-section">
     <AsciiLab client:only="react" />
   </section>
+
+  <FaqSection items={faqs} />
 </AppLayout>
 
 <style>
