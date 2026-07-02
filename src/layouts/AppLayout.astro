@@ -1,6 +1,7 @@
 ---
 import Sidebar from '../components/layout/Sidebar.astro';
 import { AppTopBar } from '../components/layout/AppTopBar';
+import ConsentBanner from '../components/ConsentBanner.astro';
 import '../index.css';
 
 interface Props {
@@ -65,6 +66,32 @@ const structuredData = {
     {noindex && <meta name="robots" content="noindex, follow" />}
     {googleSiteVerification && <meta name="google-site-verification" content={googleSiteVerification} />}
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <!-- Google Consent Mode v2 — MUST run before AdSense. Everything denied by
+         default until the user chooses (EEA/UK-safe); a stored choice is applied
+         immediately. Banner UI is in <ConsentBanner />. -->
+    <script is:inline>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){ dataLayer.push(arguments); }
+      gtag('consent', 'default', {
+        ad_storage: 'denied',
+        ad_user_data: 'denied',
+        ad_personalization: 'denied',
+        analytics_storage: 'denied',
+        wait_for_update: 500,
+      });
+      try {
+        if (localStorage.getItem('cw-consent') === 'granted') {
+          gtag('consent', 'update', {
+            ad_storage: 'granted',
+            ad_user_data: 'granted',
+            ad_personalization: 'granted',
+            analytics_storage: 'granted',
+          });
+        }
+      } catch (e) {}
+    </script>
+
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1028294908787451"
      crossorigin="anonymous"></script>
     <link rel="icon" type="image/x-icon" href="/iconCulture.ico" />
@@ -101,6 +128,7 @@ const structuredData = {
           <a href="/license" class="text-gray-400 transition-colors hover:text-brutal-neon-green">License</a>
           <a href="/privacy-policy" class="text-gray-400 transition-colors hover:text-brutal-neon-green">Privacy</a>
           <a href="/terms" class="text-gray-400 transition-colors hover:text-brutal-neon-green">Terms</a>
+          <button type="button" onclick="window.cwOpenConsent&&window.cwOpenConsent()" class="font-brutal text-xs font-black uppercase tracking-wider text-gray-400 transition-colors hover:text-brutal-neon-cyan">Cookie preferences</button>
         </div>
         <div class="mx-auto mb-4 h-1 w-20 bg-brutal-neon-cyan"></div>
         <p class="font-mono text-xs text-gray-500">
@@ -108,6 +136,8 @@ const structuredData = {
         </p>
       </footer>
     </div>
+
+    <ConsentBanner />
   </body>
 </html>
 
