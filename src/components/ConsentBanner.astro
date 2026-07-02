@@ -1,0 +1,74 @@
+---
+// Cookie consent banner wired to Google Consent Mode v2 (defaults set in the
+// <head> before AdSense). Stores the choice in localStorage; exposes
+// window.cwOpenConsent() so a "Cookie preferences" link can reopen it.
+---
+
+<div
+  id="cw-consent"
+  class="fixed inset-x-0 bottom-0 z-[9999] hidden border-t-2 border-brutal-neon-cyan bg-[#0b0b12]/98 px-4 py-4 backdrop-blur md:px-8"
+  role="dialog"
+  aria-live="polite"
+  aria-label="Cookie consent"
+>
+  <div class="mx-auto flex max-w-5xl flex-col gap-3 md:flex-row md:items-center md:justify-between">
+    <p class="font-mono text-[12px] leading-relaxed text-gray-300">
+      We use cookies for advertising (Google AdSense) and to understand site usage.
+      You can accept or reject non-essential cookies. See our
+      <a href="/privacy-policy/" class="text-brutal-neon-cyan underline underline-offset-2">Privacy Policy</a>.
+    </p>
+    <div class="flex shrink-0 gap-2">
+      <button
+        id="cw-consent-reject"
+        class="border-2 border-white/25 px-4 py-2 font-brutal text-xs font-black uppercase tracking-wide text-gray-300 transition-colors hover:border-white hover:text-white"
+      >
+        Reject
+      </button>
+      <button
+        id="cw-consent-accept"
+        class="border-2 border-black bg-brutal-neon-cyan px-4 py-2 font-brutal text-xs font-black uppercase tracking-wide text-black shadow-brutal-sm transition-transform hover:-translate-y-0.5"
+      >
+        Accept all
+      </button>
+    </div>
+  </div>
+</div>
+
+<script is:inline>
+  (function () {
+    var KEY = 'cw-consent';
+    var el = document.getElementById('cw-consent');
+    if (!el) return;
+
+    function gtag() { window.dataLayer = window.dataLayer || []; window.dataLayer.push(arguments); }
+
+    function apply(granted) {
+      var v = granted ? 'granted' : 'denied';
+      gtag('consent', 'update', {
+        ad_storage: v,
+        ad_user_data: v,
+        ad_personalization: v,
+        analytics_storage: v,
+      });
+    }
+
+    function hide() { el.classList.add('hidden'); }
+    function show() { el.classList.remove('hidden'); }
+
+    function choose(granted) {
+      try { localStorage.setItem(KEY, granted ? 'granted' : 'denied'); } catch (e) {}
+      apply(granted);
+      hide();
+    }
+
+    document.getElementById('cw-consent-accept').addEventListener('click', function () { choose(true); });
+    document.getElementById('cw-consent-reject').addEventListener('click', function () { choose(false); });
+
+    // Let a footer link reopen the choice.
+    window.cwOpenConsent = show;
+
+    var stored = null;
+    try { stored = localStorage.getItem(KEY); } catch (e) {}
+    if (stored !== 'granted' && stored !== 'denied') show();
+  })();
+</script>
