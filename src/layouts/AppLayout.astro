@@ -94,6 +94,27 @@ const structuredData = {
 
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1028294908787451"
      crossorigin="anonymous"></script>
+
+    <!-- Microsoft Clarity — loaded ONLY after analytics consent (see ConsentBanner).
+         cwLoadClarity() is idempotent; called on load if consent is stored, or by
+         the banner on "Accept". Not loaded on reject/undecided. -->
+    <script is:inline>
+      (function () {
+        var loaded = false;
+        window.cwLoadClarity = function () {
+          if (loaded) return;
+          loaded = true;
+          (function (c, l, a, r, i, t, y) {
+            c[a] = c[a] || function () { (c[a].q = c[a].q || []).push(arguments) };
+            t = l.createElement(r); t.async = 1; t.src = "https://www.clarity.ms/tag/" + i;
+            y = l.getElementsByTagName(r)[0]; y.parentNode.insertBefore(t, y);
+          })(window, document, "clarity", "script", "xfwk39u366");
+        };
+        try {
+          if (localStorage.getItem('cw-consent') === 'granted') window.cwLoadClarity();
+        } catch (e) {}
+      })();
+    </script>
     <link rel="icon" type="image/x-icon" href="/iconCulture.ico" />
     <meta name="generator" content={Astro.generator} />
     <link rel="canonical" href={canonicalURL} />

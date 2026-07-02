@@ -9,10 +9,10 @@ export const onRequest = defineMiddleware(async (_context, next) => {
     [
       "default-src 'self'",
       "img-src 'self' data: https: blob:",
-      "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://pagead2.googlesyndication.com https://www.googletagmanager.com",
+      "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://pagead2.googlesyndication.com https://www.googletagmanager.com https://www.clarity.ms",
       "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
       "font-src 'self' https://fonts.gstatic.com",
-      "connect-src 'self' https://cauitdpbsedajkuodsaf.supabase.co https://pagead2.googlesyndication.com https://openrouter.ai",
+      "connect-src 'self' https://cauitdpbsedajkuodsaf.supabase.co https://pagead2.googlesyndication.com https://openrouter.ai https://*.clarity.ms https://c.bing.com",
       "frame-src 'self' https://pagead2.googlesyndication.com",
       "object-src 'none'",
       "base-uri 'self'",
