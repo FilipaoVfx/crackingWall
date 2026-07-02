@@ -1,101 +1,52 @@
-# CrackingWall - Modern Wallpapers Platform
+# CrackingWall
 
-## 📝 Project Report (English)
+**Creative tools + tech-culture wallpapers.** Live at **[pixelatmos.com](https://pixelatmos.com)**.
 
-### 🚀 Overview
-CrackingWall is a modern web application for discovering and downloading high-quality wallpapers. Built with React 19, TypeScript, and Supabase, it offers a seamless user experience with features like authentication, search, and category filtering.
+CrackingWall is an independent studio site: a small suite of original, browser-based
+creative tools (ASCII Lab, Visual Protocol, 3D Lab) plus a curated gallery of
+tech-culture wallpapers.
 
-### 🛠️ Technical Stack
-- **Frontend**: React 19, TypeScript, Vite
-- **Styling**: CSS Modules, Framer Motion
-- **Backend**: Supabase (Authentication, Database, Storage)
-- **Routing**: React Router v7
-- **UI Components**: Custom components with Lucide Icons
-- **Build Tool**: Vite
+## Tech stack
+- **[Astro 5](https://astro.build)** (`output: 'server'`) deployed on **Cloudflare Workers** (`@astrojs/cloudflare`)
+- **React 19** islands for the interactive tools
+- **Tailwind CSS** (neobrutalism design tokens)
+- **Supabase** — Postgres (wallpapers), Storage (images), Auth
+- **OpenRouter** — vision LLM for Visual Protocol
+- Analytics/ads: Google AdSense + Microsoft Clarity (both consent-gated)
 
-### 📂 Project Structure
+## Quick start
+```bash
+npm install
+cp .env.example .env      # fill in values
+npm run dev               # http://localhost:4321
 ```
-src/
-├── components/     # Reusable UI components
-├── pages/         # Page components
-├── services/      # API and service layers
-├── types/         # TypeScript type definitions
-├── utils/         # Utility functions
-└── lib/           # Third-party library configurations
+See **[CONTRIBUTING.md](CONTRIBUTING.md)** for full setup, scripts, and workflow.
+
+## Project structure
+```
+src/            # app source (pages, layouts, components, features, services, lib, utils)
+docs/           # documentation
+  ├─ architecture/   # editable Excalidraw diagrams (runtime, deploy, tools)
+  ├─ product/        # product docs (3D Lab, aesthetic manifesto)
+  └─ seo/            # AdSense/SEO plan + GEO reports
+db/             # database schema
+public/         # static assets (ads.txt, robots.txt, favicon, avatar)
 ```
 
-### 🌟 Key Features
-- 🔐 User authentication (Sign In/Up)
-- 🔍 Advanced search with filters
-- 🏷️ Categorized wallpapers
-- ⚡ Optimized image loading
-- 📱 Responsive design
-- 🔄 Real-time updates with Supabase
+## Creative tools
+| Tool | What it does | Runs |
+|------|--------------|------|
+| **3D Lab** (`/3d-lab`) | Text/SVG → interactive 3D (sculpt, export PNG/GLB) | 100% in-browser |
+| **ASCII Lab** (`/ascii-lab`) | Image/video → ASCII art (GIF/MP4/HTML) | 100% in-browser |
+| **Visual Protocol** (`/visual-protocol`) | Image → structured creative brief | server-assisted (LLM) |
 
-### 🚀 Deployment
-- **Domain**: pixelatmos.com
-- **Hosting**: Vercel/Netlify
-- **Storage**: Supabase Storage
-- **CI/CD**: GitHub Actions
+3D Lab is powered by our open-source package **[`@filipaovfx/svg3d`](https://github.com/FilipaoVfx/Svg3Ddesign)**.
 
-### 📊 SEO & Performance
-- ✅ Sitemap.xml
-- ✅ robots.txt
-- ⚡ Lazy loading images
-- 🔍 Semantic HTML
-- 🚀 Optimized build output
+## Deployment
+Pushing to `main` triggers a Cloudflare build (`npm ci && npm run build`) that
+deploys the Worker to pixelatmos.com. See [docs/deploy.md](docs/deploy.md).
 
-### 📈 Next Steps
-- [ ] Implement user favorites
-- [ ] Add social sharing
-- [ ] Dark mode
-- [ ] Image upload functionality
-- [ ] User profiles
-
----
-
-## 📝 Informe del Proyecto (Español)
-
-### 🚀 Visión General
-CrackingWall es una aplicación web moderna para descubrir y descargar wallpapers de alta calidad. Desarrollada con React 19, TypeScript y Supabase, ofrece una experiencia de usuario fluida con autenticación, búsqueda y filtrado por categorías.
-
-### 🛠️ Tecnologías
-- **Frontend**: React 19, TypeScript, Vite
-- **Estilos**: CSS Modules, Framer Motion
-- **Backend**: Supabase (Autenticación, Base de datos, Almacenamiento)
-- **Enrutamiento**: React Router v7
-- **Componentes UI**: Componentes personalizados con Lucide Icons
-- **Herramienta de Construcción**: Vite
-
-### 📊 SEO y Rendimiento
-- ✅ Sitemap.xml generado
-- ✅ Configuración de robots.txt
-- ⚡ Carga diferida de imágenes
-- 🔍 HTML semántico
-- 🚀 Build optimizado
-
-### 📅 Próximos Pasos
-- [ ] Implementar favoritos de usuario
-- [ ] Añadir compartir en redes sociales
-- [ ] Modo oscuro
-- [ ] Subida de imágenes
-- [ ] Perfiles de usuario
-
-### 📝 Licencia
-MIT License - Ver el archivo [LICENSE](LICENSE) para más detalles.
-
----
-
-## 🚀 Cómo Empezar
-
-1. Clona el repositorio
-2. Instala dependencias: `npm install`
-3. Configura las variables de entorno en `.env`
-4. Inicia el servidor de desarrollo: `npm run dev`
-5. Abre [http://localhost:5173](http://localhost:5173) en tu navegador
-
-## 🤝 Contribuir
-Las contribuciones son bienvenidas. Por favor, lee las [pautas de contribución](CONTRIBUTING.md) antes de enviar un pull request.
-
-## 📧 Contacto
-Para consultas, contacta a [tu-email@ejemplo.com](mailto:tu-email@ejemplo.com)
+## Documentation
+- Architecture diagrams → [docs/architecture/](docs/architecture/)
+- AdSense / SEO plan → [docs/seo/adsense-seo-plan.md](docs/seo/adsense-seo-plan.md)
+- Product / 3D Lab → [docs/product/3d-lab.md](docs/product/3d-lab.md)
