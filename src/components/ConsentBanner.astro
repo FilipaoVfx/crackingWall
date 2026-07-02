@@ -58,6 +58,7 @@
     function choose(granted) {
       try { localStorage.setItem(KEY, granted ? 'granted' : 'denied'); } catch (e) {}
       apply(granted);
+      if (granted && typeof window.cwLoadClarity === 'function') window.cwLoadClarity();
       hide();
     }
 
