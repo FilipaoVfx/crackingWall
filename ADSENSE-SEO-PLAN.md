@@ -85,16 +85,23 @@ El `<head>` cargaba **HilltopAds** (native banner + *social bar* / pop-under de 
 
 ---
 
-## 6. Checklist de "listo para solicitar"
+## 6. Checklist de "listo para solicitar" — revisión final 2026-07-01 (verificado en vivo)
 
-- [x] Sin redes de anuncios intrusivas activas.
-- [x] Legales completas: About (EEAT), Contact, Privacy (con AdSense), Terms, License.
-- [~] Autor identificable (handle + avatar); falta nombre real/redes si se desea.
-- [~] Contenido con valor único: 6 posts (3 guías de tools de primera mano) + 8 wallpapers originales con descripción propia = 14 piezas. Objetivo ~15–20: casi.
-- [ ] Navegación clara, sin enlaces rotos, diseño consistente. *(Pendiente: URLs de categoría con espacio, p. ej. `/tech culture/` → slugificar a `/tech-culture/`.)*
-- [ ] Dominio final decidido y estable.
-- [ ] Structured data válido (probar en Rich Results Test).
-- [ ] Sitemap enviado en Search Console; sin errores de indexación graves.
+- [x] Sin redes de anuncios intrusivas activas (0 en producción; solo AdSense).
+- [x] `ads.txt` correcto (`pub-1028294908787451, DIRECT`) + script AdSense presente.
+- [x] Legales completas: About (EEAT), Contact, Privacy (con AdSense + opt-out), Terms, License — todas 200.
+- [x] Autor identificable (FilipaoVfx + avatar autoalojado + `Person` schema). *(Opcional: nombre real/redes.)*
+- [x] Navegación clara, **sin enlaces rotos, 404 real (404)**, diseño consistente. *(URLs de categoría reales: abstract/dark/nature, sin espacios.)*
+- [x] Dominio final estable y unificado: **pixelatmos.com** (canonical/sitemap/robots coherentes).
+- [x] Structured data amplio: Organization, WebSite, Person, BlogPosting, HowTo, WebApplication, ImageObject+interactionStatistic, FAQPage, Breadcrumb. *(Validar en Rich Results Test tras enviar.)*
+- [x] Todas las páginas clave 200; sitemaps + image-sitemap + robots 200 en pixelatmos.com.
+- [~] Contenido con valor único: 3 tools originales + 6 posts (3 guías de primera mano) + 9 wallpapers originales. Sólido por las tools; **seguir sumando posts** con el tiempo (objetivo 15–20).
+- [ ] 🔴 **Consentimiento de cookies (CMP)** — NO existe. AdSense lo exige para tráfico EEA/UK. Añadir un CMP certificado por Google (p. ej. Funding Choices / Google consent mode) antes de servir anuncios a esas regiones.
+- [ ] Verificar propiedad en **Search Console** (dominio pixelatmos.com) y **enviar sitemaps**. *(Mecanismo listo: env `PUBLIC_GOOGLE_SITE_VERIFICATION` o DNS TXT.)*
+- [ ] (Recomendado) Tener algo de indexación/tráfico antes de solicitar (dominio recién migrado).
+
+### Veredicto
+**Listo a nivel de sitio (contenido + EEAT + legal + técnico).** Antes de solicitar: (1) añadir CMP de cookies, (2) verificar + enviar sitemap en GSC, (3) idealmente dejar indexar unos días. El bloqueador #1 del notebook ("contenido de poco valor / MFA") queda cubierto por las herramientas originales + contenido honesto y la eliminación de anuncios intrusivos.
 
 ---
 
