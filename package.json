@@ -19,7 +19,7 @@
     "@astrojs/sitemap": "^3.6.0",
     "@astrojs/tailwind": "^6.0.2",
     "@faker-js/faker": "^10.1.0",
-    "@filipaovfx/svg3d": "github:FilipaoVfx/Svg3Ddesign#6535364c763bfa0982fb3810f98e32f7d8246368",
+    "@filipaovfx/svg3d": "github:FilipaoVfx/Svg3Ddesign#99489a46f5cc41a24c509db0a6b82c750b963b0e",
     "@react-three/drei": "^10.7.7",
     "@react-three/fiber": "^9.5.0",
     "@supabase/supabase-js": "^2.39.0",
