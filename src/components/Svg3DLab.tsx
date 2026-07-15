@@ -121,6 +121,7 @@ export default function Svg3DLab() {
   const [error, setError] = useState('');
   const [canExport, setCanExport] = useState(false);
   const [exporting, setExporting] = useState(false);
+  const [exportQuality, setExportQuality] = useState<'high' | 'draft'>('high');
   const [overrides, setOverrides] = useState<Overrides>({});
   const [committed, setCommitted] = useState<Overrides>({});
 
@@ -177,7 +178,7 @@ export default function Svg3DLab() {
     // live scene (no layered high-LOD path for text yet).
     setExporting(true);
     try {
-      if (svg) await exportHighLodGlb(svg, 'crackingwall-3d.glb', { overrides: committed });
+      if (svg) await exportHighLodGlb(svg, 'crackingwall-3d.glb', { overrides: committed, quality: exportQuality });
       else await exportSceneGlb(sceneRef.current, 'crackingwall-3d.glb');
     } catch (e) {
       setError(e instanceof Error ? e.message : 'GLB export failed.');
@@ -209,11 +210,17 @@ export default function Svg3DLab() {
         )}
 
         <div className="ml-auto flex gap-2">
+          {svg && (
+            <select value={exportQuality} onChange={(e) => setExportQuality(e.target.value as 'high' | 'draft')} title="GLB export quality — HD rebuilds crisp geometry, FAST exports the viewport-level mesh" aria-label="GLB export quality" className="border-2 border-white/15 bg-black/40 px-2 py-1.5 font-mono text-[11px] uppercase text-gray-300 focus:border-brutal-neon-cyan focus:outline-none">
+              <option value="high">HD</option>
+              <option value="draft">Fast</option>
+            </select>
+          )}
           <button onClick={onExportPng} disabled={!canExport} className="flex items-center gap-2 border-2 border-black bg-brutal-neon-cyan px-3 py-1.5 font-brutal text-[11px] font-black uppercase tracking-wide text-black shadow-brutal-sm transition-transform hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-40">
             <Download className="h-3.5 w-3.5" /> PNG
           </button>
           <button onClick={onExportGlb} disabled={!canExport || exporting} title={svg ? 'Export a high-quality 3D model (.glb)' : 'Export the 3D model (.glb)'} className="flex items-center gap-2 border-2 border-black bg-brutal-neon-yellow px-3 py-1.5 font-brutal text-[11px] font-black uppercase tracking-wide text-black shadow-brutal-sm transition-transform hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-40">
-            <Box className={'h-3.5 w-3.5' + (exporting ? ' animate-spin' : '')} /> {exporting ? 'HD…' : 'GLB'}
+            <Box className={'h-3.5 w-3.5' + (exporting ? ' animate-spin' : '')} /> {exporting ? (svg && exportQuality === 'high' ? 'HD…' : '…') : 'GLB'}
           </button>
         </div>
       </div>
