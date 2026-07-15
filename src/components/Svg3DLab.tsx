@@ -103,6 +103,16 @@ function LayerEditor({ profile, ovr, onChange }: { profile: AssetProfile; ovr: O
   );
 }
 
+// Curated demo SVGs (in public/) — one click to show the layered SVG→3D system
+// without needing the user to have an SVG on hand. Rich emoji faces exercise the
+// per-shape segmentation, gradient capture and spatial reconstruction.
+const EXAMPLES: { file: string; label: string }[] = [
+  { file: 'money-mouth-face-svgrepo-com.svg', label: 'Money' },
+  { file: 'rolling-on-the-floor-laughing-svgrepo-com.svg', label: 'ROFL' },
+  { file: 'clown-face-svgrepo-com.svg', label: 'Clown' },
+  { file: 'face-screaming-in-fear-svgrepo-com.svg', label: 'Scream' },
+];
+
 export default function Svg3DLab() {
   const [text, setText] = useState('CW');
   const [preset, setPreset] = useState<PresetName>('neon');
@@ -142,6 +152,18 @@ export default function Svg3DLab() {
       setError(err instanceof Error ? err.message : 'Could not read SVG.');
     } finally {
       e.target.value = '';
+    }
+  };
+
+  const loadExample = async (ex: { file: string; label: string }) => {
+    setError(''); setCanExport(false); setOverrides({}); setCommitted({});
+    try {
+      const res = await fetch('/' + ex.file);
+      if (!res.ok) throw new Error('Could not load example.');
+      setSvg(await res.text());
+      setSvgName(ex.label);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Could not load example.');
     }
   };
 
@@ -195,6 +217,25 @@ export default function Svg3DLab() {
         </div>
       )}
 
+      {!svg && (
+        <div className="mb-4">
+          <p className="mb-2 font-mono text-[10px] uppercase tracking-wider text-gray-500">Or try an example — one click to sculpt in 3D</p>
+          <div className="flex flex-wrap gap-2.5">
+            {EXAMPLES.map((ex) => (
+              <button
+                key={ex.file}
+                onClick={() => loadExample(ex)}
+                title={'Load ' + ex.label}
+                className="group flex flex-col items-center gap-1 border-2 border-white/15 bg-black/40 p-2 transition-all hover:-translate-y-0.5 hover:border-brutal-neon-cyan"
+              >
+                <img src={'/' + ex.file} alt={ex.label} width={44} height={44} loading="lazy" className="h-11 w-11" />
+                <span className="font-mono text-[9px] uppercase tracking-wide text-gray-400 group-hover:text-brutal-neon-cyan">{ex.label}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
       {error && <p className="mb-3 font-mono text-[11px] text-brutal-neon-pink">{error}</p>}
 
       <div className="flex flex-col gap-4 lg:flex-row">
@@ -214,7 +255,7 @@ export default function Svg3DLab() {
       </div>
 
       <p className="mt-3 font-mono text-[11px] text-gray-500">
-        {svg ? 'Sculpt mode — select a layer, then tweak relief / material / colour. Drag to orbit.' : 'Drag to orbit · upload an SVG for layered sculpting, or type up to 6 chars.'}
+        {svg ? 'Sculpt mode — select a layer, then tweak relief / material / colour. Drag to orbit.' : 'Drag to orbit · click an example, upload your own SVG, or type up to 6 chars.'}
       </p>
     </div>
   );
