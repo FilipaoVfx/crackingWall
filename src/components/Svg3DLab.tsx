@@ -217,24 +217,31 @@ export default function Svg3DLab() {
         </div>
       )}
 
-      {!svg && (
-        <div className="mb-4">
-          <p className="mb-2 font-mono text-[10px] uppercase tracking-wider text-gray-500">Or try an example — one click to sculpt in 3D</p>
-          <div className="flex flex-wrap gap-2.5">
-            {EXAMPLES.map((ex) => (
+      {/* Examples: ALWAYS visible + centered. Click swaps the model directly —
+          no need to clear the current one first (zero friction). */}
+      <div className="mb-4">
+        <p className="mb-2 text-center font-mono text-[10px] uppercase tracking-wider text-gray-500">Examples — one click to sculpt in 3D</p>
+        <div className="flex flex-wrap justify-center gap-2.5">
+          {EXAMPLES.map((ex) => {
+            const active = svg !== null && svgName === ex.label;
+            return (
               <button
                 key={ex.file}
                 onClick={() => loadExample(ex)}
                 title={'Load ' + ex.label}
-                className="group flex flex-col items-center gap-1 border-2 border-white/15 bg-black/40 p-2 transition-all hover:-translate-y-0.5 hover:border-brutal-neon-cyan"
+                aria-pressed={active}
+                className={
+                  'group flex flex-col items-center gap-1 border-2 bg-black/40 p-2 transition-all hover:-translate-y-0.5 ' +
+                  (active ? 'border-brutal-neon-cyan shadow-brutal-sm' : 'border-white/15 hover:border-brutal-neon-cyan')
+                }
               >
                 <img src={'/' + ex.file} alt={ex.label} width={44} height={44} loading="lazy" className="h-11 w-11" />
-                <span className="font-mono text-[9px] uppercase tracking-wide text-gray-400 group-hover:text-brutal-neon-cyan">{ex.label}</span>
+                <span className={'font-mono text-[9px] uppercase tracking-wide group-hover:text-brutal-neon-cyan ' + (active ? 'text-brutal-neon-cyan' : 'text-gray-400')}>{ex.label}</span>
               </button>
-            ))}
-          </div>
+            );
+          })}
         </div>
-      )}
+      </div>
 
       {error && <p className="mb-3 font-mono text-[11px] text-brutal-neon-pink">{error}</p>}
 
