@@ -1,5 +1,5 @@
 import { Component, Suspense, lazy, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
-import { PRESETS, analyzeSvg, exportCanvasPng, exportSceneGlb, readSvgFile, type PresetName, type AssetProfile, type MaterialPreset } from '@filipaovfx/svg3d';
+import { PRESETS, analyzeSvg, exportCanvasPng, exportSceneGlb, exportHighLodGlb, readSvgFile, type PresetName, type AssetProfile, type MaterialPreset } from '@filipaovfx/svg3d';
 import { Box, Download, Eye, EyeOff, Layers, Upload, X } from 'lucide-react';
 
 const Svg3D = lazy(() => import('@filipaovfx/svg3d').then((m) => ({ default: m.Svg3D })));
@@ -120,6 +120,7 @@ export default function Svg3DLab() {
   const [svgName, setSvgName] = useState('');
   const [error, setError] = useState('');
   const [canExport, setCanExport] = useState(false);
+  const [exporting, setExporting] = useState(false);
   const [overrides, setOverrides] = useState<Overrides>({});
   const [committed, setCommitted] = useState<Overrides>({});
 
@@ -171,8 +172,18 @@ export default function Svg3DLab() {
   const onExportPng = () => canvasRef.current && exportCanvasPng(canvasRef.current, 'crackingwall-3d.png');
   const onExportGlb = async () => {
     setError('');
-    try { await exportSceneGlb(sceneRef.current, 'crackingwall-3d.glb'); }
-    catch (e) { setError(e instanceof Error ? e.message : 'GLB export failed.'); }
+    // Uploaded SVG → rebuild a HIGH-LOD model off-screen (crisp curves), then
+    // export. The viewport stays 'draft' for 60fps. Text mode falls back to the
+    // live scene (no layered high-LOD path for text yet).
+    setExporting(true);
+    try {
+      if (svg) await exportHighLodGlb(svg, 'crackingwall-3d.glb', { overrides: committed });
+      else await exportSceneGlb(sceneRef.current, 'crackingwall-3d.glb');
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'GLB export failed.');
+    } finally {
+      setExporting(false);
+    }
   };
   const onCanvas = (c: HTMLCanvasElement) => { canvasRef.current = c; setCanExport(true); };
   const onScene = (s: unknown) => { sceneRef.current = s; };
@@ -201,8 +212,8 @@ export default function Svg3DLab() {
           <button onClick={onExportPng} disabled={!canExport} className="flex items-center gap-2 border-2 border-black bg-brutal-neon-cyan px-3 py-1.5 font-brutal text-[11px] font-black uppercase tracking-wide text-black shadow-brutal-sm transition-transform hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-40">
             <Download className="h-3.5 w-3.5" /> PNG
           </button>
-          <button onClick={onExportGlb} disabled={!canExport} className="flex items-center gap-2 border-2 border-black bg-brutal-neon-yellow px-3 py-1.5 font-brutal text-[11px] font-black uppercase tracking-wide text-black shadow-brutal-sm transition-transform hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-40">
-            <Box className="h-3.5 w-3.5" /> GLB
+          <button onClick={onExportGlb} disabled={!canExport || exporting} title={svg ? 'Export a high-quality 3D model (.glb)' : 'Export the 3D model (.glb)'} className="flex items-center gap-2 border-2 border-black bg-brutal-neon-yellow px-3 py-1.5 font-brutal text-[11px] font-black uppercase tracking-wide text-black shadow-brutal-sm transition-transform hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-40">
+            <Box className={'h-3.5 w-3.5' + (exporting ? ' animate-spin' : '')} /> {exporting ? 'HD…' : 'GLB'}
           </button>
         </div>
       </div>
