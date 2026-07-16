@@ -1,5 +1,5 @@
 import { Component, Suspense, lazy, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
-import { PRESETS, analyzeSvg, exportCanvasPng, exportSceneGlb, readSvgFile, type PresetName, type AssetProfile, type MaterialPreset } from '@filipaovfx/svg3d';
+import { PRESETS, analyzeSvg, exportCanvasPng, exportSceneGlb, exportHighLodGlb, readSvgFile, type PresetName, type AssetProfile, type MaterialPreset } from '@filipaovfx/svg3d';
 import { Box, Download, Eye, EyeOff, Layers, Upload, X } from 'lucide-react';
 
 const Svg3D = lazy(() => import('@filipaovfx/svg3d').then((m) => ({ default: m.Svg3D })));
@@ -103,6 +103,16 @@ function LayerEditor({ profile, ovr, onChange }: { profile: AssetProfile; ovr: O
   );
 }
 
+// Curated demo SVGs (in public/) — one click to show the layered SVG→3D system
+// without needing the user to have an SVG on hand. Rich emoji faces exercise the
+// per-shape segmentation, gradient capture and spatial reconstruction.
+const EXAMPLES: { file: string; label: string }[] = [
+  { file: 'money-mouth-face-svgrepo-com.svg', label: 'Money' },
+  { file: 'rolling-on-the-floor-laughing-svgrepo-com.svg', label: 'ROFL' },
+  { file: 'clown-face-svgrepo-com.svg', label: 'Clown' },
+  { file: 'face-screaming-in-fear-svgrepo-com.svg', label: 'Scream' },
+];
+
 export default function Svg3DLab() {
   const [text, setText] = useState('CW');
   const [preset, setPreset] = useState<PresetName>('neon');
@@ -110,6 +120,8 @@ export default function Svg3DLab() {
   const [svgName, setSvgName] = useState('');
   const [error, setError] = useState('');
   const [canExport, setCanExport] = useState(false);
+  const [exporting, setExporting] = useState(false);
+  const [exportQuality, setExportQuality] = useState<'high' | 'draft'>('high');
   const [overrides, setOverrides] = useState<Overrides>({});
   const [committed, setCommitted] = useState<Overrides>({});
 
@@ -145,12 +157,34 @@ export default function Svg3DLab() {
     }
   };
 
+  const loadExample = async (ex: { file: string; label: string }) => {
+    setError(''); setCanExport(false); setOverrides({}); setCommitted({});
+    try {
+      const res = await fetch('/' + ex.file);
+      if (!res.ok) throw new Error('Could not load example.');
+      setSvg(await res.text());
+      setSvgName(ex.label);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Could not load example.');
+    }
+  };
+
   const clearSvg = () => { setSvg(null); setSvgName(''); setCanExport(false); setOverrides({}); setCommitted({}); };
   const onExportPng = () => canvasRef.current && exportCanvasPng(canvasRef.current, 'crackingwall-3d.png');
   const onExportGlb = async () => {
     setError('');
-    try { await exportSceneGlb(sceneRef.current, 'crackingwall-3d.glb'); }
-    catch (e) { setError(e instanceof Error ? e.message : 'GLB export failed.'); }
+    // Uploaded SVG → rebuild a HIGH-LOD model off-screen (crisp curves), then
+    // export. The viewport stays 'draft' for 60fps. Text mode falls back to the
+    // live scene (no layered high-LOD path for text yet).
+    setExporting(true);
+    try {
+      if (svg) await exportHighLodGlb(svg, 'crackingwall-3d.glb', { overrides: committed, quality: exportQuality });
+      else await exportSceneGlb(sceneRef.current, 'crackingwall-3d.glb');
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'GLB export failed.');
+    } finally {
+      setExporting(false);
+    }
   };
   const onCanvas = (c: HTMLCanvasElement) => { canvasRef.current = c; setCanExport(true); };
   const onScene = (s: unknown) => { sceneRef.current = s; };
@@ -176,11 +210,17 @@ export default function Svg3DLab() {
         )}
 
         <div className="ml-auto flex gap-2">
+          {svg && (
+            <select value={exportQuality} onChange={(e) => setExportQuality(e.target.value as 'high' | 'draft')} title="GLB export quality — HD rebuilds crisp geometry, FAST exports the viewport-level mesh" aria-label="GLB export quality" className="border-2 border-white/15 bg-black/40 px-2 py-1.5 font-mono text-[11px] uppercase text-gray-300 focus:border-brutal-neon-cyan focus:outline-none">
+              <option value="high">HD</option>
+              <option value="draft">Fast</option>
+            </select>
+          )}
           <button onClick={onExportPng} disabled={!canExport} className="flex items-center gap-2 border-2 border-black bg-brutal-neon-cyan px-3 py-1.5 font-brutal text-[11px] font-black uppercase tracking-wide text-black shadow-brutal-sm transition-transform hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-40">
             <Download className="h-3.5 w-3.5" /> PNG
           </button>
-          <button onClick={onExportGlb} disabled={!canExport} className="flex items-center gap-2 border-2 border-black bg-brutal-neon-yellow px-3 py-1.5 font-brutal text-[11px] font-black uppercase tracking-wide text-black shadow-brutal-sm transition-transform hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-40">
-            <Box className="h-3.5 w-3.5" /> GLB
+          <button onClick={onExportGlb} disabled={!canExport || exporting} title={svg ? 'Export a high-quality 3D model (.glb)' : 'Export the 3D model (.glb)'} className="flex items-center gap-2 border-2 border-black bg-brutal-neon-yellow px-3 py-1.5 font-brutal text-[11px] font-black uppercase tracking-wide text-black shadow-brutal-sm transition-transform hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-40">
+            <Box className={'h-3.5 w-3.5' + (exporting ? ' animate-spin' : '')} /> {exporting ? (svg && exportQuality === 'high' ? 'HD…' : '…') : 'GLB'}
           </button>
         </div>
       </div>
@@ -194,6 +234,32 @@ export default function Svg3DLab() {
           ))}
         </div>
       )}
+
+      {/* Examples: ALWAYS visible + centered. Click swaps the model directly —
+          no need to clear the current one first (zero friction). */}
+      <div className="mb-4">
+        <p className="mb-2 text-center font-mono text-[10px] uppercase tracking-wider text-gray-500">Examples — one click to sculpt in 3D</p>
+        <div className="flex flex-wrap justify-center gap-2.5">
+          {EXAMPLES.map((ex) => {
+            const active = svg !== null && svgName === ex.label;
+            return (
+              <button
+                key={ex.file}
+                onClick={() => loadExample(ex)}
+                title={'Load ' + ex.label}
+                aria-pressed={active}
+                className={
+                  'group flex flex-col items-center gap-1 border-2 bg-black/40 p-2 transition-all hover:-translate-y-0.5 ' +
+                  (active ? 'border-brutal-neon-cyan shadow-brutal-sm' : 'border-white/15 hover:border-brutal-neon-cyan')
+                }
+              >
+                <img src={'/' + ex.file} alt={ex.label} width={44} height={44} loading="lazy" className="h-11 w-11" />
+                <span className={'font-mono text-[9px] uppercase tracking-wide group-hover:text-brutal-neon-cyan ' + (active ? 'text-brutal-neon-cyan' : 'text-gray-400')}>{ex.label}</span>
+              </button>
+            );
+          })}
+        </div>
+      </div>
 
       {error && <p className="mb-3 font-mono text-[11px] text-brutal-neon-pink">{error}</p>}
 
@@ -214,7 +280,7 @@ export default function Svg3DLab() {
       </div>
 
       <p className="mt-3 font-mono text-[11px] text-gray-500">
-        {svg ? 'Sculpt mode — select a layer, then tweak relief / material / colour. Drag to orbit.' : 'Drag to orbit · upload an SVG for layered sculpting, or type up to 6 chars.'}
+        {svg ? 'Sculpt mode — select a layer, then tweak relief / material / colour. Drag to orbit.' : 'Drag to orbit · click an example, upload your own SVG, or type up to 6 chars.'}
       </p>
     </div>
   );
