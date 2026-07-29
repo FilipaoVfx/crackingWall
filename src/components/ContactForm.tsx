@@ -76,11 +76,6 @@ const ContactForm: React.FC = () => {
                     </div>
                 </div>
 
-                <div className="mb-8 p-4 bg-brutal-dark-bg border-l-4 border-brutal-neon-cyan italic text-sm font-mono text-gray-400">
-                    <p className="mb-1 text-brutal-neon-cyan font-bold uppercase tracking-widest text-xs">// Sophisticated Channel</p>
-                    <p>For high-priority inquiries: <span className="text-brutal-neon-cyan decoration-double underline">contact@crackingwall.art</span></p>
-                </div>
-
                 <AnimatePresence mode="wait">
                     {status === 'success' ? (
                         <motion.div
