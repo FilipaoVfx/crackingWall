@@ -1,5 +1,5 @@
 /**
- * Generates editable .excalidraw scene files for the CrackingWall architecture
+ * Generates editable .excalidraw scene files for the Pixelatmos architecture
  * diagrams. Source element arrays mirror what was drawn via the Excalidraw MCP;
  * this expands the `label` shorthand into bound text elements and fills the
  * fields Excalidraw expects, so the files open directly at https://excalidraw.com.
@@ -77,7 +77,7 @@ function write(name, elements) {
 
 // ------------------------------------------------------------------ diagrams
 const runtime = [
-{"type":"text","id":"t1","x":150,"y":24,"text":"CrackingWall — Runtime Architecture","fontSize":24,"strokeColor":"#1e1e1e"},
+{"type":"text","id":"t1","x":150,"y":24,"text":"Pixelatmos — Runtime Architecture","fontSize":24,"strokeColor":"#1e1e1e"},
 {"type":"text","id":"t1s","x":210,"y":56,"text":"request flow · app · islands · services","fontSize":15,"strokeColor":"#757575"},
 {"type":"ellipse","id":"vh","x":270,"y":78,"width":24,"height":24,"backgroundColor":"#a5d8ff","fillStyle":"solid","strokeColor":"#4a9eed","strokeWidth":2},
 {"type":"rectangle","id":"vb","x":266,"y":102,"width":32,"height":30,"roundness":{"type":3},"backgroundColor":"#a5d8ff","fillStyle":"solid","strokeColor":"#4a9eed","strokeWidth":2},
@@ -136,7 +136,7 @@ const runtime = [
 ];
 
 const deploy = [
-{"type":"text","id":"t","x":150,"y":30,"text":"CrackingWall — Deploy / CI Pipeline","fontSize":24,"strokeColor":"#1e1e1e"},
+{"type":"text","id":"t","x":150,"y":30,"text":"Pixelatmos — Deploy / CI Pipeline","fontSize":24,"strokeColor":"#1e1e1e"},
 {"type":"ellipse","id":"gh","x":70,"y":150,"width":90,"height":90,"backgroundColor":"#e5dbff","fillStyle":"solid","strokeColor":"#6b46c1","strokeWidth":2,"label":{"text":"GH","fontSize":20}},
 {"type":"text","id":"ght","x":66,"y":248,"text":"GitHub · main","fontSize":15,"strokeColor":"#1e1e1e"},
 {"type":"arrow","id":"a1","x":164,"y":195,"width":86,"height":0,"points":[[0,0],[86,0]],"strokeColor":"#2563eb","strokeWidth":2,"endArrowhead":"arrow","label":{"text":"push","fontSize":14}},

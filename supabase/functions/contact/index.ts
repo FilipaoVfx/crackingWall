@@ -62,7 +62,7 @@ serve(async (req: Request) => {
 
     // Email privado (NUNCA se expone al usuario)
     const TO_PRIVATE = "juanku2003@gmail.com";
-    const FROM_PUBLIC = "CrackingWall Contact <onboarding@resend.dev>";
+    const FROM_PUBLIC = "Pixelatmos Contact <onboarding@resend.dev>";
 
     const textBody = [
         `Name:    ${safeName}`,
@@ -95,7 +95,7 @@ serve(async (req: Request) => {
         <p style="margin: 0; white-space: pre-wrap; color: #333;">${message}</p>
       </div>
       <p style="margin-top: 20px; font-size: 12px; color: #999;">
-        Sent from CrackingWall contact form · Reply to this email to respond to ${safeName}
+        Sent from Pixelatmos contact form · Reply to this email to respond to ${safeName}
       </p>
     </div>
   `;

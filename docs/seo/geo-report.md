@@ -1,4 +1,4 @@
-# 🎯 GEO Audit Report — CrackingWall (pixelatmos.com)
+# 🎯 GEO Audit Report — Pixelatmos (pixelatmos.com)
 
 > Generative Engine Optimization audit run with the **eGEOagents** pipeline
 > (analyze → rank → rewrite → schema). Scores the site against the 10 universal
@@ -7,7 +7,7 @@
 
 **Date:** 2026-07-01 · **Domain:** https://pixelatmos.com · **Pages audited:** key templates (home, tools, guides, wallpapers, about)
 
-> ⚠️ **Editorial guardrail:** CrackingWall is also being prepared for Google
+> ⚠️ **Editorial guardrail:** Pixelatmos is also being prepared for Google
 > AdSense approval, which penalizes "made-for-ads" hype. So we deliberately
 > under-weight the GEO *urgency* and *ranking-emphasis* features (superlatives,
 > scarcity) and lean on the honest ones — user-intent, authority/E-E-A-T,

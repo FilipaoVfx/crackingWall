@@ -5,7 +5,7 @@ import AppLayout from '../../layouts/AppLayout.astro';
 const siteURL = Astro.site?.toString().replace(/\/$/, '') ?? 'https://pixelatmos.com';
 const title = 'How to Turn Any SVG into a 3D Model in Your Browser';
 const description =
-  'A hands-on guide to CrackingWall\'s 3D Lab: the "sculpted volume" approach to SVG→3D, how the layer explorer works, and how to export clean PNG/GLB — all client-side.';
+  'A hands-on guide to Pixelatmos\'s 3D Lab: the "sculpted volume" approach to SVG→3D, how the layer explorer works, and how to export clean PNG/GLB — all client-side.';
 const published = '2026-06-28';
 const url = `${siteURL}/blog/svg-to-3d-browser-guide/`;
 
@@ -20,14 +20,14 @@ const schema = {
   author: { '@type': 'Person', name: 'FilipaoVfx', url: 'https://github.com/FilipaoVfx' },
   publisher: {
     '@type': 'Organization',
-    name: 'CrackingWall',
+    name: 'Pixelatmos',
     logo: { '@type': 'ImageObject', url: `${siteURL}/og-image.webp` },
   },
   mainEntityOfPage: { '@type': 'WebPage', '@id': url },
 };
 ---
 
-<AppLayout title={`${title} — CrackingWall`} description={description}>
+<AppLayout title={`${title} — Pixelatmos`} description={description}>
   <script type="application/ld+json" set:html={JSON.stringify(schema)} />
   <script type="application/ld+json" set:html={JSON.stringify({
     '@context': 'https://schema.org',
@@ -35,7 +35,7 @@ const schema = {
     name: 'How to turn an SVG into a 3D model in your browser',
     description,
     totalTime: 'PT7M',
-    tool: [{ '@type': 'HowToTool', name: 'CrackingWall 3D Lab' }],
+    tool: [{ '@type': 'HowToTool', name: 'Pixelatmos 3D Lab' }],
     step: [
       { '@type': 'HowToStep', position: 1, name: 'Bring in your asset', text: 'Open the 3D Lab and choose text mode or upload an SVG file. Everything runs in your browser.' },
       { '@type': 'HowToStep', position: 2, name: 'Let it interpret the SVG', text: 'The intelligence layer segments the SVG by group or by shape and resolves each element color.' },

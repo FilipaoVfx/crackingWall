@@ -34,7 +34,7 @@ export const POST: APIRoute = async ({ request }) => {
                     'Authorization': `Bearer ${RESEND_API_KEY}`,
                 },
                 body: JSON.stringify({
-                    from: 'CrackingWall <onboarding@resend.dev>',
+                    from: 'Pixelatmos <onboarding@resend.dev>',
                     to: [RECIPIENT_EMAIL],
                     reply_to: email,
                     subject: subject || `Contact from ${name}`,

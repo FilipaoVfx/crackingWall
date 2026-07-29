@@ -170,7 +170,7 @@ export default function Svg3DLab() {
   };
 
   const clearSvg = () => { setSvg(null); setSvgName(''); setCanExport(false); setOverrides({}); setCommitted({}); };
-  const onExportPng = () => canvasRef.current && exportCanvasPng(canvasRef.current, 'crackingwall-3d.png');
+  const onExportPng = () => canvasRef.current && exportCanvasPng(canvasRef.current, 'pixelatmos-3d.png');
   const onExportGlb = async () => {
     setError('');
     // Uploaded SVG → rebuild a HIGH-LOD model off-screen (crisp curves), then
@@ -178,8 +178,8 @@ export default function Svg3DLab() {
     // live scene (no layered high-LOD path for text yet).
     setExporting(true);
     try {
-      if (svg) await exportHighLodGlb(svg, 'crackingwall-3d.glb', { overrides: committed, quality: exportQuality });
-      else await exportSceneGlb(sceneRef.current, 'crackingwall-3d.glb');
+      if (svg) await exportHighLodGlb(svg, 'pixelatmos-3d.glb', { overrides: committed, quality: exportQuality });
+      else await exportSceneGlb(sceneRef.current, 'pixelatmos-3d.glb');
     } catch (e) {
       setError(e instanceof Error ? e.message : 'GLB export failed.');
     } finally {

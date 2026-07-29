@@ -7,7 +7,7 @@ Voy a priorizar lo que realmente impacta tu sitio (no ruido).
 
 # 📄 PRD.md — Web Hardening & Technical Optimization
 
-**Project:** CrakingWall
+**Project:** Pixelatmos
 **Scope:** Security + Infra + SEO Technical Fixes
 **Priority:** HIGH (bloquea confianza, SEO y escalabilidad)
 

@@ -20,21 +20,21 @@ const schema = {
   author: { '@type': 'Person', name: 'FilipaoVfx', url: 'https://github.com/FilipaoVfx' },
   publisher: {
     '@type': 'Organization',
-    name: 'CrackingWall',
+    name: 'Pixelatmos',
     logo: { '@type': 'ImageObject', url: `${siteURL}/og-image.webp` },
   },
   mainEntityOfPage: { '@type': 'WebPage', '@id': url },
 };
 ---
 
-<AppLayout title={`${title} — CrackingWall`} description={description}>
+<AppLayout title={`${title} — Pixelatmos`} description={description}>
   <script type="application/ld+json" set:html={JSON.stringify(schema)} />
   <script type="application/ld+json" set:html={JSON.stringify({
     '@context': 'https://schema.org',
     '@type': 'HowTo',
     name: 'How to make faithful ASCII art from images and video',
     description,
-    tool: [{ '@type': 'HowToTool', name: 'CrackingWall ASCII Lab' }],
+    tool: [{ '@type': 'HowToTool', name: 'Pixelatmos ASCII Lab' }],
     step: [
       { '@type': 'HowToStep', position: 1, name: 'Pick a strong source', text: 'Choose an image or clip with clear contrast and a strong subject.' },
       { '@type': 'HowToStep', position: 2, name: 'Start with a medium ramp', text: 'Open the ASCII Lab and begin with a medium-length character ramp.' },

@@ -47,7 +47,7 @@ export const Header: React.FC<HeaderProps> = ({ onSearchChange, onAuthClick }) =
               animate={{ y: 0 }}
               className="text-3xl md:text-6xl font-brutal font-black text-white drop-shadow-[3px_3px_0_#00fff9] animate-glitch group-hover:scale-105 transition-transform"
             >
-              CrakingWall
+              Pixelatmos
             </motion.h1>
           </a>
 
