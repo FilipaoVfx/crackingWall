@@ -1,4 +1,4 @@
-# GEO Implementation Checklist — CrackingWall
+# GEO Implementation Checklist — Pixelatmos
 
 ## ✅ Done (this pass)
 - [x] Install eGEOagents plugin (`.claude/commands`, `agents`, `output-styles`, GEO skills)

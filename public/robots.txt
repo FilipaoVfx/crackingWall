@@ -1,4 +1,4 @@
-# CrackingWall — wallpaper discovery site
+# Pixelatmos — wallpaper discovery site
 # Allow all search engines and AI assistants for maximum discoverability
 
 User-agent: *

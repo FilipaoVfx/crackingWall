@@ -8,7 +8,7 @@ const siteURL = Astro.site?.toString().replace(/\/$/, '') ?? 'https://pixelatmos
 const aboutSchema = {
   '@context': 'https://schema.org',
   '@type': 'AboutPage',
-  name: 'About CrackingWall',
+  name: 'About Pixelatmos',
   url: `${siteURL}/about/`,
   mainEntity: {
     '@type': 'Person',
@@ -17,38 +17,38 @@ const aboutSchema = {
     image: `${siteURL}/filipaovfx-avatar.png`,
     jobTitle: 'Independent developer & digital artist',
     description:
-      'Independent developer and digital artist behind CrackingWall — builder of its browser-based creative tools and curator of its tech-culture wallpaper gallery.',
+      'Independent developer and digital artist behind Pixelatmos — builder of its browser-based creative tools and curator of its tech-culture wallpaper gallery.',
     sameAs: ['https://github.com/FilipaoVfx'],
   },
 };
 ---
 
 <AppLayout
-  title="About CrackingWall — Who We Are & How We Work"
-  description="CrackingWall is an independent creative-tools studio and curated tech-culture gallery. Meet the creator, our editorial standards, and how we use AI transparently."
+  title="About Pixelatmos — Who We Are & How We Work"
+  description="Pixelatmos is an independent creative-tools studio and curated tech-culture gallery. Meet the creator, our editorial standards, and how we use AI transparently."
 >
   <script type="application/ld+json" set:html={JSON.stringify(aboutSchema)} />
   <div class="about-container">
     <div class="content-wrapper">
-      <h1 class="glitch-title">About CrackingWall</h1>
+      <h1 class="glitch-title">About Pixelatmos</h1>
 
       <div class="text-content">
         <p class="lead">
-          CrackingWall is an independent studio at the intersection of <strong>software and
+          Pixelatmos is an independent studio at the intersection of <strong>software and
           visual culture</strong>. We build free, browser-based creative tools and curate a
           focused gallery of tech-culture wallpapers — cyberpunk, futuristic, glitch, and
           developer-culture aesthetics. Everything here is made with intent, not scraped or
           mass-produced.
         </p>
 
-        <h2 class="first-heading">Who's Behind CrackingWall</h2>
+        <h2 class="first-heading">Who's Behind Pixelatmos</h2>
         <div class="creator-card">
           <img
             class="creator-avatar"
             src="/filipaovfx-avatar.png"
             width="96"
             height="96"
-            alt="FilipaoVfx, creator of CrackingWall"
+            alt="FilipaoVfx, creator of Pixelatmos"
             loading="lazy"
           />
           <div class="creator-meta">
@@ -60,7 +60,7 @@ const aboutSchema = {
           </div>
         </div>
         <p>
-          CrackingWall is a solo project by <strong>FilipaoVfx</strong> — an independent
+          Pixelatmos is a solo project by <strong>FilipaoVfx</strong> — an independent
           developer and digital artist. The same person writes the code for the creative
           tools, designs the visual identity, and curates every wallpaper in the gallery.
           It is an author-led project, not an anonymous content farm.
@@ -75,7 +75,7 @@ const aboutSchema = {
 
         <h2>What We Actually Build</h2>
         <p>
-          The heart of CrackingWall is a small suite of <strong>original, browser-based
+          The heart of Pixelatmos is a small suite of <strong>original, browser-based
           creative tools</strong> — real software, written by us, that runs entirely on
           your device:
         </p>
@@ -120,14 +120,14 @@ const aboutSchema = {
 
         <h2>Who It's For</h2>
         <p>
-          CrackingWall is built for developers, designers, gamers, and digital creators —
+          Pixelatmos is built for developers, designers, gamers, and digital creators —
           anyone who treats their desktop and their tools as part of their identity.
         </p>
 
         <div class="disclaimer-box">
           <h3>⚠️ Content Clarification</h3>
           <p>
-            CrackingWall features fictional digital artwork inspired by cyberpunk
+            Pixelatmos features fictional digital artwork inspired by cyberpunk
             aesthetics, speculative technology, and digital environments.
           </p>
           <p class="mt-4">

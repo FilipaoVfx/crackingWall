@@ -55,7 +55,7 @@ const WallpapersPage: React.FC<WallpapersPageProps> = ({
   return (
     <div className="min-h-screen bg-brutal-white">
       <Helmet>
-        <title>Wallpapers | CrakingWall</title>
+        <title>Wallpapers | Pixelatmos</title>
         <meta name="description" content="Explore our curated collection of professional digital topographies and high-fidelity tech backgrounds." />
       </Helmet>
 
@@ -93,7 +93,7 @@ const WallpapersPage: React.FC<WallpapersPageProps> = ({
         )}
       </main>
       <footer className="py-8 text-center text-gray-500 text-sm">
-        <p>&copy; {new Date().getFullYear()} CrakingWall. All wallpapers are free to download and use.</p>
+        <p>&copy; {new Date().getFullYear()} Pixelatmos. All wallpapers are free to download and use.</p>
       </footer>
     </div>
   );

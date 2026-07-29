@@ -25,7 +25,7 @@ export function exportHtml(frames: string[], fps: number) {
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>ASCII Video — CrakingWall</title>
+<title>ASCII Video — Pixelatmos</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 body{background:#0a0a0f;display:flex;align-items:center;justify-content:center;min-height:100vh;font-family:monospace}

@@ -1,4 +1,4 @@
-# CrackingWall — Architecture Diagrams
+# Pixelatmos — Architecture Diagrams
 
 Editable **Excalidraw** diagrams of the site (pixelatmos.com). Open any `.excalidraw`
 file at [excalidraw.com](https://excalidraw.com) (File → Open) or with the

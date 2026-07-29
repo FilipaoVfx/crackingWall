@@ -302,8 +302,8 @@ export const POST: APIRoute = async ({ request, locals }) => {
       headers: {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${env.OPENROUTER_API_KEY}`,
-        'HTTP-Referer': 'https://crackingwall.com',
-        'X-Title': 'CrackingWall Analysis',
+        'HTTP-Referer': 'https://pixelatmos.com',
+        'X-Title': 'Pixelatmos Analysis',
       },
       body: JSON.stringify({
         model: env.OPENROUTER_MODEL || DEFAULT_OPENROUTER_MODEL,

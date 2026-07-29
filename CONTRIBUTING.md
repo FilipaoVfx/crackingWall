@@ -1,6 +1,6 @@
-# Contributing to CrackingWall
+# Contributing to Pixelatmos
 
-Thanks for working on CrackingWall (pixelatmos.com). This guide gets you productive fast.
+Thanks for working on Pixelatmos (pixelatmos.com). This guide gets you productive fast.
 
 ## Prerequisites
 - Node.js 20+ (project builds on Node 22)

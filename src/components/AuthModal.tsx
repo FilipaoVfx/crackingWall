@@ -82,7 +82,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
             {/* Header */}
             <div className="flex items-center justify-between border-b-2 border-white/10 px-6 py-5">
               <div>
-                <p className="mb-1 font-mono text-[10px] uppercase tracking-[0.25em] text-brutal-neon-purple">CrackingWall</p>
+                <p className="mb-1 font-mono text-[10px] uppercase tracking-[0.25em] text-brutal-neon-purple">Pixelatmos</p>
                 <h2 className="font-brutal text-xl font-black uppercase tracking-tight text-white">
                   {isLogin ? 'Iniciar sesión' : 'Crear cuenta'}
                 </h2>

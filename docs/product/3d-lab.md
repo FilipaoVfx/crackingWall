@@ -1,7 +1,7 @@
 # 3D Lab — Manifiesto de Producto
 
 > Convierte cualquier **texto o SVG** en un objeto **3D interactivo**, directo en el navegador.
-> Una herramienta de CrackingWall Creative Tools Lab.
+> Una herramienta de Pixelatmos Creative Tools Lab.
 
 **Ruta:** `/3d-lab` · **Estado:** en producción (`main`) · **Motor:** `@filipaovfx/svg3d`
 
@@ -100,7 +100,7 @@ Una herramienta creativa **100% client-side** (WebGL en el navegador, sin backen
 ## 6. Arquitectura (trazabilidad)
 
 ```
-CrackingWall  /3d-lab  (island client:only, React 19 + R3F)
+Pixelatmos  /3d-lab  (island client:only, React 19 + R3F)
         │  usa
         ▼
 @filipaovfx/svg3d   (paquete wrapper, repo: FilipaoVfx/Svg3Ddesign)
@@ -132,7 +132,7 @@ CrackingWall  /3d-lab  (island client:only, React 19 + R3F)
 | v0.8.x | Captura de **color de gradientes** + overrides de escultura + tope de segmentos |
 | **v0.9.0** | **Granularidad por-shape** (captura cada elemento) + **painter's z-order** + colores con nombre |
 
-> Integrado en CrackingWall vía PR #10 (app-shell) y **PR #11** (3D Lab, React 19). Suite de tests del paquete en verde.
+> Integrado en Pixelatmos vía PR #10 (app-shell) y **PR #11** (3D Lab, React 19). Suite de tests del paquete en verde.
 
 ---
 
@@ -156,8 +156,8 @@ CrackingWall  /3d-lab  (island client:only, React 19 + R3F)
 
 ## 10. Créditos
 
-3D Lab está construido sobre **[`3dsvg`](https://github.com/renatoworks/3dsvg)** (MIT © Renato Costa), con la capa de inteligencia, presets, escultura y exportación de **CrackingWall**.
+3D Lab está construido sobre **[`3dsvg`](https://github.com/renatoworks/3dsvg)** (MIT © Renato Costa), con la capa de inteligencia, presets, escultura y exportación de **Pixelatmos**.
 
 ---
 
-*CrackingWall · Creative Tools Lab — "Analyze visuals · Generate ideas · Build experiences."*
+*Pixelatmos · Creative Tools Lab — "Analyze visuals · Generate ideas · Build experiences."*

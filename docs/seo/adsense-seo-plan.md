@@ -1,4 +1,4 @@
-# CrackingWall — AdSense Approval & SEO Plan
+# Pixelatmos — AdSense Approval & SEO Plan
 
 > Fase de producto: **profesionalizar el sitio, mejorar el SEO y adecuarlo para ser aprobado en Google AdSense.**
 > Documento vivo. Fuente doctrinal: notebook personal de AdSense (NotebookLM) + auditoría del repo (rama `feat/adsense-seo`).
@@ -19,8 +19,8 @@ El notebook es consistente en un mensaje central:
 4. **Diseño limpio y profesional.** Navegación clara, páginas legales completas, sin trucos.
 5. **Imágenes con propósito editorial**, no relleno.
 
-### Traducción a CrackingWall
-CrackingWall combina **IA (wallpapers/tools) + herramientas creativas originales**. El riesgo es parecer "otra galería de imágenes IA" (MFA). **La ventaja/foso** es que las *creative tools* (ASCII Lab, Visual Protocol, 3D Lab) son **software original propio** — eso es EEAT genuino y difícil de replicar. La estrategia: **poner las herramientas y el valor humano al frente**, y hacer los wallpapers transparentes (IA como base, curación humana como producto).
+### Traducción a Pixelatmos
+Pixelatmos combina **IA (wallpapers/tools) + herramientas creativas originales**. El riesgo es parecer "otra galería de imágenes IA" (MFA). **La ventaja/foso** es que las *creative tools* (ASCII Lab, Visual Protocol, 3D Lab) son **software original propio** — eso es EEAT genuino y difícil de replicar. La estrategia: **poner las herramientas y el valor humano al frente**, y hacer los wallpapers transparentes (IA como base, curación humana como producto).
 
 ---
 
@@ -79,7 +79,7 @@ El `<head>` cargaba **HilltopAds** (native banner + *social bar* / pop-under de 
 
 ### P3 — Profesionalización / confianza
 - [ ] Página o sección de **contacto real** verificable (email visible, no solo formulario).
-- [ ] Consistencia de marca: "CrackingWall" vs "CrakingWall" vs "CrakingCultureWallpaper" — unificar el nombre público.
+- [ ] Consistencia de marca: "Pixelatmos" vs "Pixelatmos" vs "CrakingCultureWallpaper" — unificar el nombre público.
 - [ ] Banner de **consentimiento de cookies** (GDPR/consent mode) — recomendable con AdSense.
 - [ ] `404` y estados de error con diseño propio.
 
@@ -107,7 +107,7 @@ El `<head>` cargaba **HilltopAds** (native banner + *social bar* / pop-under de 
 
 ## 7. Principio rector
 
-> **No fingir.** El notebook premia autenticidad. La jugada ganadora de CrackingWall no es esconder que usa IA, sino **demostrar el valor humano y el software original que la rodea.** Las creative tools son el argumento de EEAT — hay que hacerlas protagonistas.
+> **No fingir.** El notebook premia autenticidad. La jugada ganadora de Pixelatmos no es esconder que usa IA, sino **demostrar el valor humano y el software original que la rodea.** Las creative tools son el argumento de EEAT — hay que hacerlas protagonistas.
 
 ---
 
