@@ -1,6 +1,8 @@
 ---
 // Persistent app sidebar — neobrutalism refined.
 // Only real, shipped tools are listed (future tools hidden until built).
+import { LABS } from '../../config/labs';
+
 const { pathname } = Astro.url;
 
 // Normalize trailing slashes for active-state matching
@@ -10,11 +12,11 @@ const isActive = (href: string) => current === norm(href);
 
 type NavItem = { label: string; href: string; accent: string; icon: string };
 
+// Labs come from the shared config so this list and the header dropdown
+// can't drift apart (see src/config/labs.ts).
 const tools: NavItem[] = [
   { label: 'Home', href: '/', accent: 'cyan', icon: 'grid' },
-  { label: 'ASCII Lab', href: '/ascii-lab/', accent: 'green', icon: 'terminal' },
-  { label: 'Visual Protocol', href: '/visual-protocol/', accent: 'pink', icon: 'scan' },
-  { label: '3D Lab', href: '/3d-lab/', accent: 'yellow', icon: 'cube' },
+  ...LABS,
 ];
 
 const library: NavItem[] = [
