@@ -3,6 +3,7 @@ export const prerender = true;
 import AppLayout from '../layouts/AppLayout.astro';
 import Svg3DLab from '../components/Svg3DLab';
 import FaqSection from '../components/FaqSection.astro';
+import Breadcrumbs from '../components/Breadcrumbs.astro';
 
 const faqs = [
   { q: 'Is the 3D Lab free?', a: 'Yes — it is completely free and needs no account or signup.' },
@@ -48,9 +49,10 @@ const canonicalUrl = new URL(Astro.url.pathname, Astro.site).href;
     ],
   })} />
 
+  <Breadcrumbs items={[{ name: 'Labs' }, { name: '3D Lab' }]} />
+
   <!-- Compact hero -->
   <section class="mb-6 border-2 border-black bg-brutal-dark-bg px-6 py-5 shadow-brutal md:px-8">
-    <p class="mb-1.5 font-mono text-[10px] uppercase tracking-[0.3em] text-brutal-neon-purple">Labs / 3D Lab</p>
     <h1 class="font-brutal text-2xl font-black uppercase tracking-tight text-white md:text-3xl">
       Text &amp; SVG → <span class="text-brutal-neon-cyan">3D</span>
     </h1>
