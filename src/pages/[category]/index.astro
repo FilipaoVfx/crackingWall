@@ -63,10 +63,28 @@ const title = `${category} Wallpapers | Pixelatmos`;
     </div>
   </div>
 
-  <WallpapersGridContainer 
-    client:load 
-    initialWallpapers={wallpapers} 
+  <WallpapersGridContainer
+    client:load
+    initialWallpapers={wallpapers}
   />
+
+  <!-- Flywheel bridge: send browsers on to the tools rather than ending here. -->
+  <section class="mt-14 border-t-2 border-white/10 pt-10">
+    <h2 class="mb-1 font-brutal text-xl font-black uppercase tracking-tight text-white">Make your own visuals</h2>
+    <p class="mb-4 font-mono text-[11px] text-gray-500">Free browser tools — no signup, nothing uploaded.</p>
+    <div class="grid gap-3 sm:grid-cols-3">
+      {[
+        { href: '/creative-tools/', t: 'All creative tools', d: 'SVG, 3D and image tools, compared.', hover: 'group-hover:text-brutal-neon-cyan' },
+        { href: '/3d-lab/svg-to-3d/', t: 'SVG to 3D', d: 'Turn a logo or icon into a 3D model.', hover: 'group-hover:text-brutal-neon-yellow' },
+        { href: '/ascii-lab/', t: 'ASCII Lab', d: 'Convert video into animated ASCII art.', hover: 'group-hover:text-brutal-neon-green' },
+      ].map((l) => (
+        <a href={l.href} class="group border-2 border-black bg-brutal-dark-bg p-4 shadow-brutal-sm transition-transform hover:-translate-y-0.5">
+          <h3 class={`font-brutal text-sm font-black uppercase tracking-wide text-white ${l.hover}`}>{l.t}</h3>
+          <p class="mt-1 font-mono text-[11px] leading-relaxed text-gray-500">{l.d}</p>
+        </a>
+      ))}
+    </div>
+  </section>
 </AppLayout>
 
 <style>

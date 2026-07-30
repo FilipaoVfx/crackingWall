@@ -195,6 +195,26 @@ const chip = 'flex items-center gap-1.5 border-2 border-white/15 px-3 py-1.5 fon
         </div>
       </section>
     )}
+
+    <!-- Flywheel bridge: wallpapers are the discovery layer, the tools are the
+         product. Someone who came here for a background is exactly the audience
+         for the tools, so give them the next step rather than a dead end. -->
+    <section class="mt-12">
+      <h2 class="mb-1 font-brutal text-xl font-black uppercase tracking-tight text-white">Make your own</h2>
+      <p class="mb-4 font-mono text-[11px] text-gray-500">Free browser tools — no signup, nothing uploaded.</p>
+      <div class="grid gap-3 sm:grid-cols-3">
+        {[
+          { href: '/3d-lab/svg-to-3d/', t: 'SVG to 3D', d: 'Turn a logo or icon into a real 3D model.', hover: 'group-hover:text-brutal-neon-cyan' },
+          { href: '/3d-text-generator/', t: '3D Text', d: 'Make a 3D wordmark from any word.', hover: 'group-hover:text-brutal-neon-yellow' },
+          { href: '/ascii-lab/', t: 'ASCII Lab', d: 'Convert video into animated ASCII art.', hover: 'group-hover:text-brutal-neon-green' },
+        ].map((l) => (
+          <a href={l.href} class="group border-2 border-black bg-brutal-dark-bg p-4 shadow-brutal-sm transition-transform hover:-translate-y-0.5">
+            <h3 class={`font-brutal text-sm font-black uppercase tracking-wide text-white ${l.hover}`}>{l.t}</h3>
+            <p class="mt-1 font-mono text-[11px] leading-relaxed text-gray-500">{l.d}</p>
+          </a>
+        ))}
+      </div>
+    </section>
   </div>
 </AppLayout>
 
