@@ -1,6 +1,7 @@
 ---
 export const prerender = true;
 import AppLayout from '../../layouts/AppLayout.astro';
+import Breadcrumbs from '../../components/Breadcrumbs.astro';
 
 // NOTE: Tailwind's scanner only picks up complete, literal class strings, so the
 // full class names are written out here (not composed from a color token).
@@ -67,6 +68,7 @@ const culturePosts = [
   description="Hands-on guides for Pixelatmos's creative tools (3D Lab, ASCII Lab, Visual Protocol) plus writing on developer setups and digital culture."
 >
   <div class="max-w-4xl mx-auto px-4 py-12">
+    <Breadcrumbs items={[{ name: 'Blog' }]} />
     <h1 class="text-5xl font-brutal font-black uppercase mb-4 text-center drop-shadow-[2px_2px_0_#b026ff]">
       Transmissions
     </h1>

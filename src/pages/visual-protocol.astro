@@ -3,6 +3,7 @@ export const prerender = true;
 import AppLayout from '../layouts/AppLayout.astro';
 import { ImageAnalyzer } from '../components/ImageAnalyzer';
 import FaqSection from '../components/FaqSection.astro';
+import Breadcrumbs from '../components/Breadcrumbs.astro';
 
 const faqs = [
   { q: 'Is Visual Protocol free?', a: 'Yes — it is free to use with no signup.' },
@@ -30,10 +31,11 @@ const canonicalUrl = "https://pixelatmos.com/visual-protocol/";
     "creator": { "@type": "Organization", "name": "Pixelatmos", "url": "https://pixelatmos.com" }
   })} />
 
+  <Breadcrumbs items={[{ name: 'Labs' }, { name: 'Visual Protocol' }]} class="px-4 pt-4" />
+
   <!-- Hero Section -->
   <section class="vp-hero">
     <div class="vp-hero-content">
-      <span class="vp-badge">LABS / VISUAL PROTOCOL</span>
       <h1 class="vp-title">Understand why an image works.</h1>
       <p class="vp-subtitle">
         Upload any image and decode its visual structure — composition, hierarchy, color and balance.
@@ -44,6 +46,20 @@ const canonicalUrl = "https://pixelatmos.com/visual-protocol/";
         Upload & Analyze
         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12l7 7 7-7"/></svg>
       </a>
+    </div>
+  </section>
+
+  <!-- Front-loaded definition — the most citable passage on the page. -->
+  <section class="mx-auto max-w-3xl px-4">
+    <div class="border-l-4 border-brutal-neon-pink bg-brutal-dark-bg px-5 py-4">
+      <p class="font-mono text-[13px] leading-relaxed text-gray-300">
+        <strong class="text-white">Visual Protocol is a free tool that analyses any image and returns a structured creative brief.</strong>
+        Upload a reference and it breaks the picture down the way a creative director would: the
+        dominant palette, the mood and atmosphere, how the composition guides the eye, and the style
+        cues the image leans on. The point is to turn a vague "I like this" into direction you can
+        actually brief from. Unlike the other labs, this one sends your image to an AI model to
+        analyse it.
+      </p>
     </div>
   </section>
 
@@ -101,7 +117,45 @@ const canonicalUrl = "https://pixelatmos.com/visual-protocol/";
     <ImageAnalyzer client:load />
   </section>
 
+  <!-- How it works -->
+  <section class="mx-auto mt-12 max-w-3xl px-4">
+    <h2 class="mb-4 font-brutal text-xl font-black uppercase tracking-tight text-white">How to analyse an image</h2>
+    <ol class="flex flex-col gap-3">
+      {[
+        { t: 'Upload a reference', d: 'Pick an image whose look you want to understand — a poster, a frame, a screenshot, a photo.' },
+        { t: 'Read the breakdown', d: 'You get the dominant palette, the mood, how the composition directs attention, and the style cues at work.' },
+        { t: 'Compare two references', d: 'Running a second image sharpens the contrast and exposes what you actually want, which one image alone rarely reveals.' },
+        { t: 'Turn it into direction', d: 'Use the breakdown as the basis of a brief, a moodboard rationale, or an argument for a creative decision.' },
+      ].map((s, i) => (
+        <li class="flex gap-4 border-2 border-black bg-brutal-dark-bg p-4 shadow-brutal-sm">
+          <span class="grid h-7 w-7 shrink-0 place-items-center border-2 border-black bg-brutal-neon-pink font-brutal text-sm font-black text-black">{i + 1}</span>
+          <div>
+            <h3 class="font-brutal text-sm font-black uppercase tracking-wide text-white">{s.t}</h3>
+            <p class="mt-1 font-mono text-[12px] leading-relaxed text-gray-400">{s.d}</p>
+          </div>
+        </li>
+      ))}
+    </ol>
+  </section>
+
   <FaqSection items={faqs} />
+
+  <!-- Related -->
+  <section class="mx-auto mt-12 max-w-3xl px-4">
+    <h2 class="mb-4 font-brutal text-xl font-black uppercase tracking-tight text-white">Related</h2>
+    <div class="grid gap-3 sm:grid-cols-3">
+      {[
+        { href: '/blog/visual-protocol-creative-direction/', t: 'Creative direction', d: 'Why structured analysis beats taste alone.' },
+        { href: '/3d-lab/', t: '3D Lab', d: 'Turn SVG or text into interactive 3D.' },
+        { href: '/ascii-lab/', t: 'ASCII Lab', d: 'Turn video into animated ASCII art.' },
+      ].map((l) => (
+        <a href={l.href} class="group border-2 border-black bg-brutal-dark-bg p-4 shadow-brutal-sm transition-transform hover:-translate-y-0.5">
+          <h3 class="font-brutal text-sm font-black uppercase tracking-wide text-white group-hover:text-brutal-neon-pink">{l.t}</h3>
+          <p class="mt-1 font-mono text-[11px] leading-relaxed text-gray-500">{l.d}</p>
+        </a>
+      ))}
+    </div>
+  </section>
 </AppLayout>
 
 <style>

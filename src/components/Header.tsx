@@ -3,6 +3,17 @@ import { Search, User, Menu, X, LogOut, ChevronDown, FlaskConical } from 'lucide
 import { BrutalButton } from './BrutalButton';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../hooks/useAuth';
+import { LABS } from '../config/labs';
+
+// Accent -> hover classes. Written out in full because Tailwind's JIT only
+// keeps classes it can find as literal strings in the source.
+const LAB_HOVER: Record<string, string> = {
+  green: 'hover:bg-brutal-neon-green/10 hover:text-brutal-neon-green',
+  pink: 'hover:bg-brutal-neon-pink/10 hover:text-brutal-neon-pink',
+  cyan: 'hover:bg-brutal-neon-cyan/10 hover:text-brutal-neon-cyan',
+  purple: 'hover:bg-brutal-neon-purple/10 hover:text-brutal-neon-purple',
+  yellow: 'hover:bg-brutal-neon-yellow/10 hover:text-brutal-neon-yellow',
+};
 
 interface HeaderProps {
   onSearchChange: (query: string) => void;
@@ -73,20 +84,16 @@ export const Header: React.FC<HeaderProps> = ({ onSearchChange, onAuthClick }) =
                       transition={{ duration: 0.15 }}
                       className="absolute top-full left-0 mt-3 w-56 bg-[#0d0f14] border-2 border-brutal-neon-green/40 shadow-[0_0_20px_rgba(0,255,156,0.15)] z-50"
                     >
-                      <a
-                        href="/ascii-lab/"
-                        className="block px-5 py-3 text-xs hover:bg-brutal-neon-green/10 hover:text-brutal-neon-green transition-all border-b border-white/5"
-                      >
-                        <span className="block text-white font-black">ASCII Lab</span>
-                        <span className="block text-gray-500 font-normal normal-case mt-0.5" style={{ fontSize: '10px' }}>Video → ASCII art converter</span>
-                      </a>
-                      <a
-                        href="/visual-protocol/"
-                        className="block px-5 py-3 text-xs hover:bg-[#ff003c]/10 hover:text-[#ff003c] transition-all"
-                      >
-                        <span className="block text-white font-black">Visual Protocol</span>
-                        <span className="block text-gray-500 font-normal normal-case mt-0.5" style={{ fontSize: '10px' }}>AI image analysis tool</span>
-                      </a>
+                      {LABS.map((lab, i) => (
+                        <a
+                          key={lab.href}
+                          href={lab.href}
+                          className={`block px-5 py-3 text-xs transition-all ${LAB_HOVER[lab.accent]} ${i < LABS.length - 1 ? 'border-b border-white/5' : ''}`}
+                        >
+                          <span className="block text-white font-black">{lab.label}</span>
+                          <span className="block text-gray-500 font-normal normal-case mt-0.5" style={{ fontSize: '10px' }}>{lab.description}</span>
+                        </a>
+                      ))}
                     </motion.div>
                   )}
                 </AnimatePresence>
@@ -165,6 +172,21 @@ export const Header: React.FC<HeaderProps> = ({ onSearchChange, onAuthClick }) =
                   onChange={handleSearchChange}
                   className="w-full px-4 py-3 text-lg font-brutal font-bold bg-brutal-yellow border-4 border-brutal-black shadow-brutal focus:outline-none placeholder-brutal-black"
                 />
+
+                {/* Nav — the mobile menu previously had no links at all, so the
+                    tools were unreachable from the header on small screens. */}
+                <nav className="border-2 border-white/10 divide-y divide-white/5">
+                  <a href="/blog/" className="block px-4 py-3 font-brutal text-sm font-bold uppercase text-white hover:bg-brutal-neon-cyan/10 hover:text-brutal-neon-cyan transition-colors">Blog</a>
+                  {LABS.map((lab) => (
+                    <a key={lab.href} href={lab.href} className={`block px-4 py-3 transition-colors ${LAB_HOVER[lab.accent]}`}>
+                      <span className="block font-brutal text-sm font-bold uppercase text-white">{lab.label}</span>
+                      <span className="block font-mono text-gray-500 mt-0.5" style={{ fontSize: '10px' }}>{lab.description}</span>
+                    </a>
+                  ))}
+                  <a href="/wallpapers/" className="block px-4 py-3 font-brutal text-sm font-bold uppercase text-white hover:bg-brutal-neon-purple/10 hover:text-brutal-neon-purple transition-colors">Wallpapers</a>
+                  <a href="/about/" className="block px-4 py-3 font-brutal text-sm font-bold uppercase text-white hover:bg-brutal-neon-pink/10 hover:text-brutal-neon-pink transition-colors">About</a>
+                  <a href="/contact/" className="block px-4 py-3 font-brutal text-sm font-bold uppercase text-white hover:bg-brutal-neon-yellow/10 hover:text-brutal-neon-yellow transition-colors">Contact</a>
+                </nav>
 
                 {user ? (
                   <div className="space-y-2">

@@ -42,6 +42,8 @@ module.exports = {
         'neon-green-hover': '0 0 40px rgba(57, 255, 20, 0.8), 10px 10px 0 rgba(0, 0, 0, 0.8)',
         'neon-purple': '0 0 20px rgba(176, 38, 255, 0.5), 6px 6px 0 rgba(0, 0, 0, 0.8)',
         'neon-purple-hover': '0 0 40px rgba(176, 38, 255, 0.8), 10px 10px 0 rgba(0, 0, 0, 0.8)',
+        'neon-yellow': '0 0 20px rgba(255, 237, 0, 0.5), 6px 6px 0 rgba(0, 0, 0, 0.8)',
+        'neon-yellow-hover': '0 0 40px rgba(255, 237, 0, 0.8), 10px 10px 0 rgba(0, 0, 0, 0.8)',
       },
       borderWidth: {
         '3': '3px',

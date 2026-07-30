@@ -3,6 +3,7 @@ export const prerender = true;
 import AppLayout from '../layouts/AppLayout.astro';
 import Svg3DLab from '../components/Svg3DLab';
 import FaqSection from '../components/FaqSection.astro';
+import Breadcrumbs from '../components/Breadcrumbs.astro';
 
 const faqs = [
   { q: 'Is the 3D Lab free?', a: 'Yes — it is completely free and needs no account or signup.' },
@@ -31,9 +32,27 @@ const canonicalUrl = new URL(Astro.url.pathname, Astro.site).href;
     "creator": { "@type": "Organization", "name": "Pixelatmos", "url": "https://pixelatmos.com" }
   })} />
 
+  <script type="application/ld+json" set:html={JSON.stringify({
+    "@context": "https://schema.org",
+    "@type": "HowTo",
+    name: 'How to convert an SVG to 3D',
+    description: 'Turn an SVG file into an interactive 3D object in the browser, sculpt each layer, and export it as PNG or GLB.',
+    totalTime: 'PT3M',
+    tool: [{ '@type': 'HowToTool', name: 'Pixelatmos 3D Lab' }],
+    supply: [{ '@type': 'HowToSupply', name: 'An SVG file (or up to six characters of text)' }],
+    step: [
+      { '@type': 'HowToStep', position: 1, name: 'Load a shape', text: 'Click an example emoji, upload your own SVG, or type up to six characters for text mode.' },
+      { '@type': 'HowToStep', position: 2, name: 'Automatic interpretation', text: 'The engine segments the file by group or by shape and resolves each element fill, including gradients.' },
+      { '@type': 'HowToStep', position: 3, name: 'Depth reconstruction', text: 'Overlapping shapes are analysed spatially so disjoint siblings share a height and contained shapes rise above their parent.' },
+      { '@type': 'HowToStep', position: 4, name: 'Sculpt each layer', text: 'Adjust relief depth, material preset, color and visibility per element in the Layer Explorer.' },
+      { '@type': 'HowToStep', position: 5, name: 'Export', text: 'Download a PNG of the viewport or a GLB model rebuilt at high quality with each layer as a named node.' },
+    ],
+  })} />
+
+  <Breadcrumbs items={[{ name: 'Labs' }, { name: '3D Lab' }]} />
+
   <!-- Compact hero -->
   <section class="mb-6 border-2 border-black bg-brutal-dark-bg px-6 py-5 shadow-brutal md:px-8">
-    <p class="mb-1.5 font-mono text-[10px] uppercase tracking-[0.3em] text-brutal-neon-purple">Labs / 3D Lab</p>
     <h1 class="font-brutal text-2xl font-black uppercase tracking-tight text-white md:text-3xl">
       Text &amp; SVG → <span class="text-brutal-neon-cyan">3D</span>
     </h1>
@@ -41,7 +60,118 @@ const canonicalUrl = new URL(Astro.url.pathname, Astro.site).href;
     <p class="mt-1.5 font-mono text-[11px] uppercase tracking-wide text-brutal-neon-cyan">100% in your browser · no signup · your files never leave your device · free</p>
   </section>
 
+  <!-- Front-loaded definition: the interactive tool below is client-only, so
+       this prose is what search engines and AI crawlers actually read. -->
+  <section class="mb-8 border-l-4 border-brutal-neon-cyan bg-brutal-dark-bg px-5 py-4">
+    <p class="font-mono text-[13px] leading-relaxed text-gray-300">
+      <strong class="text-white">The 3D Lab is a free browser tool that converts SVG files and short text into interactive 3D geometry.</strong>
+      It reads each shape in your SVG, extrudes it into real volume, and stacks the parts by depth so
+      details rise as relief over the base. You can sculpt every layer — depth, material, color,
+      visibility — then export a PNG image or a GLB model. Nothing is uploaded: the conversion runs
+      entirely on your device using WebGL.
+    </p>
+  </section>
+
   <Svg3DLab client:only="react" />
 
+  <!-- How it works -->
+  <section class="mx-auto mt-12 max-w-3xl">
+    <h2 class="mb-4 font-brutal text-xl font-black uppercase tracking-tight text-white">How to convert an SVG to 3D</h2>
+    <p class="mb-5 font-mono text-[13px] leading-relaxed text-gray-400">
+      The 3D Lab is not a one-click converter — it is a transformation workflow. Each stage is visible
+      and adjustable, which is what separates a usable 3D asset from a flat extrusion.
+    </p>
+    <ol class="flex flex-col gap-3">
+      {[
+        { t: 'Load a shape', d: 'Click one of the example emoji, upload your own SVG, or type up to six characters for text mode. The examples let you test the whole pipeline before committing your own file.' },
+        { t: 'Automatic interpretation', d: 'The engine segments the file — by authored <g id> groups when they exist, otherwise per individual shape — and resolves each element’s fill, including gradients.' },
+        { t: 'Depth reconstruction', d: 'Overlapping shapes are analysed spatially: disjoint siblings share a height, contained shapes rise above their parent. Two eyes stay level; a pupil lifts off the eye.' },
+        { t: 'Sculpt each layer', d: 'In the Layer Explorer, adjust relief depth, material preset, color and visibility per element. Changes re-extrude only the layer you touched, so editing stays fluid.' },
+        { t: 'Export', d: 'Download a PNG of the viewport, or a GLB model rebuilt at high quality with each layer as a named node — ready for Blender, game engines or AR.' },
+      ].map((s, i) => (
+        <li class="flex gap-4 border-2 border-black bg-brutal-dark-bg p-4 shadow-brutal-sm">
+          <span class="grid h-7 w-7 shrink-0 place-items-center border-2 border-black bg-brutal-neon-cyan font-brutal text-sm font-black text-black">{i + 1}</span>
+          <div>
+            <h3 class="font-brutal text-sm font-black uppercase tracking-wide text-white">{s.t}</h3>
+            <p class="mt-1 font-mono text-[12px] leading-relaxed text-gray-400" set:html={s.d} />
+          </div>
+        </li>
+      ))}
+    </ol>
+  </section>
+
+  <!-- Supported formats -->
+  <section class="mx-auto mt-12 max-w-3xl">
+    <h2 class="mb-4 font-brutal text-xl font-black uppercase tracking-tight text-white">Supported formats</h2>
+    <div class="overflow-x-auto border-2 border-black shadow-brutal-sm">
+      <table class="w-full border-collapse bg-brutal-dark-bg font-mono text-[12px]">
+        <thead>
+          <tr class="border-b-2 border-black bg-black/40 text-left">
+            <th class="px-4 py-2.5 font-brutal text-[11px] uppercase tracking-wider text-brutal-neon-cyan">Format</th>
+            <th class="px-4 py-2.5 font-brutal text-[11px] uppercase tracking-wider text-brutal-neon-cyan">Direction</th>
+            <th class="px-4 py-2.5 font-brutal text-[11px] uppercase tracking-wider text-brutal-neon-cyan">Notes</th>
+          </tr>
+        </thead>
+        <tbody class="text-gray-400">
+          <tr class="border-b border-white/5">
+            <td class="px-4 py-2.5 font-bold text-white">SVG</td>
+            <td class="px-4 py-2.5">Input</td>
+            <td class="px-4 py-2.5">Paths, groups, gradients and masks. Scripts are stripped on load.</td>
+          </tr>
+          <tr class="border-b border-white/5">
+            <td class="px-4 py-2.5 font-bold text-white">Text</td>
+            <td class="px-4 py-2.5">Input</td>
+            <td class="px-4 py-2.5">Up to six characters, extruded with a material preset.</td>
+          </tr>
+          <tr class="border-b border-white/5">
+            <td class="px-4 py-2.5 font-bold text-white">PNG</td>
+            <td class="px-4 py-2.5">Export</td>
+            <td class="px-4 py-2.5">Transparent-background capture of the current view.</td>
+          </tr>
+          <tr>
+            <td class="px-4 py-2.5 font-bold text-white">GLB</td>
+            <td class="px-4 py-2.5">Export</td>
+            <td class="px-4 py-2.5">Binary glTF. Rebuilt at high quality, one named node per layer, compressed.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- Features -->
+  <section class="mx-auto mt-12 max-w-3xl">
+    <h2 class="mb-4 font-brutal text-xl font-black uppercase tracking-tight text-white">What makes it different</h2>
+    <ul class="grid gap-3 sm:grid-cols-2">
+      {[
+        ['Per-layer sculpting', 'Every shape in the SVG becomes its own editable object — not one flat extrusion.'],
+        ['Real gradients', 'Gradients become actual textures plus a derived normal map, so surfaces read as sculpted rather than painted.'],
+        ['Draft viewport, HD export', 'Editing runs low-poly for a smooth 60fps; the GLB is rebuilt at high quality only when you download.'],
+        ['Nothing leaves your device', 'No upload, no account, no server round-trip. The file stays in your browser.'],
+      ].map(([t, d]) => (
+        <li class="border-2 border-black bg-brutal-dark-bg p-4 shadow-brutal-sm">
+          <h3 class="font-brutal text-sm font-black uppercase tracking-wide text-brutal-neon-cyan">{t}</h3>
+          <p class="mt-1.5 font-mono text-[12px] leading-relaxed text-gray-400">{d}</p>
+        </li>
+      ))}
+    </ul>
+  </section>
+
   <FaqSection items={faqs} />
+
+  <!-- Related -->
+  <section class="mx-auto mt-12 max-w-3xl">
+    <h2 class="mb-4 font-brutal text-xl font-black uppercase tracking-tight text-white">Related</h2>
+    <div class="grid gap-3 sm:grid-cols-3">
+      {[
+        { href: '/blog/svg-to-3d-browser-guide/', t: 'SVG to 3D guide', d: 'The full walkthrough, step by step.' },
+        { href: '/ascii-lab/', t: 'ASCII Lab', d: 'Turn video into animated ASCII art.' },
+        { href: '/visual-protocol/', t: 'Visual Protocol', d: 'Decode any image like a creative director.' },
+      ].map((l) => (
+        <a href={l.href} class="group border-2 border-black bg-brutal-dark-bg p-4 shadow-brutal-sm transition-transform hover:-translate-y-0.5">
+          <h3 class="font-brutal text-sm font-black uppercase tracking-wide text-white group-hover:text-brutal-neon-cyan">{l.t}</h3>
+          <p class="mt-1 font-mono text-[11px] leading-relaxed text-gray-500">{l.d}</p>
+        </a>
+      ))}
+    </div>
+  </section>
 </AppLayout>
