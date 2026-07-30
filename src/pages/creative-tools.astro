@@ -1,0 +1,229 @@
+---
+export const prerender = true;
+import AppLayout from '../layouts/AppLayout.astro';
+import FaqSection from '../components/FaqSection.astro';
+import Breadcrumbs from '../components/Breadcrumbs.astro';
+import { LABS } from '../config/labs';
+
+const title = 'Creative Tools for Designers, Developers & Digital Artists | Pixelatmos';
+const description =
+  'Free browser-based creative tools: turn SVG and text into 3D, convert video to ASCII art, and decode any image into a creative brief. No signup, no install.';
+const canonicalUrl = 'https://pixelatmos.com/creative-tools/';
+
+// Accent -> literal classes. Tailwind's scanner only keeps class names it can
+// find as complete strings, so these are written out rather than composed.
+const ACCENT = {
+  yellow: { text: 'text-brutal-neon-yellow', border: 'border-brutal-neon-yellow/30', bg: 'bg-brutal-neon-yellow/10', hoverShadow: 'hover:shadow-neon-yellow' },
+  green: { text: 'text-brutal-neon-green', border: 'border-brutal-neon-green/30', bg: 'bg-brutal-neon-green/10', hoverShadow: 'hover:shadow-neon-green' },
+  pink: { text: 'text-brutal-neon-pink', border: 'border-brutal-neon-pink/30', bg: 'bg-brutal-neon-pink/10', hoverShadow: 'hover:shadow-neon-pink' },
+  cyan: { text: 'text-brutal-neon-cyan', border: 'border-brutal-neon-cyan/30', bg: 'bg-brutal-neon-cyan/10', hoverShadow: 'hover:shadow-neon-cyan' },
+  purple: { text: 'text-brutal-neon-purple', border: 'border-brutal-neon-purple/30', bg: 'bg-brutal-neon-purple/10', hoverShadow: 'hover:shadow-neon-purple' },
+} as const;
+
+// Per-tool detail for this page. LABS carries nav-level data (label/href);
+// the longer copy lives here so the nav config stays small.
+const DETAIL: Record<string, { tagline: string; blurb: string; input: string; output: string; local: string; useWhen: string }> = {
+  '/3d-lab/': {
+    tagline: 'SVG → 3D',
+    blurb: 'Converts an SVG or a short string into interactive 3D geometry. Each shape becomes its own editable layer with its own depth, material and colour.',
+    input: 'SVG, text',
+    output: 'PNG, GLB',
+    local: 'Fully local',
+    useWhen: 'You need a logo, icon or word as a real 3D asset.',
+  },
+  '/ascii-lab/': {
+    tagline: 'Video → ASCII',
+    blurb: 'Rebuilds video and images out of text characters. You control the character ramp, resolution and frame rate, with a live preview.',
+    input: 'Video, image',
+    output: 'GIF, MP4, HTML',
+    local: 'Fully local',
+    useWhen: 'You want a terminal-flavoured animation or a text-art still.',
+  },
+  '/visual-protocol/': {
+    tagline: 'Image → Insight',
+    blurb: 'Reads an image and returns a structured creative brief: palette, mood, composition and the style cues it leans on.',
+    input: 'Image',
+    output: 'Written breakdown',
+    local: 'Sends to an AI model',
+    useWhen: 'You have a reference you like and need to articulate why.',
+  },
+};
+
+const tools = LABS.map((lab) => ({ ...lab, ...DETAIL[lab.href] }));
+
+const faqs = [
+  {
+    q: 'Are these tools really free?',
+    a: 'Yes. Every tool on Pixelatmos is free, with no account, no trial and no export watermark.',
+  },
+  {
+    q: 'Do I need to install anything?',
+    a: 'No. They run in the browser. The 3D Lab needs WebGL, which any current browser supports.',
+  },
+  {
+    q: 'Do my files get uploaded?',
+    a: 'The 3D Lab and ASCII Lab process everything on your device — nothing is sent anywhere. Visual Protocol is the exception: it sends your image to an AI model to analyse it, and says so on its page.',
+  },
+  {
+    q: 'Can I use the output commercially?',
+    a: 'Yes. Whatever you make with the tools is yours. The wallpaper collection has its own licence, covered on the licence page.',
+  },
+  {
+    q: 'What is being built next?',
+    a: 'The SVG side is expanding first — an optimizer and a dedicated 3D text and logo generator, both built on the engine the 3D Lab already uses.',
+  },
+];
+---
+
+<AppLayout title={title} description={description}>
+  <script type="application/ld+json" set:html={JSON.stringify({
+    '@context': 'https://schema.org',
+    '@type': 'CollectionPage',
+    name: 'Creative Tools',
+    description,
+    url: canonicalUrl,
+    isPartOf: { '@type': 'WebSite', url: 'https://pixelatmos.com/' },
+    mainEntity: {
+      '@type': 'ItemList',
+      itemListElement: tools.map((t, i) => ({
+        '@type': 'ListItem',
+        position: i + 1,
+        item: {
+          '@type': 'WebApplication',
+          name: t.label,
+          description: t.blurb,
+          url: `https://pixelatmos.com${t.href}`,
+          applicationCategory: 'DesignApplication',
+          operatingSystem: 'Web',
+          offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+        },
+      })),
+    },
+  })} />
+
+  <Breadcrumbs items={[{ name: 'Creative Tools' }]} />
+
+  <!-- Hero -->
+  <section class="mb-6 border-2 border-black bg-brutal-dark-bg px-6 py-6 shadow-brutal md:px-8">
+    <h1 class="font-brutal text-2xl font-black uppercase tracking-tight text-white md:text-3xl">
+      Creative tools for <span class="text-brutal-neon-cyan">digital makers</span>
+    </h1>
+    <p class="mt-2 max-w-2xl font-mono text-xs leading-relaxed text-gray-400">
+      Experimental visual tools for SVG, 3D and digital art — built for designers, developers and
+      anyone who makes things on a screen.
+    </p>
+  </section>
+
+  <!-- Front-loaded definition: the most citable passage on the page. -->
+  <section class="mb-8 border-l-4 border-brutal-neon-cyan bg-brutal-dark-bg px-5 py-4">
+    <p class="font-mono text-[13px] leading-relaxed text-gray-300">
+      <strong class="text-white">Pixelatmos is a set of free, browser-based creative tools for visual work.</strong>
+      There are three: the 3D Lab turns SVG files and short text into interactive 3D objects you can
+      export as PNG or GLB; ASCII Lab converts video and images into animated ASCII art; and Visual
+      Protocol analyses any image and returns a structured creative brief. None of them need an
+      account or an install, and two of the three never send your file anywhere — the conversion
+      happens on your own machine.
+    </p>
+  </section>
+
+  <!-- The tools -->
+  <section class="mb-12">
+    <h2 class="mb-1 font-brutal text-xl font-black uppercase tracking-tight text-white">The tools</h2>
+    <p class="mb-5 font-mono text-[11px] text-gray-500">Three, each doing one thing properly.</p>
+
+    <div class="grid gap-5 md:grid-cols-3">
+      {tools.map((t) => {
+        const a = ACCENT[t.accent];
+        return (
+          <a
+            href={t.href}
+            class={`group flex flex-col border-2 border-black bg-brutal-dark-bg p-5 shadow-brutal transition-all hover:-translate-y-1 ${a.hoverShadow}`}
+          >
+            <span class={`mb-2 w-fit border ${a.border} ${a.bg} px-2 py-0.5 font-mono text-[10px] font-bold uppercase tracking-[0.15em] ${a.text}`}>{t.tagline}</span>
+            <h3 class="mb-1.5 font-brutal text-lg font-black uppercase tracking-wide text-white">{t.label}</h3>
+            <p class="mb-4 flex-1 font-mono text-[11px] leading-relaxed text-gray-400">{t.blurb}</p>
+            <span class={`flex items-center gap-2 font-brutal text-xs font-black uppercase tracking-wide ${a.text}`}>
+              Open tool
+              <svg class="transition-transform group-hover:translate-x-1" xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+            </span>
+          </a>
+        );
+      })}
+    </div>
+  </section>
+
+  <!-- Comparison — the substance that makes this a hub rather than a link list -->
+  <section class="mb-12">
+    <h2 class="mb-4 font-brutal text-xl font-black uppercase tracking-tight text-white">Which tool should you use?</h2>
+    <div class="overflow-x-auto border-2 border-black shadow-brutal-sm">
+      <table class="w-full border-collapse bg-brutal-dark-bg font-mono text-[12px]">
+        <thead>
+          <tr class="border-b-2 border-black bg-black/40 text-left">
+            <th class="px-4 py-2.5 font-brutal text-[11px] uppercase tracking-wider text-brutal-neon-cyan">Tool</th>
+            <th class="px-4 py-2.5 font-brutal text-[11px] uppercase tracking-wider text-brutal-neon-cyan">Takes</th>
+            <th class="px-4 py-2.5 font-brutal text-[11px] uppercase tracking-wider text-brutal-neon-cyan">Gives</th>
+            <th class="px-4 py-2.5 font-brutal text-[11px] uppercase tracking-wider text-brutal-neon-cyan">Privacy</th>
+            <th class="px-4 py-2.5 font-brutal text-[11px] uppercase tracking-wider text-brutal-neon-cyan">Reach for it when</th>
+          </tr>
+        </thead>
+        <tbody class="text-gray-400">
+          {tools.map((t, i) => (
+            <tr class={i < tools.length - 1 ? 'border-b border-white/5' : ''}>
+              <td class="px-4 py-2.5 font-bold text-white"><a href={t.href} class="hover:text-brutal-neon-cyan">{t.label}</a></td>
+              <td class="px-4 py-2.5">{t.input}</td>
+              <td class="px-4 py-2.5">{t.output}</td>
+              <td class="px-4 py-2.5">{t.local}</td>
+              <td class="px-4 py-2.5">{t.useWhen}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- Workflow -->
+  <section class="mb-12">
+    <h2 class="mb-4 font-brutal text-xl font-black uppercase tracking-tight text-white">How they fit together</h2>
+    <p class="mb-5 max-w-3xl font-mono text-[13px] leading-relaxed text-gray-400">
+      The tools are separate, but they were built around one loop: find something visual you like,
+      understand why it works, then make your own version of it. A typical pass looks like this.
+    </p>
+    <ol class="flex flex-col gap-3">
+      {[
+        { t: 'Start from a reference', d: 'Run an image you admire through Visual Protocol to get its palette, mood and composition in words you can act on.', href: '/visual-protocol/' },
+        { t: 'Build the asset', d: 'Take a logo or icon into the 3D Lab, sculpt its layers, and export a GLB or a PNG you can drop into a design.', href: '/3d-lab/' },
+        { t: 'Give it texture', d: 'Push a clip through ASCII Lab when you want the terminal-native, text-art treatment instead of a rendered look.', href: '/ascii-lab/' },
+        { t: 'Set the scene', d: 'Pull a wallpaper from the collection to sit behind the work, or to set the tone of the workspace you build in.', href: '/wallpapers/' },
+      ].map((s, i) => (
+        <li class="flex gap-4 border-2 border-black bg-brutal-dark-bg p-4 shadow-brutal-sm">
+          <span class="grid h-7 w-7 shrink-0 place-items-center border-2 border-black bg-brutal-neon-cyan font-brutal text-sm font-black text-black">{i + 1}</span>
+          <div>
+            <h3 class="font-brutal text-sm font-black uppercase tracking-wide text-white">
+              <a href={s.href} class="hover:text-brutal-neon-cyan">{s.t}</a>
+            </h3>
+            <p class="mt-1 font-mono text-[12px] leading-relaxed text-gray-400">{s.d}</p>
+          </div>
+        </li>
+      ))}
+    </ol>
+  </section>
+
+  <FaqSection items={faqs} />
+
+  <!-- Guides -->
+  <section class="mt-12">
+    <h2 class="mb-4 font-brutal text-xl font-black uppercase tracking-tight text-white">Guides</h2>
+    <div class="grid gap-3 sm:grid-cols-3">
+      {[
+        { href: '/blog/svg-to-3d-browser-guide/', t: 'SVG to 3D', d: 'Turn any SVG into a 3D model, step by step.' },
+        { href: '/blog/faithful-ascii-art-guide/', t: 'Faithful ASCII art', d: 'Picking charsets and settings that hold detail.' },
+        { href: '/blog/visual-protocol-creative-direction/', t: 'Creative direction', d: 'Why structured analysis beats taste alone.' },
+      ].map((l) => (
+        <a href={l.href} class="group border-2 border-black bg-brutal-dark-bg p-4 shadow-brutal-sm transition-transform hover:-translate-y-0.5">
+          <h3 class="font-brutal text-sm font-black uppercase tracking-wide text-white group-hover:text-brutal-neon-cyan">{l.t}</h3>
+          <p class="mt-1 font-mono text-[11px] leading-relaxed text-gray-500">{l.d}</p>
+        </a>
+      ))}
+    </div>
+  </section>
+</AppLayout>

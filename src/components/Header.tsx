@@ -84,16 +84,22 @@ export const Header: React.FC<HeaderProps> = ({ onSearchChange, onAuthClick }) =
                       transition={{ duration: 0.15 }}
                       className="absolute top-full left-0 mt-3 w-56 bg-[#0d0f14] border-2 border-brutal-neon-green/40 shadow-[0_0_20px_rgba(0,255,156,0.15)] z-50"
                     >
-                      {LABS.map((lab, i) => (
+                      {LABS.map((lab) => (
                         <a
                           key={lab.href}
                           href={lab.href}
-                          className={`block px-5 py-3 text-xs transition-all ${LAB_HOVER[lab.accent]} ${i < LABS.length - 1 ? 'border-b border-white/5' : ''}`}
+                          className={`block px-5 py-3 text-xs transition-all border-b border-white/5 ${LAB_HOVER[lab.accent]}`}
                         >
                           <span className="block text-white font-black">{lab.label}</span>
                           <span className="block text-gray-500 font-normal normal-case mt-0.5" style={{ fontSize: '10px' }}>{lab.description}</span>
                         </a>
                       ))}
+                      <a
+                        href="/creative-tools/"
+                        className="block px-5 py-2.5 text-xs bg-black/30 hover:bg-brutal-neon-cyan/10 hover:text-brutal-neon-cyan transition-all"
+                      >
+                        <span className="block font-black text-gray-400">All creative tools →</span>
+                      </a>
                     </motion.div>
                   )}
                 </AnimatePresence>
@@ -183,6 +189,7 @@ export const Header: React.FC<HeaderProps> = ({ onSearchChange, onAuthClick }) =
                       <span className="block font-mono text-gray-500 mt-0.5" style={{ fontSize: '10px' }}>{lab.description}</span>
                     </a>
                   ))}
+                  <a href="/creative-tools/" className="block px-4 py-3 font-brutal text-sm font-bold uppercase text-gray-400 hover:bg-brutal-neon-cyan/10 hover:text-brutal-neon-cyan transition-colors">All creative tools →</a>
                   <a href="/wallpapers/" className="block px-4 py-3 font-brutal text-sm font-bold uppercase text-white hover:bg-brutal-neon-purple/10 hover:text-brutal-neon-purple transition-colors">Wallpapers</a>
                   <a href="/about/" className="block px-4 py-3 font-brutal text-sm font-bold uppercase text-white hover:bg-brutal-neon-pink/10 hover:text-brutal-neon-pink transition-colors">About</a>
                   <a href="/contact/" className="block px-4 py-3 font-brutal text-sm font-bold uppercase text-white hover:bg-brutal-neon-yellow/10 hover:text-brutal-neon-yellow transition-colors">Contact</a>
