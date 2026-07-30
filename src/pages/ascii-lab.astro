@@ -49,11 +49,85 @@ const canonicalUrl = "https://pixelatmos.com/ascii-lab/";
     </div>
   </section>
 
+  <!-- Front-loaded definition: the tool below is client-only, so this prose is
+       what search engines and AI crawlers actually read. -->
+  <section class="mx-auto mb-6 max-w-3xl border-l-4 border-brutal-neon-green bg-brutal-dark-bg px-5 py-4">
+    <p class="font-mono text-[13px] leading-relaxed text-gray-300">
+      <strong class="text-white">ASCII Lab is a free browser tool that converts video and images into ASCII art.</strong>
+      It samples each frame, maps brightness to a character ramp you choose, and rebuilds the image
+      out of text. You control the character set, frame rate and resolution, with a live preview as
+      you tune them. Finished pieces export as an animated GIF, an MP4 video, or a self-contained
+      HTML file. Conversion happens on your device — no upload, no account.
+    </p>
+  </section>
+
   <section class="ascii-tool-section">
     <AsciiLab client:only="react" />
   </section>
 
+  <!-- How it works -->
+  <section class="mx-auto mt-12 max-w-3xl px-4">
+    <h2 class="mb-4 font-brutal text-xl font-black uppercase tracking-tight text-white">How to convert a video to ASCII art</h2>
+    <ol class="flex flex-col gap-3">
+      {[
+        { t: 'Load your media', d: 'Drop in a video or an image. It is read locally by your browser — nothing is sent to a server.' },
+        { t: 'Choose a character ramp', d: 'The charset maps brightness to glyphs. A dense ramp keeps subtle tones; a sparse one gives a harder, more graphic look.' },
+        { t: 'Set resolution and FPS', d: 'Resolution controls how many characters wide the output is — the real detail dial. Lower FPS makes smaller files.' },
+        { t: 'Preview and adjust', d: 'The preview updates as you tune. High-contrast sources convert most faithfully, so adjust until the shapes read clearly.' },
+        { t: 'Export', d: 'Save as an animated GIF, an MP4, or a self-contained HTML file that plays the animation anywhere.' },
+      ].map((s, i) => (
+        <li class="flex gap-4 border-2 border-black bg-brutal-dark-bg p-4 shadow-brutal-sm">
+          <span class="grid h-7 w-7 shrink-0 place-items-center border-2 border-black bg-brutal-neon-green font-brutal text-sm font-black text-black">{i + 1}</span>
+          <div>
+            <h3 class="font-brutal text-sm font-black uppercase tracking-wide text-white">{s.t}</h3>
+            <p class="mt-1 font-mono text-[12px] leading-relaxed text-gray-400">{s.d}</p>
+          </div>
+        </li>
+      ))}
+    </ol>
+  </section>
+
+  <!-- Supported formats -->
+  <section class="mx-auto mt-12 max-w-3xl px-4">
+    <h2 class="mb-4 font-brutal text-xl font-black uppercase tracking-tight text-white">Supported formats</h2>
+    <div class="overflow-x-auto border-2 border-black shadow-brutal-sm">
+      <table class="w-full border-collapse bg-brutal-dark-bg font-mono text-[12px]">
+        <thead>
+          <tr class="border-b-2 border-black bg-black/40 text-left">
+            <th class="px-4 py-2.5 font-brutal text-[11px] uppercase tracking-wider text-brutal-neon-green">Format</th>
+            <th class="px-4 py-2.5 font-brutal text-[11px] uppercase tracking-wider text-brutal-neon-green">Direction</th>
+            <th class="px-4 py-2.5 font-brutal text-[11px] uppercase tracking-wider text-brutal-neon-green">Notes</th>
+          </tr>
+        </thead>
+        <tbody class="text-gray-400">
+          <tr class="border-b border-white/5"><td class="px-4 py-2.5 font-bold text-white">Video</td><td class="px-4 py-2.5">Input</td><td class="px-4 py-2.5">Converted frame by frame at the frame rate you set.</td></tr>
+          <tr class="border-b border-white/5"><td class="px-4 py-2.5 font-bold text-white">Image</td><td class="px-4 py-2.5">Input</td><td class="px-4 py-2.5">Single-frame conversion using the same controls.</td></tr>
+          <tr class="border-b border-white/5"><td class="px-4 py-2.5 font-bold text-white">GIF</td><td class="px-4 py-2.5">Export</td><td class="px-4 py-2.5">Animated, self-contained, plays anywhere.</td></tr>
+          <tr class="border-b border-white/5"><td class="px-4 py-2.5 font-bold text-white">MP4</td><td class="px-4 py-2.5">Export</td><td class="px-4 py-2.5">Video output for longer clips.</td></tr>
+          <tr><td class="px-4 py-2.5 font-bold text-white">HTML</td><td class="px-4 py-2.5">Export</td><td class="px-4 py-2.5">Real text in a single file — selectable, scalable, tiny.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
   <FaqSection items={faqs} />
+
+  <!-- Related -->
+  <section class="mx-auto mt-12 max-w-3xl px-4">
+    <h2 class="mb-4 font-brutal text-xl font-black uppercase tracking-tight text-white">Related</h2>
+    <div class="grid gap-3 sm:grid-cols-3">
+      {[
+        { href: '/blog/faithful-ascii-art-guide/', t: 'Faithful ASCII art', d: 'How to pick charsets and settings.' },
+        { href: '/3d-lab/', t: '3D Lab', d: 'Turn SVG or text into interactive 3D.' },
+        { href: '/visual-protocol/', t: 'Visual Protocol', d: 'Decode any image like a creative director.' },
+      ].map((l) => (
+        <a href={l.href} class="group border-2 border-black bg-brutal-dark-bg p-4 shadow-brutal-sm transition-transform hover:-translate-y-0.5">
+          <h3 class="font-brutal text-sm font-black uppercase tracking-wide text-white group-hover:text-brutal-neon-green">{l.t}</h3>
+          <p class="mt-1 font-mono text-[11px] leading-relaxed text-gray-500">{l.d}</p>
+        </a>
+      ))}
+    </div>
+  </section>
 </AppLayout>
 
 <style>
