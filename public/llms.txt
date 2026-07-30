@@ -1,0 +1,49 @@
+# Pixelatmos
+
+> A creative tools laboratory for designers, developers and digital artists. Free,
+> browser-based tools for SVG, 3D and visual work, plus a curated collection of
+> tech and cyberpunk wallpapers.
+
+Every tool is free, needs no account, and runs client-side unless stated
+otherwise — files are processed in the browser and not uploaded.
+
+## Creative Tools
+
+- [Creative Tools](https://pixelatmos.com/creative-tools/): All tools, compared by input, output and privacy.
+- [SVG Tools](https://pixelatmos.com/svg-tools/): Optimize vector files or convert them to 3D.
+- [3D Tools](https://pixelatmos.com/3d-tools/): Browser generators that output standard GLB models.
+
+## Tools
+
+- [SVG to 3D Converter](https://pixelatmos.com/3d-lab/svg-to-3d/): Extrudes each shape in an SVG into its own 3D layer with its own depth and material; exports GLB or PNG. Runs entirely in the browser.
+- [3D Lab](https://pixelatmos.com/3d-lab/): The full lab — SVG and text modes, per-layer sculpting of depth, material, colour and visibility.
+- [3D Text Generator](https://pixelatmos.com/3d-text-generator/): Turns a word of up to 12 characters into a 3D wordmark with a material preset; exports GLB or PNG.
+- [SVG Optimizer](https://pixelatmos.com/svg-optimizer/): Strips editor metadata, comments and excess coordinate precision without changing how the graphic looks; side-by-side preview.
+- [ASCII Lab](https://pixelatmos.com/ascii-lab/): Converts video and images into ASCII art; exports GIF, MP4 or self-contained HTML.
+- [Visual Protocol](https://pixelatmos.com/visual-protocol/): Analyses an image and returns a structured creative brief — palette, mood, composition, style cues. This is the one tool that sends your image to an AI model.
+
+## Guides
+
+- [How to Optimize SVG Files for the Web](https://pixelatmos.com/blog/how-to-optimize-svg-files/): Where SVG file weight comes from, what is safe to remove, and which optimizer passes break files.
+- [SVG vs PNG](https://pixelatmos.com/blog/svg-vs-png/): When to use each format and where each breaks down.
+- [How to Turn Any SVG into a 3D Model](https://pixelatmos.com/blog/svg-to-3d-browser-guide/): The full SVG-to-3D walkthrough.
+- [Making Faithful ASCII Art](https://pixelatmos.com/blog/faithful-ascii-art-guide/): Luminance ramps and character density.
+- [Visual Protocol: Turning an Image into Creative Direction](https://pixelatmos.com/blog/visual-protocol-creative-direction/): Reading an image as a brief.
+
+## Wallpapers
+
+- [Wallpapers](https://pixelatmos.com/wallpapers/): Original tech, cyberpunk, dark and abstract wallpapers in WebP, free to download.
+
+## About
+
+- [About](https://pixelatmos.com/about/): Who makes Pixelatmos and why.
+- [Licence](https://pixelatmos.com/license/): Usage terms for the wallpaper collection.
+- [Contact](https://pixelatmos.com/contact/): Contact form.
+
+## Key facts
+
+- Everything on the site is free; no account is required for any tool.
+- The 3D Lab, 3D Text Generator, SVG Optimizer and ASCII Lab run fully client-side. Files never leave the user's device.
+- Visual Protocol is the sole exception: it sends the uploaded image to an AI model for analysis.
+- 3D exports are GLB (binary glTF), with each SVG layer preserved as a named node.
+- Created by FilipaoVfx (https://github.com/FilipaoVfx).

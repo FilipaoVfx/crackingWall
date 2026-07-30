@@ -1,0 +1,183 @@
+---
+export const prerender = true;
+import AppLayout from '../../layouts/AppLayout.astro';
+import Breadcrumbs from '../../components/Breadcrumbs.astro';
+
+const siteURL = Astro.site?.toString().replace(/\/$/, '') ?? 'https://pixelatmos.com';
+const title = 'How to Optimize SVG Files for the Web';
+const description =
+  'Why SVG exports from Figma and Illustrator are two to five times bigger than they need to be, what is safe to strip, and what breaks the file if you touch it.';
+const published = '2026-07-15';
+const url = `${siteURL}/blog/how-to-optimize-svg-files/`;
+
+const schema = {
+  '@context': 'https://schema.org',
+  '@type': 'BlogPosting',
+  headline: title,
+  description,
+  datePublished: published,
+  dateModified: published,
+  inLanguage: 'en',
+  author: { '@type': 'Person', name: 'FilipaoVfx', url: 'https://github.com/FilipaoVfx' },
+  publisher: {
+    '@type': 'Organization',
+    name: 'Pixelatmos',
+    logo: { '@type': 'ImageObject', url: `${siteURL}/og-image.webp` },
+  },
+  mainEntityOfPage: { '@type': 'WebPage', '@id': url },
+};
+---
+
+<AppLayout title={`${title} — Pixelatmos`} description={description}>
+  <script type="application/ld+json" set:html={JSON.stringify(schema)} />
+
+  <div class="mx-auto max-w-4xl px-4">
+    <Breadcrumbs items={[{ name: 'Blog', href: '/blog/' }, { name: title }]} />
+  </div>
+
+  <article
+    class="max-w-4xl mx-auto px-4 pb-12 prose prose-invert prose-lg prose-headings:font-brutal prose-headings:uppercase prose-a:text-brutal-neon-green text-gray-300"
+  >
+    <h1 class="text-4xl md:text-6xl font-black mb-4 !text-brutal-neon-green">
+      How to Optimize SVG Files for the Web
+    </h1>
+    <div class="not-prose font-mono text-sm text-gray-400 mb-12 border-b border-gray-800 pb-4">
+      By <a href="/about/" class="text-brutal-neon-cyan">FilipaoVfx</a> · Published July 15, 2026 · ~6 min read
+    </div>
+
+    <p class="lead">
+      An SVG exported from Figma, Illustrator or Inkscape is typically two to five times larger than
+      the browser needs. The excess is not image data — SVG has none. It is editor bookkeeping,
+      formatting whitespace, and coordinates carried to more decimal places than a screen can
+      resolve. Stripping it changes nothing about how the graphic looks.
+    </p>
+
+    <h2>Where the Weight Actually Comes From</h2>
+    <p>
+      Open any exported SVG in a text editor and you will find four things the renderer ignores
+      completely.
+    </p>
+    <p>
+      <strong>Editor metadata.</strong> Inkscape writes <code>sodipodi:</code> and
+      <code>inkscape:</code> attributes recording layer names, guide positions and document units.
+      Illustrator embeds an XML prolog and often a full RDF metadata block. Figma adds its own
+      namespace. None of it reaches the renderer.
+    </p>
+    <p>
+      <strong>Coordinate precision.</strong> This is usually the single largest win. Editors export
+      path data at full float precision, so you get <code>M 10.123456789 20.987654321</code> where
+      <code>M 10.12 20.99</code> draws the identical pixels. On a path with a few hundred points,
+      that is kilobytes of digits describing sub-nanometre differences.
+    </p>
+    <p>
+      <strong>Formatting whitespace.</strong> Pretty-printed XML with indentation is pleasant to read
+      and irrelevant to the browser.
+    </p>
+    <p>
+      <strong>The prolog and doctype.</strong> <code>&lt;?xml version="1.0"?&gt;</code> and an SVG
+      doctype are required for standalone XML documents, but not for an SVG used inline or via
+      <code>&lt;img&gt;</code> on the web.
+    </p>
+
+    <h2>What Is Safe to Remove</h2>
+    <p>
+      The safe set is everything that cannot reach the rendering step: comments, the XML prolog and
+      doctype, <code>&lt;metadata&gt;</code>, editor-namespaced attributes, and redundant whitespace.
+      Rounding coordinates is safe within a tolerance you choose — two decimal places is a good
+      default for icons and logos, and simple geometric shapes often survive at one or zero.
+    </p>
+    <p>
+      Two more removals are conditionally safe. Dropping <code>width</code> and <code>height</code>
+      lets the SVG scale to its CSS container, but only if a <code>viewBox</code> remains to define
+      the coordinate system — without one the graphic collapses. Dropping
+      <code>&lt;title&gt;</code> and <code>&lt;desc&gt;</code> saves a little, at the cost of the
+      accessible name a screen reader announces. That is a real trade, not a free win.
+    </p>
+
+    <h2>What Breaks Files</h2>
+    <p>
+      Aggressive optimizers cause more broken graphics than large files ever did. Four passes are
+      responsible for most of it.
+    </p>
+    <p>
+      <strong>Renaming or stripping IDs.</strong> An ID that looks unreferenced to a static analyser
+      is often referenced from CSS, from JavaScript, or from a <code>&lt;use&gt;</code> element
+      elsewhere in the page. When the optimizer renames <code>#logo-gradient</code> to
+      <code>#a</code>, the fill silently falls back to black.
+    </p>
+    <p>
+      <strong>Removing "unused" defs.</strong> Same failure, one level up. Gradients, filters, masks
+      and clip paths live in <code>&lt;defs&gt;</code> and are referenced by URL. Reference-tracking
+      through nested groups and CSS is genuinely hard, and getting it wrong deletes the definition
+      your artwork depends on.
+    </p>
+    <p>
+      <strong>Merging paths.</strong> Combining shapes that share a fill reduces node count and
+      destroys the structure. If you ever want to animate one element, style it separately, or
+      convert the file to 3D, you now cannot — the shapes are one path.
+    </p>
+    <p>
+      <strong>Collapsing groups.</strong> Flattening a <code>&lt;g&gt;</code> means multiplying its
+      transform into every child. Mathematically equivalent, until a transform involves rotation and
+      the accumulated floating-point error becomes visible on long paths.
+    </p>
+
+    <h2>A Practical Workflow</h2>
+    <p>
+      Optimize at export time, not as an afterthought, and verify visually rather than trusting a
+      percentage.
+    </p>
+    <ol>
+      <li>In your editor, outline strokes and convert text to paths. Both remove a class of downstream problems entirely.</li>
+      <li>Delete hidden layers and empty groups before exporting — an optimizer has to guess whether they matter, you know.</li>
+      <li>Run the file through the <a href="/svg-optimizer/">SVG Optimizer</a> at precision 2.</li>
+      <li>Compare the before and after previews. If a curve visibly shifts, raise the precision and re-run.</li>
+      <li>If the SVG will be styled or animated, skip the ID-touching passes entirely. No optimizer knows what your CSS references.</li>
+    </ol>
+    <p>
+      A realistic result for a detailed icon is 30–60% smaller. A logo full of hand-drawn curves can
+      exceed that. An already-minimal file may barely move, which is the correct outcome — an
+      optimizer that always reports a big win is removing something it should not.
+    </p>
+
+    <h2>Then Gzip Does the Rest</h2>
+    <p>
+      SVG is text, so it compresses well over the wire. Any server worth using serves it gzipped or
+      brotli-compressed, often cutting another 60–70%. That is why whitespace removal matters less
+      than it appears: compression handles repetitive whitespace efficiently. Coordinate precision is
+      different — those digits are high-entropy and compress poorly, which is why rounding stays the
+      highest-value pass.
+    </p>
+    <p>
+      Worth checking that your host actually does this. An SVG served uncompressed is a bigger
+      problem than an unoptimized one.
+    </p>
+
+    <h2>Where This Leads</h2>
+    <p>
+      A clean SVG is easier to work with, not just lighter. Well-separated shapes with meaningful IDs
+      can be styled by CSS variable, animated per element, or fed into the
+      <a href="/3d-lab/svg-to-3d/">SVG to 3D converter</a>, which gives every shape its own depth and
+      material. A merged, over-optimized path can do none of those things.
+    </p>
+    <p>
+      Which is the argument for conservative optimization generally: keep the structure, drop the
+      bytes that were never doing anything.
+    </p>
+
+    <div class="not-prose mt-12 grid gap-3 sm:grid-cols-3">
+      <a href="/svg-optimizer/" class="group border-2 border-black bg-brutal-dark-bg p-4 shadow-brutal-sm transition-transform hover:-translate-y-0.5">
+        <h3 class="font-brutal text-sm font-black uppercase tracking-wide text-white group-hover:text-brutal-neon-green">SVG Optimizer</h3>
+        <p class="mt-1 font-mono text-[11px] leading-relaxed text-gray-500">Try it — free, in your browser.</p>
+      </a>
+      <a href="/3d-lab/svg-to-3d/" class="group border-2 border-black bg-brutal-dark-bg p-4 shadow-brutal-sm transition-transform hover:-translate-y-0.5">
+        <h3 class="font-brutal text-sm font-black uppercase tracking-wide text-white group-hover:text-brutal-neon-cyan">SVG to 3D</h3>
+        <p class="mt-1 font-mono text-[11px] leading-relaxed text-gray-500">Turn the clean file into a 3D model.</p>
+      </a>
+      <a href="/svg-tools/" class="group border-2 border-black bg-brutal-dark-bg p-4 shadow-brutal-sm transition-transform hover:-translate-y-0.5">
+        <h3 class="font-brutal text-sm font-black uppercase tracking-wide text-white group-hover:text-brutal-neon-green">SVG Tools</h3>
+        <p class="mt-1 font-mono text-[11px] leading-relaxed text-gray-500">Everything on the SVG side.</p>
+      </a>
+    </div>
+  </article>
+</AppLayout>

@@ -1,0 +1,164 @@
+---
+export const prerender = true;
+import AppLayout from '../../layouts/AppLayout.astro';
+import Breadcrumbs from '../../components/Breadcrumbs.astro';
+
+const siteURL = Astro.site?.toString().replace(/\/$/, '') ?? 'https://pixelatmos.com';
+const title = 'SVG vs PNG: Which Should You Use?';
+const description =
+  'The decision comes down to one question — is the image made of shapes or of pixels? What each format costs, where each breaks down, and why the answer is rarely both.';
+const published = '2026-07-15';
+const url = `${siteURL}/blog/svg-vs-png/`;
+
+const schema = {
+  '@context': 'https://schema.org',
+  '@type': 'BlogPosting',
+  headline: title,
+  description,
+  datePublished: published,
+  dateModified: published,
+  inLanguage: 'en',
+  author: { '@type': 'Person', name: 'FilipaoVfx', url: 'https://github.com/FilipaoVfx' },
+  publisher: {
+    '@type': 'Organization',
+    name: 'Pixelatmos',
+    logo: { '@type': 'ImageObject', url: `${siteURL}/og-image.webp` },
+  },
+  mainEntityOfPage: { '@type': 'WebPage', '@id': url },
+};
+---
+
+<AppLayout title={`${title} — Pixelatmos`} description={description}>
+  <script type="application/ld+json" set:html={JSON.stringify(schema)} />
+
+  <div class="mx-auto max-w-4xl px-4">
+    <Breadcrumbs items={[{ name: 'Blog', href: '/blog/' }, { name: 'SVG vs PNG' }]} />
+  </div>
+
+  <article
+    class="max-w-4xl mx-auto px-4 pb-12 prose prose-invert prose-lg prose-headings:font-brutal prose-headings:uppercase prose-a:text-brutal-neon-green text-gray-300"
+  >
+    <h1 class="text-4xl md:text-6xl font-black mb-4 !text-brutal-neon-green">
+      SVG vs PNG: Which Should You Use?
+    </h1>
+    <div class="not-prose font-mono text-sm text-gray-400 mb-12 border-b border-gray-800 pb-4">
+      By <a href="/about/" class="text-brutal-neon-cyan">FilipaoVfx</a> · Published July 15, 2026 · ~5 min read
+    </div>
+
+    <p class="lead">
+      Use SVG when the image is made of shapes — logos, icons, illustrations, charts. Use PNG when it
+      is made of pixels — screenshots, photographs, anything with a texture that was captured rather
+      than drawn. Almost every real decision follows from that one distinction, and the cases where
+      it is genuinely close are rarer than the debate suggests.
+    </p>
+
+    <h2>They Store Different Things</h2>
+    <p>
+      A PNG is a grid of pixel values. A 512×512 icon is 262,144 colour samples, whatever it depicts.
+      An SVG is a set of instructions: <em>draw a circle here, fill it with this gradient, cut this
+      path out of it</em>. The browser executes those instructions at whatever size the layout needs.
+    </p>
+    <p>
+      Everything else is downstream of that. SVG scales without blurring because it re-executes at
+      the new size. PNG blurs because there is nothing to re-execute — only samples to interpolate.
+      SVG can be styled by CSS and animated per element because its shapes are DOM nodes. PNG cannot,
+      because it has no parts.
+    </p>
+
+    <h2>Where Each One Wins</h2>
+    <div class="not-prose my-8 overflow-x-auto border-2 border-black shadow-brutal-sm">
+      <table class="w-full border-collapse bg-brutal-dark-bg font-mono text-[12px]">
+        <thead>
+          <tr class="border-b-2 border-black bg-black/40 text-left">
+            <th class="px-4 py-2.5 font-brutal text-[11px] uppercase tracking-wider text-brutal-neon-green">Use case</th>
+            <th class="px-4 py-2.5 font-brutal text-[11px] uppercase tracking-wider text-brutal-neon-green">Format</th>
+            <th class="px-4 py-2.5 font-brutal text-[11px] uppercase tracking-wider text-brutal-neon-green">Why</th>
+          </tr>
+        </thead>
+        <tbody class="text-gray-400">
+          <tr class="border-b border-white/5"><td class="px-4 py-2.5 font-bold text-white">Logo</td><td class="px-4 py-2.5 text-brutal-neon-green">SVG</td><td class="px-4 py-2.5">One file for a favicon and a billboard.</td></tr>
+          <tr class="border-b border-white/5"><td class="px-4 py-2.5 font-bold text-white">UI icons</td><td class="px-4 py-2.5 text-brutal-neon-green">SVG</td><td class="px-4 py-2.5">Recolour with CSS; crisp on every display density.</td></tr>
+          <tr class="border-b border-white/5"><td class="px-4 py-2.5 font-bold text-white">Charts</td><td class="px-4 py-2.5 text-brutal-neon-green">SVG</td><td class="px-4 py-2.5">Text stays selectable and searchable.</td></tr>
+          <tr class="border-b border-white/5"><td class="px-4 py-2.5 font-bold text-white">Photographs</td><td class="px-4 py-2.5 text-brutal-neon-cyan">WebP / AVIF</td><td class="px-4 py-2.5">Lossy compression built for continuous tone.</td></tr>
+          <tr class="border-b border-white/5"><td class="px-4 py-2.5 font-bold text-white">Screenshots</td><td class="px-4 py-2.5 text-brutal-neon-cyan">PNG</td><td class="px-4 py-2.5">Lossless — text stays legible, no artefacts.</td></tr>
+          <tr><td class="px-4 py-2.5 font-bold text-white">Complex illustration</td><td class="px-4 py-2.5 text-brutal-neon-cyan">PNG</td><td class="px-4 py-2.5">Thousands of paths outweigh a raster of the same thing.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h2>The Size Question Is Not What People Think</h2>
+    <p>
+      "SVG is smaller" holds for simple graphics and inverts for complex ones. A three-shape icon is
+      a few hundred bytes of SVG against several kilobytes of PNG. A detailed illustration with
+      thousands of paths, gradients and filters can easily exceed a well-compressed raster of the
+      same artwork.
+    </p>
+    <p>
+      The crossover is roughly where you stop being able to name the shapes. If you can describe the
+      graphic as "a circle, two rounded rectangles and a path", SVG wins comfortably. If it is a
+      hand-drawn scene with texture, render it once and ship pixels.
+    </p>
+    <p>
+      Two things distort the comparison. SVG is text, so it gzips well — the transferred size is
+      often half the file size, which raw file-size comparisons miss. And SVG exports carry
+      significant dead weight; see <a href="/blog/how-to-optimize-svg-files/">how to optimize SVG
+      files</a> for what is safe to strip, or run one through the
+      <a href="/svg-optimizer/">SVG Optimizer</a> and compare.
+    </p>
+
+    <h2>Where SVG Breaks Down</h2>
+    <p>
+      <strong>Fonts.</strong> An SVG referencing a font renders in whatever the viewer has. Convert
+      text to paths before shipping, or accept the substitution.
+    </p>
+    <p>
+      <strong>Filters.</strong> Blurs and drop shadows are computed at render time. A page with many
+      filtered SVGs can cost more CPU than the equivalent raster.
+    </p>
+    <p>
+      <strong>Untrusted files.</strong> SVG is XML that can carry scripts and event handlers. If you
+      accept user-uploaded SVG, sanitize it before rendering — a PNG has no such attack surface.
+    </p>
+    <p>
+      <strong>Email.</strong> SVG support in email clients remains poor. Use PNG.
+    </p>
+
+    <h2>What About WebP and AVIF?</h2>
+    <p>
+      For photographic content they beat PNG substantially — often 25–50% smaller at equivalent
+      quality — and both support transparency. The honest modern advice is: SVG for shapes, WebP or
+      AVIF for photographs, PNG when you specifically need lossless raster such as a screenshot with
+      fine text.
+    </p>
+    <p>
+      That is one reason the wallpapers here are served as <a href="/wallpapers/">WebP</a>: they are
+      photographic, so a vector format would make no sense.
+    </p>
+
+    <h2>The Capability Nobody Weighs</h2>
+    <p>
+      SVG stays editable after export. A logo shipped as SVG can be recoloured for a dark theme,
+      animated stroke by stroke, or fed to the <a href="/3d-lab/svg-to-3d/">SVG to 3D converter</a>,
+      which turns each shape into its own 3D layer with its own depth and material.
+    </p>
+    <p>
+      The same logo as a PNG is a finished picture. That difference rarely appears in a
+      format-comparison table, and it is often the one that matters six months later.
+    </p>
+
+    <div class="not-prose mt-12 grid gap-3 sm:grid-cols-3">
+      <a href="/svg-optimizer/" class="group border-2 border-black bg-brutal-dark-bg p-4 shadow-brutal-sm transition-transform hover:-translate-y-0.5">
+        <h3 class="font-brutal text-sm font-black uppercase tracking-wide text-white group-hover:text-brutal-neon-green">SVG Optimizer</h3>
+        <p class="mt-1 font-mono text-[11px] leading-relaxed text-gray-500">See what your file is carrying.</p>
+      </a>
+      <a href="/blog/how-to-optimize-svg-files/" class="group border-2 border-black bg-brutal-dark-bg p-4 shadow-brutal-sm transition-transform hover:-translate-y-0.5">
+        <h3 class="font-brutal text-sm font-black uppercase tracking-wide text-white group-hover:text-brutal-neon-green">Optimizing SVG</h3>
+        <p class="mt-1 font-mono text-[11px] leading-relaxed text-gray-500">What is safe to strip, what breaks.</p>
+      </a>
+      <a href="/3d-lab/svg-to-3d/" class="group border-2 border-black bg-brutal-dark-bg p-4 shadow-brutal-sm transition-transform hover:-translate-y-0.5">
+        <h3 class="font-brutal text-sm font-black uppercase tracking-wide text-white group-hover:text-brutal-neon-cyan">SVG to 3D</h3>
+        <p class="mt-1 font-mono text-[11px] leading-relaxed text-gray-500">The thing PNG can never do.</p>
+      </a>
+    </div>
+  </article>
+</AppLayout>
