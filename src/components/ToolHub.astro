@@ -1,0 +1,126 @@
+---
+/**
+ * Shared layout for a tool sub-hub (/svg-tools, /3d-tools).
+ *
+ * The two pillars have identical structure and differ only in copy and accent,
+ * so they share this template and keep their content in src/config/toolHubs.ts.
+ */
+import FaqSection from './FaqSection.astro';
+import Breadcrumbs from './Breadcrumbs.astro';
+import type { ToolHub } from '../config/toolHubs';
+
+interface Props {
+  hub: ToolHub;
+}
+const { hub } = Astro.props;
+
+// Tailwind's scanner only keeps literal class strings, so both accents are
+// written out rather than composed from the token.
+const ACCENT = {
+  green: { text: 'text-brutal-neon-green', border: 'border-brutal-neon-green', hoverText: 'group-hover:text-brutal-neon-green', hoverShadow: 'hover:shadow-neon-green', bg: 'bg-brutal-neon-green' },
+  yellow: { text: 'text-brutal-neon-yellow', border: 'border-brutal-neon-yellow', hoverText: 'group-hover:text-brutal-neon-yellow', hoverShadow: 'hover:shadow-neon-yellow', bg: 'bg-brutal-neon-yellow' },
+} as const;
+const a = ACCENT[hub.accent];
+---
+
+<script type="application/ld+json" set:html={JSON.stringify({
+  '@context': 'https://schema.org',
+  '@type': 'CollectionPage',
+  name: hub.name,
+  description: hub.description,
+  url: `https://pixelatmos.com/${hub.slug}/`,
+  isPartOf: { '@type': 'WebSite', url: 'https://pixelatmos.com/' },
+  mainEntity: {
+    '@type': 'ItemList',
+    itemListElement: hub.tools.map((t, i) => ({
+      '@type': 'ListItem',
+      position: i + 1,
+      item: {
+        '@type': 'WebApplication',
+        name: t.label,
+        description: t.blurb,
+        url: `https://pixelatmos.com${t.href}`,
+        applicationCategory: 'DesignApplication',
+        operatingSystem: 'Web',
+        offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+      },
+    })),
+  },
+})} />
+
+<Breadcrumbs items={[{ name: 'Creative Tools', href: '/creative-tools/' }, { name: hub.name }]} />
+
+<!-- Hero -->
+<section class="mb-6 border-2 border-black bg-brutal-dark-bg px-6 py-6 shadow-brutal md:px-8">
+  <h1 class={`font-brutal text-2xl font-black uppercase tracking-tight text-white md:text-3xl`}>
+    <span class={a.text}>{hub.name}</span>
+  </h1>
+  <p class="mt-2 max-w-2xl font-mono text-xs leading-relaxed text-gray-400">{hub.description}</p>
+</section>
+
+<!-- Front-loaded definition: the most citable passage on the page. -->
+<section class={`mb-8 border-l-4 ${a.border} bg-brutal-dark-bg px-5 py-4`}>
+  <p class="font-mono text-[13px] leading-relaxed text-gray-300">{hub.intro}</p>
+</section>
+
+<!-- Tools -->
+<section class="mb-12">
+  <h2 class="mb-4 font-brutal text-xl font-black uppercase tracking-tight text-white">The tools</h2>
+  <div class="grid gap-5 md:grid-cols-2">
+    {hub.tools.map((t) => (
+      <a
+        href={t.href}
+        class={`group flex flex-col border-2 border-black bg-brutal-dark-bg p-5 shadow-brutal transition-all hover:-translate-y-1 ${a.hoverShadow}`}
+      >
+        <h3 class={`mb-1.5 font-brutal text-lg font-black uppercase tracking-wide text-white ${a.hoverText}`}>{t.label}</h3>
+        <p class="mb-4 flex-1 font-mono text-[11px] leading-relaxed text-gray-400">{t.blurb}</p>
+        <span class={`flex items-center gap-2 font-brutal text-xs font-black uppercase tracking-wide ${a.text}`}>
+          Open tool
+          <svg class="transition-transform group-hover:translate-x-1" xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </span>
+      </a>
+    ))}
+  </div>
+</section>
+
+<!-- Which one -->
+<section class="mb-12">
+  <h2 class="mb-4 font-brutal text-xl font-black uppercase tracking-tight text-white">Which one do you need?</h2>
+  <div class="overflow-x-auto border-2 border-black shadow-brutal-sm">
+    <table class="w-full border-collapse bg-brutal-dark-bg font-mono text-[12px]">
+      <thead>
+        <tr class="border-b-2 border-black bg-black/40 text-left">
+          <th class={`px-4 py-2.5 font-brutal text-[11px] uppercase tracking-wider ${a.text}`}>Tool</th>
+          <th class={`px-4 py-2.5 font-brutal text-[11px] uppercase tracking-wider ${a.text}`}>Reach for it when</th>
+        </tr>
+      </thead>
+      <tbody class="text-gray-400">
+        {hub.tools.map((t, i) => (
+          <tr class={i < hub.tools.length - 1 ? 'border-b border-white/5' : ''}>
+            <td class="px-4 py-2.5 font-bold text-white"><a href={t.href} class={`hover:${a.text}`}>{t.label}</a></td>
+            <td class="px-4 py-2.5">{t.useWhen}</td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<FaqSection items={hub.faqs} />
+
+<!-- Guides -->
+<section class="mt-12">
+  <h2 class="mb-4 font-brutal text-xl font-black uppercase tracking-tight text-white">Guides</h2>
+  <div class="grid gap-3 sm:grid-cols-3">
+    {hub.guides.map((l) => (
+      <a href={l.href} class="group border-2 border-black bg-brutal-dark-bg p-4 shadow-brutal-sm transition-transform hover:-translate-y-0.5">
+        <h3 class={`font-brutal text-sm font-black uppercase tracking-wide text-white ${a.hoverText}`}>{l.t}</h3>
+        <p class="mt-1 font-mono text-[11px] leading-relaxed text-gray-500">{l.d}</p>
+      </a>
+    ))}
+    <a href="/creative-tools/" class="group border-2 border-black bg-brutal-dark-bg p-4 shadow-brutal-sm transition-transform hover:-translate-y-0.5">
+      <h3 class="font-brutal text-sm font-black uppercase tracking-wide text-white group-hover:text-brutal-neon-cyan">All creative tools</h3>
+      <p class="mt-1 font-mono text-[11px] leading-relaxed text-gray-500">Every tool on Pixelatmos, compared.</p>
+    </a>
+  </div>
+</section>

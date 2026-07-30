@@ -43,4 +43,18 @@ export const LABS: Lab[] = [
     accent: 'yellow',
     icon: 'cube',
   },
+  {
+    label: 'SVG Optimizer',
+    href: '/svg-optimizer/',
+    description: 'Shrink SVG files, same output',
+    accent: 'green',
+    icon: 'minimize',
+  },
+  {
+    label: '3D Text Generator',
+    href: '/3d-text-generator/',
+    description: 'Word → 3D wordmark',
+    accent: 'yellow',
+    icon: 'type',
+  },
 ];
