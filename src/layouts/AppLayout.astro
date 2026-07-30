@@ -40,9 +40,26 @@ const structuredData = {
         url: `${siteURL}/og-image.webp`,
       },
       description:
-        'Pixelatmos is an independent creative-tools studio and curated gallery for tech-culture visuals — browser-based tools (ASCII Lab, Visual Protocol, 3D Lab) plus original cyberpunk and developer-culture wallpapers.',
+        'Pixelatmos is an independent creative-tools studio and curated gallery for tech-culture visuals — browser-based tools for SVG, 3D and image work (3D Lab, SVG Optimizer, 3D Text Generator, ASCII Lab, Visual Protocol) plus original cyberpunk and developer-culture wallpapers.',
       foundingDate: '2024',
+      // Entity linking: every profile that represents this brand elsewhere.
+      // Add new ones as they go live — an unresolvable sameAs is worse than a
+      // missing one, so nothing goes in here before it exists.
       sameAs: ['https://github.com/FilipaoVfx'],
+      founder: { '@id': `${siteURL}/#person` },
+      knowsAbout: ['SVG', '3D graphics', 'glTF', 'WebGL', 'Generative art', 'Graphic design', 'ASCII art'],
+    },
+    {
+      '@type': 'Person',
+      '@id': `${siteURL}/#person`,
+      name: 'FilipaoVfx',
+      url: `${siteURL}/about/`,
+      image: `${siteURL}/filipaovfx-avatar.png`,
+      description:
+        'Independent designer and developer building browser-based creative tools for SVG, 3D and visual work.',
+      sameAs: ['https://github.com/FilipaoVfx'],
+      knowsAbout: ['SVG', '3D graphics', 'WebGL', 'Creative coding', 'Visual design'],
+      worksFor: { '@id': `${siteURL}/#organization` },
     },
     {
       '@type': 'WebSite',

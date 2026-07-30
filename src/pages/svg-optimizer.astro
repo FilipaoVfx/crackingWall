@@ -1,0 +1,149 @@
+---
+export const prerender = true;
+import AppLayout from '../layouts/AppLayout.astro';
+import SvgOptimizer from '../components/SvgOptimizer';
+import FaqSection from '../components/FaqSection.astro';
+import Breadcrumbs from '../components/Breadcrumbs.astro';
+
+const faqs = [
+  { q: 'Is the SVG Optimizer free?', a: 'Yes — free, no account, no upload limit.' },
+  { q: 'Does my file get uploaded?', a: 'No. The file is read and optimized by your browser. It never touches a server, so you can safely run client work or unreleased assets through it.' },
+  { q: 'Will it break my SVG?', a: 'It is deliberately conservative. It only removes bytes that cannot affect rendering — comments, editor metadata, XML prolog, whitespace — plus number rounding at a precision you choose. It never merges paths, renames IDs or drops "unused" definitions, which is where aggressive optimizers usually break files. The side-by-side preview lets you confirm before downloading.' },
+  { q: 'What precision should I use?', a: 'Two decimals is a good default for icons and logos. Drop to 1 or 0 for simple geometric shapes to save more; raise it if you see curves visibly shift in the preview.' },
+  { q: 'When should I drop width and height?', a: 'When you want the SVG to scale to its container in CSS. It is only safe if the file has a viewBox, so the tool leaves the dimensions alone when there is none.' },
+  { q: 'Does it remove scripts?', a: 'Yes. Scripts, inline event handlers and javascript: URLs are stripped. That is a size win and a safety one, since an optimized SVG is usually about to be embedded in a page.' },
+];
+
+const title = 'SVG Optimizer — Compress SVG Files Online, Free | Pixelatmos';
+const description =
+  'Optimize and minify SVG files in your browser. Strips editor metadata, comments and whitespace, rounds path precision, and shows a live before/after preview. Free, no upload.';
+const canonicalUrl = 'https://pixelatmos.com/svg-optimizer/';
+---
+
+<AppLayout title={title} description={description}>
+  <script type="application/ld+json" set:html={JSON.stringify({
+    '@context': 'https://schema.org',
+    '@type': 'WebApplication',
+    name: 'SVG Optimizer',
+    description,
+    url: canonicalUrl,
+    applicationCategory: 'DesignApplication',
+    operatingSystem: 'Web',
+    offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+    featureList: ['Minify SVG', 'Strip editor metadata', 'Round path precision', 'Live before/after preview', 'Client-side processing'],
+    creator: { '@type': 'Organization', name: 'Pixelatmos', url: 'https://pixelatmos.com' },
+  })} />
+
+  <script type="application/ld+json" set:html={JSON.stringify({
+    '@context': 'https://schema.org',
+    '@type': 'HowTo',
+    name: 'How to optimize an SVG file',
+    description: 'Reduce an SVG file size in the browser without changing how it looks.',
+    totalTime: 'PT1M',
+    tool: [{ '@type': 'HowToTool', name: 'Pixelatmos SVG Optimizer' }],
+    step: [
+      { '@type': 'HowToStep', position: 1, name: 'Upload the SVG', text: 'Drop in the file. It is read locally by your browser and never uploaded.' },
+      { '@type': 'HowToStep', position: 2, name: 'Set the precision', text: 'Choose how many decimal places to keep on path coordinates. Two is a safe default for icons and logos.' },
+      { '@type': 'HowToStep', position: 3, name: 'Compare the preview', text: 'The original and optimized versions render side by side so you can confirm nothing shifted.' },
+      { '@type': 'HowToStep', position: 4, name: 'Download or copy', text: 'Save the minified file or copy the markup straight into your project.' },
+    ],
+  })} />
+
+  <Breadcrumbs items={[{ name: 'Creative Tools', href: '/creative-tools/' }, { name: 'SVG Tools', href: '/svg-tools/' }, { name: 'SVG Optimizer' }]} />
+
+  <!-- Hero -->
+  <section class="mb-6 border-2 border-black bg-brutal-dark-bg px-6 py-5 shadow-brutal md:px-8">
+    <h1 class="font-brutal text-2xl font-black uppercase tracking-tight text-white md:text-3xl">
+      SVG <span class="text-brutal-neon-green">Optimizer</span>
+    </h1>
+    <p class="mt-2 font-mono text-xs text-gray-400">Smaller files, identical output · compare before you download.</p>
+    <p class="mt-1.5 font-mono text-[11px] uppercase tracking-wide text-brutal-neon-green">100% in your browser · no signup · your files never leave your device · free</p>
+  </section>
+
+  <!-- Front-loaded definition: the most citable passage on the page. -->
+  <section class="mb-8 border-l-4 border-brutal-neon-green bg-brutal-dark-bg px-5 py-4">
+    <p class="font-mono text-[13px] leading-relaxed text-gray-300">
+      <strong class="text-white">The SVG Optimizer is a free browser tool that reduces SVG file size without changing how the graphic looks.</strong>
+      Files exported from Illustrator, Figma or Inkscape carry editor metadata, XML prolog, comments
+      and coordinates with a dozen decimal places — none of which the browser needs. This strips that
+      overhead and rounds path numbers to a precision you set, typically cutting 20–60% of the bytes.
+      Both versions render side by side so you can confirm nothing shifted before downloading.
+    </p>
+  </section>
+
+  <SvgOptimizer client:only="react" />
+
+  <!-- How it works -->
+  <section class="mx-auto mt-12 max-w-3xl">
+    <h2 class="mb-4 font-brutal text-xl font-black uppercase tracking-tight text-white">How to optimize an SVG</h2>
+    <ol class="flex flex-col gap-3">
+      {[
+        { t: 'Upload the file', d: 'Drop in any .svg. It is read by your browser with FileReader — nothing is sent to a server.' },
+        { t: 'Set the precision', d: 'Path coordinates rarely need more than two decimals. Lower it for simple shapes; raise it if the preview shows curves drifting.' },
+        { t: 'Pick the optional passes', d: 'Dropping width/height lets the SVG scale to its CSS container. Dropping title/desc saves a little more, at the cost of the accessibility text.' },
+        { t: 'Compare', d: 'The two panes render the original and the result from the same markup your browser will use. If they match, the optimization is safe.' },
+        { t: 'Download or copy', d: 'Save a .min.svg file, or copy the markup straight into a component.' },
+      ].map((s, i) => (
+        <li class="flex gap-4 border-2 border-black bg-brutal-dark-bg p-4 shadow-brutal-sm">
+          <span class="grid h-7 w-7 shrink-0 place-items-center border-2 border-black bg-brutal-neon-green font-brutal text-sm font-black text-black">{i + 1}</span>
+          <div>
+            <h3 class="font-brutal text-sm font-black uppercase tracking-wide text-white">{s.t}</h3>
+            <p class="mt-1 font-mono text-[12px] leading-relaxed text-gray-400">{s.d}</p>
+          </div>
+        </li>
+      ))}
+    </ol>
+  </section>
+
+  <!-- What it does / doesn't -->
+  <section class="mx-auto mt-12 max-w-3xl">
+    <h2 class="mb-4 font-brutal text-xl font-black uppercase tracking-tight text-white">What it removes — and what it leaves alone</h2>
+    <p class="mb-5 font-mono text-[13px] leading-relaxed text-gray-400">
+      Aggressive optimizers break files. This one is built on the opposite bet: every pass either
+      deletes bytes that cannot reach the renderer, or shortens numbers within a tolerance you chose.
+    </p>
+    <div class="grid gap-4 sm:grid-cols-2">
+      <div class="border-2 border-black bg-brutal-dark-bg p-4 shadow-brutal-sm">
+        <h3 class="mb-2.5 font-brutal text-sm font-black uppercase tracking-wide text-brutal-neon-green">Removed</h3>
+        <ul class="flex flex-col gap-1.5 font-mono text-[12px] leading-relaxed text-gray-400">
+          <li>XML prolog and doctype</li>
+          <li>Comments and editor metadata</li>
+          <li>Inkscape, Figma, Sketch and Adobe attributes</li>
+          <li>Scripts, event handlers, javascript: URLs</li>
+          <li>Redundant whitespace</li>
+          <li>Excess decimal places</li>
+        </ul>
+      </div>
+      <div class="border-2 border-black bg-brutal-dark-bg p-4 shadow-brutal-sm">
+        <h3 class="mb-2.5 font-brutal text-sm font-black uppercase tracking-wide text-brutal-neon-cyan">Never touched</h3>
+        <ul class="flex flex-col gap-1.5 font-mono text-[12px] leading-relaxed text-gray-400">
+          <li>Path geometry and drawing order</li>
+          <li>IDs — gradients and <code>&lt;use&gt;</code> depend on them</li>
+          <li>Gradients, filters, masks and clip paths</li>
+          <li>Groups and transforms</li>
+          <li>Fills, strokes and opacity</li>
+          <li>viewBox</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <FaqSection items={faqs} />
+
+  <!-- Related -->
+  <section class="mx-auto mt-12 max-w-3xl">
+    <h2 class="mb-4 font-brutal text-xl font-black uppercase tracking-tight text-white">Related</h2>
+    <div class="grid gap-3 sm:grid-cols-3">
+      {[
+        { href: '/3d-lab/', t: '3D Lab', d: 'Turn that SVG into an interactive 3D object.' },
+        { href: '/svg-tools/', t: 'SVG Tools', d: 'Everything on the SVG side, in one place.' },
+        { href: '/blog/svg-to-3d-browser-guide/', t: 'SVG to 3D guide', d: 'The full walkthrough, step by step.' },
+      ].map((l) => (
+        <a href={l.href} class="group border-2 border-black bg-brutal-dark-bg p-4 shadow-brutal-sm transition-transform hover:-translate-y-0.5">
+          <h3 class="font-brutal text-sm font-black uppercase tracking-wide text-white group-hover:text-brutal-neon-green">{l.t}</h3>
+          <p class="mt-1 font-mono text-[11px] leading-relaxed text-gray-500">{l.d}</p>
+        </a>
+      ))}
+    </div>
+  </section>
+</AppLayout>

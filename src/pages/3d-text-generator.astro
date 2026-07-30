@@ -1,0 +1,152 @@
+---
+export const prerender = true;
+import AppLayout from '../layouts/AppLayout.astro';
+import Text3DGenerator from '../components/Text3DGenerator';
+import FaqSection from '../components/FaqSection.astro';
+import Breadcrumbs from '../components/Breadcrumbs.astro';
+
+const faqs = [
+  { q: 'Is the 3D text generator free?', a: 'Yes — free, no account, and no watermark on exports.' },
+  { q: 'How long can the text be?', a: 'Up to 12 characters. It is built for words, wordmarks and short logos rather than sentences: past a dozen characters the letters get too small to read once the object is rotated.' },
+  { q: 'Can I use the result commercially?', a: 'Yes. Whatever you generate is yours to use, including in client and commercial work.' },
+  { q: 'What can I export?', a: 'A PNG of the current view, or a GLB — a standard binary glTF model you can open in Blender, Three.js, Babylon, or any AR viewer.' },
+  { q: 'Does my text get sent anywhere?', a: 'No. The geometry is built and rendered in your browser with WebGL. Nothing is uploaded.' },
+  { q: 'I have a logo as an SVG, not text. What then?', a: 'Use the 3D Lab instead. It takes an SVG and turns every shape into its own editable 3D layer, which is what you want for an actual logo file.' },
+];
+
+const title = '3D Text Generator — Make 3D Logos & Wordmarks Free | Pixelatmos';
+const description =
+  'Turn any word into a 3D object in your browser. Pick a material — neon, chrome, gold, glass — orbit it, and export as PNG or GLB. Free, no signup.';
+const canonicalUrl = 'https://pixelatmos.com/3d-text-generator/';
+---
+
+<AppLayout title={title} description={description}>
+  <script type="application/ld+json" set:html={JSON.stringify({
+    '@context': 'https://schema.org',
+    '@type': 'WebApplication',
+    name: '3D Text Generator',
+    description,
+    url: canonicalUrl,
+    applicationCategory: 'DesignApplication',
+    operatingSystem: 'Web',
+    offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+    featureList: ['Text to 3D', 'Material presets', 'Interactive orbit', 'PNG export', 'GLB export'],
+    creator: { '@type': 'Organization', name: 'Pixelatmos', url: 'https://pixelatmos.com' },
+  })} />
+
+  <script type="application/ld+json" set:html={JSON.stringify({
+    '@context': 'https://schema.org',
+    '@type': 'HowTo',
+    name: 'How to make 3D text',
+    description: 'Turn a word into a 3D object in the browser and export it as an image or a 3D model.',
+    totalTime: 'PT1M',
+    tool: [{ '@type': 'HowToTool', name: 'Pixelatmos 3D Text Generator' }],
+    step: [
+      { '@type': 'HowToStep', position: 1, name: 'Type your word', text: 'Enter up to twelve characters — a name, a wordmark, an acronym.' },
+      { '@type': 'HowToStep', position: 2, name: 'Choose a material', text: 'Switch between presets like neon, chrome, gold and glass to change how the surface catches light.' },
+      { '@type': 'HowToStep', position: 3, name: 'Find the angle', text: 'Drag to orbit and scroll to zoom until the composition reads the way you want.' },
+      { '@type': 'HowToStep', position: 4, name: 'Export', text: 'Download a PNG of the view, or a GLB model for Blender, a game engine or AR.' },
+    ],
+  })} />
+
+  <Breadcrumbs items={[{ name: 'Creative Tools', href: '/creative-tools/' }, { name: '3D Tools', href: '/3d-tools/' }, { name: '3D Text Generator' }]} />
+
+  <!-- Hero -->
+  <section class="mb-6 border-2 border-black bg-brutal-dark-bg px-6 py-5 shadow-brutal md:px-8">
+    <h1 class="font-brutal text-2xl font-black uppercase tracking-tight text-white md:text-3xl">
+      3D <span class="text-brutal-neon-yellow">Text Generator</span>
+    </h1>
+    <p class="mt-2 font-mono text-xs text-gray-400">Type a word · pick a material · orbit · export.</p>
+    <p class="mt-1.5 font-mono text-[11px] uppercase tracking-wide text-brutal-neon-yellow">100% in your browser · no signup · no watermark · free</p>
+  </section>
+
+  <!-- Front-loaded definition: the most citable passage on the page. -->
+  <section class="mb-8 border-l-4 border-brutal-neon-yellow bg-brutal-dark-bg px-5 py-4">
+    <p class="font-mono text-[13px] leading-relaxed text-gray-300">
+      <strong class="text-white">The 3D Text Generator turns a word into a real 3D object in your browser.</strong>
+      Type up to twelve characters, pick a material — neon, chrome, gold, glass — and the letters are
+      extruded into geometry you can orbit and light. Export a PNG for a mockup, or a GLB model to
+      open in Blender, drop into a game engine, or view in AR. It is built for wordmarks, logos and
+      titles. Nothing is uploaded; the geometry is generated on your machine.
+    </p>
+  </section>
+
+  <Text3DGenerator client:only="react" />
+
+  <!-- How it works -->
+  <section class="mx-auto mt-12 max-w-3xl">
+    <h2 class="mb-4 font-brutal text-xl font-black uppercase tracking-tight text-white">How to make 3D text</h2>
+    <ol class="flex flex-col gap-3">
+      {[
+        { t: 'Type your word', d: 'Up to twelve characters. Short reads best in 3D — a rotated object loses legibility fast as the letter count climbs.' },
+        { t: 'Choose a material', d: 'Each preset changes how the surface handles light. Chrome and gold need a bright angle to read; neon and glass carry their own glow.' },
+        { t: 'Find the angle', d: 'Drag to orbit, scroll to zoom. A slight three-quarter view usually shows depth better than a straight-on shot.' },
+        { t: 'Export', d: 'PNG captures exactly what you see. GLB gives you the model itself, ready for Blender, Three.js or an AR viewer.' },
+      ].map((s, i) => (
+        <li class="flex gap-4 border-2 border-black bg-brutal-dark-bg p-4 shadow-brutal-sm">
+          <span class="grid h-7 w-7 shrink-0 place-items-center border-2 border-black bg-brutal-neon-yellow font-brutal text-sm font-black text-black">{i + 1}</span>
+          <div>
+            <h3 class="font-brutal text-sm font-black uppercase tracking-wide text-white">{s.t}</h3>
+            <p class="mt-1 font-mono text-[12px] leading-relaxed text-gray-400">{s.d}</p>
+          </div>
+        </li>
+      ))}
+    </ol>
+  </section>
+
+  <!-- Text vs SVG -->
+  <section class="mx-auto mt-12 max-w-3xl">
+    <h2 class="mb-4 font-brutal text-xl font-black uppercase tracking-tight text-white">Text or SVG?</h2>
+    <p class="mb-5 font-mono text-[13px] leading-relaxed text-gray-400">
+      This tool and the 3D Lab share an engine but solve different problems. Which one you want
+      depends on what you are starting from.
+    </p>
+    <div class="overflow-x-auto border-2 border-black shadow-brutal-sm">
+      <table class="w-full border-collapse bg-brutal-dark-bg font-mono text-[12px]">
+        <thead>
+          <tr class="border-b-2 border-black bg-black/40 text-left">
+            <th class="px-4 py-2.5 font-brutal text-[11px] uppercase tracking-wider text-brutal-neon-yellow">You have</th>
+            <th class="px-4 py-2.5 font-brutal text-[11px] uppercase tracking-wider text-brutal-neon-yellow">Use</th>
+            <th class="px-4 py-2.5 font-brutal text-[11px] uppercase tracking-wider text-brutal-neon-yellow">Because</th>
+          </tr>
+        </thead>
+        <tbody class="text-gray-400">
+          <tr class="border-b border-white/5">
+            <td class="px-4 py-2.5 font-bold text-white">A word or acronym</td>
+            <td class="px-4 py-2.5"><a href="/3d-text-generator/" class="text-brutal-neon-yellow">This tool</a></td>
+            <td class="px-4 py-2.5">Straight to geometry, one material for the whole wordmark.</td>
+          </tr>
+          <tr class="border-b border-white/5">
+            <td class="px-4 py-2.5 font-bold text-white">A logo as an SVG</td>
+            <td class="px-4 py-2.5"><a href="/3d-lab/" class="text-brutal-neon-cyan">3D Lab</a></td>
+            <td class="px-4 py-2.5">Every shape becomes its own layer, with its own depth and material.</td>
+          </tr>
+          <tr>
+            <td class="px-4 py-2.5 font-bold text-white">A heavy SVG</td>
+            <td class="px-4 py-2.5"><a href="/svg-optimizer/" class="text-brutal-neon-green">SVG Optimizer</a></td>
+            <td class="px-4 py-2.5">Clean it first — fewer stray nodes means cleaner geometry.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <FaqSection items={faqs} />
+
+  <!-- Related -->
+  <section class="mx-auto mt-12 max-w-3xl">
+    <h2 class="mb-4 font-brutal text-xl font-black uppercase tracking-tight text-white">Related</h2>
+    <div class="grid gap-3 sm:grid-cols-3">
+      {[
+        { href: '/3d-lab/', t: '3D Lab', d: 'Turn an SVG logo into layered 3D.' },
+        { href: '/3d-tools/', t: '3D Tools', d: 'Everything on the 3D side.' },
+        { href: '/blog/svg-to-3d-browser-guide/', t: 'SVG to 3D guide', d: 'The full walkthrough.' },
+      ].map((l) => (
+        <a href={l.href} class="group border-2 border-black bg-brutal-dark-bg p-4 shadow-brutal-sm transition-transform hover:-translate-y-0.5">
+          <h3 class="font-brutal text-sm font-black uppercase tracking-wide text-white group-hover:text-brutal-neon-yellow">{l.t}</h3>
+          <p class="mt-1 font-mono text-[11px] leading-relaxed text-gray-500">{l.d}</p>
+        </a>
+      ))}
+    </div>
+  </section>
+</AppLayout>
