@@ -1,9 +1,9 @@
 ---
 export const prerender = true;
-import AppLayout from '../layouts/AppLayout.astro';
-import Svg3DLab from '../components/Svg3DLab';
-import FaqSection from '../components/FaqSection.astro';
-import Breadcrumbs from '../components/Breadcrumbs.astro';
+import AppLayout from '../../layouts/AppLayout.astro';
+import Svg3DLab from '../../components/Svg3DLab';
+import FaqSection from '../../components/FaqSection.astro';
+import Breadcrumbs from '../../components/Breadcrumbs.astro';
 
 const faqs = [
   { q: 'Is the 3D Lab free?', a: 'Yes — it is completely free and needs no account or signup.' },
@@ -163,9 +163,9 @@ const canonicalUrl = new URL(Astro.url.pathname, Astro.site).href;
     <h2 class="mb-4 font-brutal text-xl font-black uppercase tracking-tight text-white">Related</h2>
     <div class="grid gap-3 sm:grid-cols-3">
       {[
+        { href: '/3d-lab/svg-to-3d/', t: 'SVG to 3D', d: 'The focused converter, with formats and troubleshooting.' },
+        { href: '/svg-optimizer/', t: 'SVG Optimizer', d: 'Clean the file before converting it.' },
         { href: '/blog/svg-to-3d-browser-guide/', t: 'SVG to 3D guide', d: 'The full walkthrough, step by step.' },
-        { href: '/ascii-lab/', t: 'ASCII Lab', d: 'Turn video into animated ASCII art.' },
-        { href: '/visual-protocol/', t: 'Visual Protocol', d: 'Decode any image like a creative director.' },
       ].map((l) => (
         <a href={l.href} class="group border-2 border-black bg-brutal-dark-bg p-4 shadow-brutal-sm transition-transform hover:-translate-y-0.5">
           <h3 class="font-brutal text-sm font-black uppercase tracking-wide text-white group-hover:text-brutal-neon-cyan">{l.t}</h3>

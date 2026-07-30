@@ -1,0 +1,185 @@
+---
+export const prerender = true;
+import AppLayout from '../../layouts/AppLayout.astro';
+import Svg3DLab from '../../components/Svg3DLab';
+import FaqSection from '../../components/FaqSection.astro';
+import Breadcrumbs from '../../components/Breadcrumbs.astro';
+
+/**
+ * Transactional landing for the SVG → 3D intent cluster.
+ *
+ * Deliberately distinct from /3d-lab/, which is the exploratory lab (text mode,
+ * feature tour). This page answers one question — "how do I convert this SVG
+ * into a 3D model?" — and leans on the pipeline framing, export formats and
+ * troubleshooting rather than repeating the lab's feature list.
+ */
+
+const faqs = [
+  { q: 'How do I convert an SVG to 3D?', a: 'Upload the SVG above. It is parsed in your browser, each shape is extruded into geometry, and the parts are stacked by depth. You then adjust any layer and export a GLB or PNG. No account, no upload to a server.' },
+  { q: 'Is this an SVG to GLB converter?', a: 'Yes — GLB is the primary export. It is the binary form of glTF, so one self-contained file carries the geometry and materials, and each SVG layer arrives as a named node you can select in Blender.' },
+  { q: 'Can I convert an SVG logo to 3D?', a: 'That is the main use case. A logo with distinct shapes converts best, because each shape becomes its own layer with its own depth — which is what makes the result read as a sculpted object instead of a flat slab.' },
+  { q: 'What is SVG extrusion?', a: 'Extrusion takes a flat 2D outline and pushes it along a third axis to give it thickness. A circle becomes a cylinder, a letter becomes a solid block. It is the step that turns vector paths into 3D geometry.' },
+  { q: 'Does it work with gradients?', a: 'Yes. Linear and radial gradients are read from the SVG and rebuilt as real textures on the 3D surface, plus a derived normal map so the gradient also affects how light falls across the shape.' },
+  { q: 'My SVG converted badly. What went wrong?', a: 'The usual causes are strokes that were never converted to outlines, text that was not converted to paths, and clipping masks. Flatten those in your vector editor first. Running the file through the SVG Optimizer also helps by removing stray nodes.' },
+  { q: 'Can I use the model commercially?', a: 'Yes. What you convert is yours, including for client work.' },
+];
+
+const title = 'SVG to 3D Converter — Turn Vector Files into 3D Models Free | Pixelatmos';
+const description =
+  'Convert SVG to 3D in your browser. Each shape becomes an editable layer with its own depth and material. Export GLB or PNG. Free, no upload, no signup.';
+const canonicalUrl = 'https://pixelatmos.com/3d-lab/svg-to-3d/';
+---
+
+<AppLayout title={title} description={description}>
+  <script type="application/ld+json" set:html={JSON.stringify({
+    '@context': 'https://schema.org',
+    '@type': 'WebApplication',
+    name: 'SVG to 3D Converter',
+    description,
+    url: canonicalUrl,
+    applicationCategory: 'DesignApplication',
+    operatingSystem: 'Web',
+    offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+    featureList: ['SVG to 3D conversion', 'SVG to GLB export', 'Per-layer extrusion depth', 'Gradient textures', 'Client-side processing'],
+    creator: { '@type': 'Organization', name: 'Pixelatmos', url: 'https://pixelatmos.com' },
+  })} />
+
+  <script type="application/ld+json" set:html={JSON.stringify({
+    '@context': 'https://schema.org',
+    '@type': 'HowTo',
+    name: 'How to convert an SVG to a 3D model',
+    description: 'Turn a vector file into 3D geometry in the browser and export it as GLB.',
+    totalTime: 'PT3M',
+    tool: [{ '@type': 'HowToTool', name: 'Pixelatmos SVG to 3D Converter' }],
+    supply: [{ '@type': 'HowToSupply', name: 'An SVG file' }],
+    step: [
+      { '@type': 'HowToStep', position: 1, name: 'Clean the vector', text: 'Outline strokes and convert text to paths in your editor, so every element is a real closed shape.' },
+      { '@type': 'HowToStep', position: 2, name: 'Upload it', text: 'Drop the SVG into the converter. It is parsed by your browser and never sent to a server.' },
+      { '@type': 'HowToStep', position: 3, name: 'Extrude', text: 'Each shape is given thickness and the parts are stacked by depth, so details sit in relief above the base.' },
+      { '@type': 'HowToStep', position: 4, name: 'Assign materials', text: 'Set depth, material and colour per layer. Gradients from the SVG carry through as textures.' },
+      { '@type': 'HowToStep', position: 5, name: 'Export GLB', text: 'Download a binary glTF with each layer as a named node, ready for Blender, a game engine or AR.' },
+    ],
+  })} />
+
+  <Breadcrumbs items={[{ name: 'Creative Tools', href: '/creative-tools/' }, { name: '3D Lab', href: '/3d-lab/' }, { name: 'SVG to 3D' }]} />
+
+  <!-- Hero -->
+  <section class="mb-6 border-2 border-black bg-brutal-dark-bg px-6 py-5 shadow-brutal md:px-8">
+    <h1 class="font-brutal text-2xl font-black uppercase tracking-tight text-white md:text-3xl">
+      SVG to <span class="text-brutal-neon-cyan">3D</span> converter
+    </h1>
+    <p class="mt-2 font-mono text-xs text-gray-400">Upload a vector file · get a real 3D model · export GLB.</p>
+    <p class="mt-1.5 font-mono text-[11px] uppercase tracking-wide text-brutal-neon-cyan">100% in your browser · no signup · your files never leave your device · free</p>
+  </section>
+
+  <!-- Front-loaded definition: the most citable passage on the page. -->
+  <section class="mb-8 border-l-4 border-brutal-neon-cyan bg-brutal-dark-bg px-5 py-4">
+    <p class="font-mono text-[13px] leading-relaxed text-gray-300">
+      <strong class="text-white">Converting an SVG to 3D means taking the flat outlines in a vector file and extruding them into geometry with real thickness.</strong>
+      This converter does it in the browser: it reads every shape in the SVG, gives each one its own
+      depth, stacks them so details sit in relief above the base, and carries the original colours and
+      gradients onto the 3D surfaces. The result exports as GLB — the standard 3D format — with each
+      SVG layer preserved as a named node. Nothing is uploaded.
+    </p>
+  </section>
+
+  <Svg3DLab client:only="react" />
+
+  <!-- The pipeline — the positioning that separates this from generic converters -->
+  <section class="mx-auto mt-12 max-w-3xl">
+    <h2 class="mb-4 font-brutal text-xl font-black uppercase tracking-tight text-white">Not a converter — a transformation pipeline</h2>
+    <p class="mb-5 font-mono text-[13px] leading-relaxed text-gray-400">
+      Most SVG-to-3D converters do one thing: push the whole drawing out by a fixed amount, producing
+      a flat slab shaped like your logo. This runs seven distinct stages, and you can intervene at any
+      of them. That is the difference between an extruded outline and something that reads as an object.
+    </p>
+    <ol class="flex flex-col gap-2.5">
+      {[
+        { t: 'Clean', d: 'Scripts and non-rendered regions are stripped; defs, masks and clip paths are skipped so they do not become stray geometry.' },
+        { t: 'Interpret', d: 'The file is segmented — by authored groups where they exist, otherwise per shape — and each element\'s fill is resolved, including gradient stops.' },
+        { t: 'Reconstruct depth', d: 'Bounding boxes are compared to work out what sits inside what. Disjoint siblings share a height; contained shapes rise above their parent.' },
+        { t: 'Extrude', d: 'Each shape becomes solid geometry with bevelled edges, at a curve resolution matched to the complexity of the file.' },
+        { t: 'Material', d: 'Colours come across as materials. Gradients become real textures plus a normal map derived from their luminance, so light responds to them.' },
+        { t: 'Sculpt', d: 'You adjust any layer — depth, material, colour, visibility — and only that layer is rebuilt, so the model stays responsive.' },
+        { t: 'Export', d: 'The model is rebuilt at high quality off-screen and written as a compressed GLB, so the download is crisper than the editing preview.' },
+      ].map((s, i) => (
+        <li class="flex gap-4 border-2 border-black bg-brutal-dark-bg p-3.5 shadow-brutal-sm">
+          <span class="grid h-6 w-6 shrink-0 place-items-center border-2 border-black bg-brutal-neon-cyan font-brutal text-[11px] font-black text-black">{i + 1}</span>
+          <div>
+            <h3 class="font-brutal text-sm font-black uppercase tracking-wide text-white">{s.t}</h3>
+            <p class="mt-0.5 font-mono text-[12px] leading-relaxed text-gray-400">{s.d}</p>
+          </div>
+        </li>
+      ))}
+    </ol>
+  </section>
+
+  <!-- Export formats -->
+  <section class="mx-auto mt-12 max-w-3xl">
+    <h2 class="mb-4 font-brutal text-xl font-black uppercase tracking-tight text-white">Which export format?</h2>
+    <div class="overflow-x-auto border-2 border-black shadow-brutal-sm">
+      <table class="w-full border-collapse bg-brutal-dark-bg font-mono text-[12px]">
+        <thead>
+          <tr class="border-b-2 border-black bg-black/40 text-left">
+            <th class="px-4 py-2.5 font-brutal text-[11px] uppercase tracking-wider text-brutal-neon-cyan">Format</th>
+            <th class="px-4 py-2.5 font-brutal text-[11px] uppercase tracking-wider text-brutal-neon-cyan">Best for</th>
+            <th class="px-4 py-2.5 font-brutal text-[11px] uppercase tracking-wider text-brutal-neon-cyan">Opens in</th>
+          </tr>
+        </thead>
+        <tbody class="text-gray-400">
+          <tr class="border-b border-white/5">
+            <td class="px-4 py-2.5 font-bold text-white">GLB</td>
+            <td class="px-4 py-2.5">The 3D model itself — animation, AR, further editing.</td>
+            <td class="px-4 py-2.5">Blender, Three.js, Babylon, Unity, Godot, AR viewers.</td>
+          </tr>
+          <tr>
+            <td class="px-4 py-2.5 font-bold text-white">PNG</td>
+            <td class="px-4 py-2.5">A still of the current view for mockups and social.</td>
+            <td class="px-4 py-2.5">Anything.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="mt-3 font-mono text-[12px] leading-relaxed text-gray-500">
+      GLB is chosen over OBJ because a single file carries geometry and materials together — an OBJ
+      needs a companion .mtl and separate texture files, which is a worse handoff.
+    </p>
+  </section>
+
+  <!-- Troubleshooting -->
+  <section class="mx-auto mt-12 max-w-3xl">
+    <h2 class="mb-4 font-brutal text-xl font-black uppercase tracking-tight text-white">If your SVG converts badly</h2>
+    <div class="grid gap-3 sm:grid-cols-2">
+      {[
+        ['Strokes disappear', 'A stroke is a line style, not a shape. Convert strokes to outlines in your editor so they become real closed paths.'],
+        ['Text vanishes', 'Text elements reference a font the converter cannot load. Convert text to paths before exporting.'],
+        ['Shapes look wrong', 'Clipping masks and filters are skipped rather than guessed at. Flatten them in your editor first.'],
+        ['Everything is one flat slab', 'The file is a single merged path. Split it into separate shapes so each can take its own depth.'],
+      ].map(([t, d]) => (
+        <div class="border-2 border-black bg-brutal-dark-bg p-4 shadow-brutal-sm">
+          <h3 class="font-brutal text-sm font-black uppercase tracking-wide text-brutal-neon-pink">{t}</h3>
+          <p class="mt-1.5 font-mono text-[12px] leading-relaxed text-gray-400">{d}</p>
+        </div>
+      ))}
+    </div>
+  </section>
+
+  <FaqSection items={faqs} />
+
+  <!-- Related -->
+  <section class="mx-auto mt-12 max-w-3xl">
+    <h2 class="mb-4 font-brutal text-xl font-black uppercase tracking-tight text-white">Related</h2>
+    <div class="grid gap-3 sm:grid-cols-3">
+      {[
+        { href: '/svg-optimizer/', t: 'SVG Optimizer', d: 'Clean the file first — fewer stray nodes, cleaner geometry.' },
+        { href: '/3d-text-generator/', t: '3D Text Generator', d: 'Starting from a word instead of a file.' },
+        { href: '/blog/svg-to-3d-browser-guide/', t: 'SVG to 3D guide', d: 'The long-form walkthrough.' },
+      ].map((l) => (
+        <a href={l.href} class="group border-2 border-black bg-brutal-dark-bg p-4 shadow-brutal-sm transition-transform hover:-translate-y-0.5">
+          <h3 class="font-brutal text-sm font-black uppercase tracking-wide text-white group-hover:text-brutal-neon-cyan">{l.t}</h3>
+          <p class="mt-1 font-mono text-[11px] leading-relaxed text-gray-500">{l.d}</p>
+        </a>
+      ))}
+    </div>
+  </section>
+</AppLayout>

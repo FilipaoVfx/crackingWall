@@ -43,9 +43,9 @@ export const SVG_TOOLS: ToolHub = {
       useWhen: 'A file from Figma or Illustrator is heavier than it should be.',
     },
     {
-      label: '3D Lab',
-      href: '/3d-lab/',
-      blurb: 'Turns each shape in an SVG into its own 3D layer with depth, material and colour. Exports PNG or GLB.',
+      label: 'SVG to 3D Converter',
+      href: '/3d-lab/svg-to-3d/',
+      blurb: 'Turns each shape in an SVG into its own 3D layer with depth, material and colour. Exports GLB or PNG.',
       useWhen: 'You want a flat logo or icon as a real 3D asset.',
     },
   ],
@@ -57,6 +57,7 @@ export const SVG_TOOLS: ToolHub = {
   ],
   guides: [
     { href: '/blog/svg-to-3d-browser-guide/', t: 'SVG to 3D', d: 'Turn any SVG into a 3D model, step by step.' },
+    { href: '/3d-lab/', t: '3D Lab', d: 'The full lab — text mode and layer sculpting.' },
   ],
 };
 
