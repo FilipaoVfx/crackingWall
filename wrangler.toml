@@ -1,4 +1,4 @@
-name = "crackingwall"
+name = "crackingwalldev2"
 compatibility_date = "2024-09-23"
 # expose_global_message_channel: React 19 SSR (react-dom/server) references
 # MessageChannel, which Workers only expose by default from compat date
